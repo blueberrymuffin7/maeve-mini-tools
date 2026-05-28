@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Sister Snake Cat Snack</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-night: #0d0b1b;
+      --bg-plum: #201439;
+      --panel: rgba(35, 28, 61, 0.88);
+      --panel-strong: rgba(58, 44, 91, 0.94);
+      --cream: #fff4da;
+      --lavender: #d9c5ff;
+      --pink: #ffbde7;
+      --hot-pink: #ff63b8;
+      --mint: #9cf2d7;
+      --yellow: #ffe082;
+      --grid: rgba(255, 244, 218, 0.08);
+      --shadow: rgba(5, 3, 13, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 14% 10%, rgba(255, 189, 231, 0.28), transparent 26%),
+        radial-gradient(circle at 88% 8%, rgba(156, 242, 215, 0.18), transparent 25%),
+        radial-gradient(circle at 50% 92%, rgba(255, 224, 130, 0.12), transparent 28%),
+        linear-gradient(145deg, var(--bg-plum), var(--bg-night) 72%);
+      padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    a { color: inherit; }
+
+    .sparkles, .sparkles::before, .sparkles::after {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.75) 0 1px, transparent 1.7px),
+        radial-gradient(circle, rgba(255,189,231,.55) 0 1px, transparent 1.8px);
+      background-size: 64px 64px, 109px 109px;
+      background-position: 8px 14px, 44px 30px;
+      opacity: .32;
+    }
+
+    .sparkles::before, .sparkles::after { content: ""; }
+    .sparkles::before { transform: rotate(9deg) scale(1.05); opacity: .24; }
+    .sparkles::after { transform: rotate(-11deg) scale(.95); opacity: .18; }
+
+    .shell {
+      position: relative;
+      width: min(1040px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: clamp(14px, 2.5vw, 22px);
+    }
+
+    header, .game-card, .instructions {
+      border: 1px solid rgba(255, 244, 218, 0.18);
+      background: linear-gradient(155deg, rgba(52, 39, 86, .9), rgba(22, 17, 42, .9));
+      border-radius: 28px;
+      box-shadow: 0 22px 55px var(--shadow), inset 0 1px 0 rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+    }
+
+    header {
+      display: grid;
+      gap: 10px;
+      padding: clamp(18px, 3vw, 30px);
+      overflow: hidden;
+    }
+
+    .back-link {
+      width: fit-content;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: var(--mint);
+      background: rgba(156, 242, 215, 0.1);
+      border: 1px solid rgba(156, 242, 215, 0.28);
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.25rem, 8vw, 5.1rem);
+      line-height: .92;
+      letter-spacing: -0.055em;
+      text-shadow: 0 10px 0 rgba(0,0,0,.18), 0 22px 34px rgba(0,0,0,.28);
+    }
+
+    .tagline {
+      max-width: 760px;
+      margin: 0;
+      color: var(--lavender);
+      font-size: clamp(1rem, 2.4vw, 1.22rem);
+      line-height: 1.5;
+    }
+
+    .game-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+      gap: clamp(14px, 3vw, 24px);
+      align-items: start;
+      padding: clamp(14px, 2.4vw, 24px);
+    }
+
+    .board-wrap {
+      display: grid;
+      gap: 12px;
+      place-items: center;
+    }
+
+    canvas {
+      width: min(88vw, 650px, 70vh);
+      height: min(88vw, 650px, 70vh);
+      max-width: 100%;
+      border-radius: 24px;
+      border: 3px solid rgba(255, 244, 218, 0.24);
+      background: #121026;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.04), 0 18px 38px rgba(0,0,0,.34);
+      image-rendering: pixelated;
+      touch-action: none;
+    }
+
+    .message {
+      min-height: 52px;
+      width: min(650px, 100%);
+      display: grid;
+      place-items: center;
+      padding: 10px 14px;
+      border-radius: 18px;
+      color: var(--yellow);
+      background: rgba(255, 224, 130, .1);
+      border: 1px dashed rgba(255, 224, 130, .34);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: .01em;
+    }
+
+    .side-panel {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat, .option-box {
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.13);
+    }
+
+    .label {
+      display: block;
+      color: var(--lavender);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .value {
+      display: block;
+      margin-top: 4px;
+      font-size: 2.05rem;
+      line-height: 1;
+      font-weight: 1000;
+      color: var(--cream);
+    }
+
+    .primary-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    button, .switch {
+      min-height: 54px;
+      border: 0;
+      border-radius: 18px;
+      color: var(--cream);
+      font: inherit;
+      font-weight: 1000;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.18), 0 10px 22px rgba(0,0,0,.22);
+    }
+
+    button:focus-visible, .switch:focus-visible {
+      outline: 3px solid rgba(255, 224, 130, .8);
+      outline-offset: 3px;
+    }
+
+    #restartBtn {
+      background: linear-gradient(180deg, var(--hot-pink), #b93589);
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: linear-gradient(180deg, rgba(156,242,215,.22), rgba(61,145,128,.28));
+      border: 1px solid rgba(156, 242, 215, .28);
+    }
+
+    .switch input {
+      width: 26px;
+      height: 26px;
+      accent-color: var(--mint);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(64px, 1fr));
+      gap: 10px;
+      align-items: center;
+      justify-items: stretch;
+      user-select: none;
+    }
+
+    .control-btn {
+      min-height: 72px;
+      font-size: 2rem;
+      background: linear-gradient(180deg, rgba(216,197,255,.33), rgba(99,76,156,.62));
+      border: 1px solid rgba(216,197,255,.28);
+    }
+
+    .control-btn[data-dir="up"] { grid-column: 2; }
+    .control-btn[data-dir="left"] { grid-column: 1; grid-row: 2; }
+    .control-btn[data-dir="right"] { grid-column: 3; grid-row: 2; }
+    .control-btn[data-dir="down"] { grid-column: 2; grid-row: 3; }
+    .cat-center {
+      grid-column: 2;
+      grid-row: 2;
+      display: grid;
+      place-items: center;
+      min-height: 72px;
+      border-radius: 18px;
+      background: rgba(255, 189, 231, .11);
+      border: 1px dashed rgba(255, 189, 231, .32);
+      font-size: 2rem;
+    }
+
+    .instructions {
+      padding: clamp(18px, 3vw, 26px);
+    }
+
+    .instructions h2 { margin: 0 0 10px; }
+    .instructions ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--lavender);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 860px) {
+      .game-card { grid-template-columns: 1fr; }
+      .side-panel { grid-template-columns: minmax(0, 1fr); }
+      canvas {
+        width: min(92vw, 620px, 62vh);
+        height: min(92vw, 620px, 62vh);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .control-btn { min-height: 66px; }
+      header, .game-card, .instructions { border-radius: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sparkles" aria-hidden="true"></div>
+  <main class="shell">
+    <header>
+      <a class="back-link" href="index.html">← Back to arcade</a>
+      <h1>Sister Snake Cat Snack</h1>
+      <p class="tagline">A ridiculous pixel snake starring a big sister face, a wiggly trail, and tiny cat snacks who absolutely did not sign up for this.</p>
+    </header>
+
+    <section class="game-card" aria-label="Sister Snake Cat Snack game">
+      <div class="board-wrap">
+        <canvas id="gameCanvas" width="600" height="600" aria-label="Sister Snake game board"></canvas>
+        <div id="message" class="message" role="status" aria-live="polite">Tap a direction or press an arrow key to begin. 🐱</div>
+      </div>
+
+      <aside class="side-panel" aria-label="Game controls and score">
+        <div class="stats">
+          <div class="stat">
+            <span class="label">Score</span>
+            <span id="score" class="value">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">High score</span>
+            <span id="highScore" class="value">0</span>
+          </div>
+        </div>
+
+        <div class="primary-actions">
+          <button id="restartBtn" type="button">Restart the big-face snake</button>
+          <label class="switch" for="sillyMode">
+            <span>Optional silly cat wiggle mode</span>
+            <input id="sillyMode" type="checkbox" checked />
+          </label>
+        </div>
+
+        <div class="controls" aria-label="Touch direction controls">
+          <button class="control-btn" type="button" data-dir="up" aria-label="Move up">▲</button>
+          <button class="control-btn" type="button" data-dir="left" aria-label="Move left">◀</button>
+          <div class="cat-center" aria-hidden="true">🐱</div>
+          <button class="control-btn" type="button" data-dir="right" aria-label="Move right">▶</button>
+          <button class="control-btn" type="button" data-dir="down" aria-label="Move down">▼</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="instructions">
+      <h2>How to play</h2>
+      <ul>
+        <li>Use the big buttons on iPad, or arrow keys on desktop, to steer sister snake around the grid.</li>
+        <li>Eat the 🐱 cats to grow longer and increase your score.</li>
+        <li>Avoid walls and your own snake body. Big sister face confidence does not prevent bonking.</li>
+        <li>Turn silly mode on if you want the cat snack to occasionally wiggle to a nearby square.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const sisterHead = new Image();
+    sisterHead.src = "assets/sister-head.png";
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const highScoreEl = document.getElementById("highScore");
+    const messageEl = document.getElementById("message");
+    const restartBtn = document.getElementById("restartBtn");
+    const sillyModeEl = document.getElementById("sillyMode");
+    const controlButtons = document.querySelectorAll(".control-btn");
+
+    const gridSize = 18;
+    const cellSize = canvas.width / gridSize;
+    const tickMs = 145;
+    const highScoreKey = "sisterSnakeHighScore";
+    const directions = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 }
+    };
+    const eatingMessages = [
+      "姐姐吃到一只小猫！",
+      "猫猫被大脸蛇盯上了。",
+      "蛇身变长，姐姐更嚣张。",
+      "小猫：喵？"
+    ];
+
+    let snake;
+    let food;
+    let direction;
+    let queuedDirection;
+    let score;
+    let highScore;
+    let gameTimer;
+    let running;
+    let gameOver;
+    let headReady = false;
+    let catWiggle = 0;
+
+    function loadHighScore() {
+      const saved = Number(window.localStorage.getItem(highScoreKey));
+      return Number.isFinite(saved) ? saved : 0;
+    }
+
+    function saveHighScore() {
+      if (score > highScore) {
+        highScore = score;
+        window.localStorage.setItem(highScoreKey, String(highScore));
+      }
+      highScoreEl.textContent = highScore;
+    }
+
+    function resetGame() {
+      snake = [
+        { x: 8, y: 9 },
+        { x: 7, y: 9 },
+        { x: 6, y: 9 }
+      ];
+      direction = { ...directions.right };
+      queuedDirection = { ...directions.right };
+      score = 0;
+      running = false;
+      gameOver = false;
+      catWiggle = 0;
+      scoreEl.textContent = score;
+      highScore = loadHighScore();
+      highScoreEl.textContent = highScore;
+      food = placeFood();
+      messageEl.textContent = "Tap a direction or press an arrow key to begin. 🐱";
+      stopTimer();
+      draw();
+    }
+
+    function stopTimer() {
+      window.clearInterval(gameTimer);
+      gameTimer = undefined;
+    }
+
+    function startGame() {
+      if (running || gameOver) return;
+      running = true;
+      gameTimer = window.setInterval(step, tickMs);
+    }
+
+    function setDirection(next) {
+      const desired = directions[next];
+      if (!desired || gameOver) return;
+      const wouldReverse = desired.x + direction.x === 0 && desired.y + direction.y === 0;
+      if (wouldReverse) return;
+      queuedDirection = { ...desired };
+      startGame();
+    }
+
+    function step() {
+      direction = { ...queuedDirection };
+      const currentHead = snake[0];
+      const nextHead = {
+        x: currentHead.x + direction.x,
+        y: currentHead.y + direction.y
+      };
+
+      if (hitWall(nextHead) || hitSnake(nextHead)) {
+        endGame();
+        return;
+      }
+
+      snake.unshift(nextHead);
+      if (nextHead.x === food.x && nextHead.y === food.y) {
+        score += 1;
+        scoreEl.textContent = score;
+        saveHighScore();
+        messageEl.textContent = eatingMessages[Math.floor(Math.random() * eatingMessages.length)];
+        food = placeFood();
+      } else {
+        snake.pop();
+        maybeMoveCat();
+      }
+
+      catWiggle += 1;
+      draw();
+    }
+
+    function endGame() {
+      gameOver = true;
+      running = false;
+      stopTimer();
+      saveHighScore();
+      messageEl.textContent = `Bonk! Big sister snake scored ${score}. Tap restart for revenge. 💥`;
+      draw();
+    }
+
+    function hitWall(point) {
+      return point.x < 0 || point.y < 0 || point.x >= gridSize || point.y >= gridSize;
+    }
+
+    function hitSnake(point) {
+      return snake.some(segment => segment.x === point.x && segment.y === point.y);
+    }
+
+    function placeFood() {
+      const openCells = [];
+      for (let y = 0; y < gridSize; y += 1) {
+        for (let x = 0; x < gridSize; x += 1) {
+          if (!snake.some(segment => segment.x === x && segment.y === y)) {
+            openCells.push({ x, y });
+          }
+        }
+      }
+      return openCells[Math.floor(Math.random() * openCells.length)] || { x: 2, y: 2 };
+    }
+
+    function maybeMoveCat() {
+      if (!sillyModeEl.checked || Math.random() > 0.16) return;
+      const options = [food, ...Object.values(directions).map(move => ({ x: food.x + move.x, y: food.y + move.y }))]
+        .filter(point => !hitWall(point) && !hitSnake(point));
+      food = options[Math.floor(Math.random() * options.length)] || food;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBoard();
+      drawFood();
+      drawSnakeBody();
+      drawHead();
+      if (gameOver) drawGameOverOverlay();
+    }
+
+    function drawBoard() {
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, "#191431");
+      gradient.addColorStop(1, "#0f0c20");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let y = 0; y < gridSize; y += 1) {
+        for (let x = 0; x < gridSize; x += 1) {
+          if ((x + y) % 2 === 0) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
+            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      ctx.strokeStyle = "rgba(255, 244, 218, 0.07)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= gridSize; i += 1) {
+        const p = i * cellSize;
+        ctx.beginPath();
+        ctx.moveTo(p, 0);
+        ctx.lineTo(p, canvas.height);
+        ctx.moveTo(0, p);
+        ctx.lineTo(canvas.width, p);
+        ctx.stroke();
+      }
+    }
+
+    function drawSnakeBody() {
+      snake.slice(1).forEach((segment, index) => {
+        const inset = 4;
+        const pulse = index % 2 === 0 ? 0 : 2;
+        const x = segment.x * cellSize + inset;
+        const y = segment.y * cellSize + inset;
+        const size = cellSize - inset * 2;
+        roundedRect(x, y + pulse, size, size - pulse, 10);
+        ctx.fillStyle = index % 2 === 0 ? "#ff8bd3" : "#9cf2d7";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 244, 218, .45)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(255, 244, 218, .45)";
+        ctx.fillRect(x + size * .28, y + size * .28, 5, 5);
+      });
+    }
+
+    function drawFood() {
+      const wiggle = sillyModeEl.checked ? Math.sin(catWiggle * 0.8) * 4 : 0;
+      const x = food.x * cellSize + cellSize / 2;
+      const y = food.y * cellSize + cellSize / 2 + wiggle;
+
+      ctx.save();
+      ctx.font = `${Math.floor(cellSize * 0.92)}px Apple Color Emoji, Segoe UI Emoji, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(255, 224, 130, .65)";
+      ctx.shadowBlur = 15;
+      ctx.fillText("🐱", x, y);
+      ctx.restore();
+    }
+
+    function drawHead() {
+      const head = snake[0];
+      const headSize = cellSize * 1.52;
+      const x = head.x * cellSize + cellSize / 2 - headSize / 2;
+      const y = head.y * cellSize + cellSize / 2 - headSize / 2;
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, .5)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 7;
+      if (headReady) {
+        ctx.drawImage(sisterHead, x, y, headSize, headSize);
+      } else {
+        ctx.font = `${Math.floor(cellSize * 1.05)}px Apple Color Emoji, Segoe UI Emoji, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("😈", head.x * cellSize + cellSize / 2, head.y * cellSize + cellSize / 2);
+      }
+      ctx.restore();
+    }
+
+    function drawGameOverOverlay() {
+      ctx.save();
+      ctx.fillStyle = "rgba(13, 11, 27, .58)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#fff4da";
+      ctx.font = "900 42px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("BONK!", canvas.width / 2, canvas.height / 2 - 8);
+      ctx.font = "800 22px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillStyle = "#ffe082";
+      ctx.fillText("restart for more cat snack chaos", canvas.width / 2, canvas.height / 2 + 32);
+      ctx.restore();
+    }
+
+    function roundedRect(x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    sisterHead.addEventListener("load", () => {
+      headReady = true;
+      draw();
+    });
+
+    sisterHead.addEventListener("error", () => {
+      headReady = false;
+      messageEl.textContent = "Sister head hid from Safari, so the fallback chaos face is driving. 😈";
+      draw();
+    });
+
+    restartBtn.addEventListener("click", resetGame);
+
+    controlButtons.forEach(button => {
+      button.addEventListener("click", () => setDirection(button.dataset.dir));
+      button.addEventListener("touchstart", event => {
+        event.preventDefault();
+        setDirection(button.dataset.dir);
+      }, { passive: false });
+    });
+
+    window.addEventListener("keydown", event => {
+      const keyMap = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right"
+      };
+      if (keyMap[event.key]) {
+        event.preventDefault();
+        setDirection(keyMap[event.key]);
+      }
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>
