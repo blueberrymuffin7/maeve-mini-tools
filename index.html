@@ -108,7 +108,7 @@
     .cards {
       position: relative;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(14px, 3vw, 24px);
       margin-top: clamp(24px, 4vw, 38px);
     }
@@ -170,6 +170,7 @@
 
     .pup-card { background: radial-gradient(circle at 80% 16%, rgba(255,209,236,.25), transparent 30%), linear-gradient(155deg, rgba(73,54,105,.9), rgba(31,24,56,.9)); }
     .moon-card { background: radial-gradient(circle at 78% 14%, rgba(174,243,220,.18), transparent 33%), linear-gradient(155deg, rgba(53,49,95,.9), rgba(25,23,52,.9)); }
+    .study-card { background: radial-gradient(circle at 78% 14%, rgba(255, 223, 138, .18), transparent 33%), radial-gradient(circle at 18% 86%, rgba(158, 217, 255, .13), transparent 30%), linear-gradient(155deg, rgba(48, 45, 66, .92), rgba(20, 22, 34, .92)); }
 
     footer { position: relative; margin-top: 24px; color: rgba(201,190,232,.82); font-size: .95rem; }
 
@@ -183,12 +184,12 @@
   <div class="stars" aria-hidden="true"></div>
   <main>
     <section class="intro" aria-labelledby="hub-title">
-      <p class="eyebrow">✦ Maeve Mini Tools arcade</p>
-      <h1 id="hub-title">Tiny cozy games</h1>
-      <p>Choose a soft little world to visit. Your Moon Garden is preserved, and Pup has a brand-new room waiting with snacks, naps, magic, and secrets.</p>
+      <p class="eyebrow">✦ Maeve Mini Tools</p>
+      <h1 id="hub-title">Tiny cozy tools</h1>
+      <p>Choose a soft little world or practical helper to visit. Your Moon Garden is preserved, Pup has a magical room, and the Study Room is ready for focused work.</p>
     </section>
 
-    <section class="cards" aria-label="Game choices">
+    <section class="cards" aria-label="Mini tool choices">
       <a class="card moon-card" href="moon-garden.html">
         <span class="icon" aria-hidden="true">🌙</span>
         <span>
@@ -205,6 +206,15 @@
           <p>Raise Pup in a private magical room. Feed meal combos, unlock forms, and collect secret whispers.</p>
         </span>
         <span class="launch">Raise Pup →</span>
+      </a>
+
+      <a class="card study-card" href="study-room.html">
+        <span class="icon" aria-hidden="true">✦</span>
+        <span>
+          <h2>Pup Study Room</h2>
+          <p>A quiet focus room with timers, ambient sound, session logs, and a steady Pup companion.</p>
+        </span>
+        <span class="launch">Enter study room →</span>
       </a>
     </section>
 
