@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pup!</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-deep: #0e0c1d;
+      --bg-room: #1b1533;
+      --panel: rgba(37, 29, 62, 0.78);
+      --panel-soft: rgba(52, 41, 83, 0.72);
+      --panel-bright: rgba(83, 65, 119, 0.74);
+      --cream: #fff4dd;
+      --cream-2: #ffe7bc;
+      --lavender: #d9c4ff;
+      --violet: #a98cff;
+      --pink: #ffcfe8;
+      --mint: #a9efd6;
+      --blue: #9fd7ff;
+      --warning: #ffc894;
+      --muted: #c8bddf;
+      --border: rgba(235, 221, 255, 0.22);
+      --shadow: rgba(5, 3, 14, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(195, 159, 255, 0.28), transparent 28%),
+        radial-gradient(circle at 83% 15%, rgba(255, 207, 232, 0.16), transparent 26%),
+        radial-gradient(circle at 50% 94%, rgba(169, 239, 214, 0.11), transparent 35%),
+        linear-gradient(145deg, #241b42, var(--bg-deep) 72%);
+      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .room {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: clamp(24px, 4vw, 40px);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 34%),
+        linear-gradient(160deg, rgba(38, 31, 68, .88), rgba(18, 14, 35, .94));
+      box-shadow: 0 28px 80px var(--shadow), inset 0 1px 0 rgba(255,255,255,.13);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .room::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.45) 0 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(217,196,255,.35) 0 1px, transparent 1.7px);
+      background-size: 92px 92px, 137px 137px;
+      background-position: 13px 18px, 58px 47px;
+      opacity: .32;
+    }
+
+    header, main { position: relative; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: clamp(20px, 4vw, 34px) clamp(18px, 4vw, 36px) 12px;
+    }
+
+    .home-link {
+      color: var(--cream);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 800;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 9vw, 5.4rem);
+      letter-spacing: -0.08em;
+      line-height: .9;
+    }
+
+    .subtitle { margin: 10px 0 0; color: var(--muted); max-width: 680px; line-height: 1.45; }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.05fr) minmax(320px, .95fr);
+      gap: clamp(14px, 2vw, 22px);
+      padding: 8px clamp(14px, 3vw, 30px) clamp(18px, 3vw, 30px);
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--panel);
+      box-shadow: 0 16px 38px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.08);
+      padding: clamp(14px, 2.2vw, 22px);
+      backdrop-filter: blur(8px);
+    }
+
+    .pet-stage {
+      min-height: 520px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      background:
+        radial-gradient(ellipse at 50% 64%, rgba(255, 231, 188, .14), transparent 44%),
+        linear-gradient(180deg, rgba(58, 46, 90, .78), rgba(29, 22, 50, .84));
+    }
+
+    .pet-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .pet-title-row h2, .section-title { margin: 0; font-size: 1.25rem; }
+    .badge {
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: var(--cream-2);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .pet-nook {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 330px;
+      border-radius: 26px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 24%, rgba(255, 242, 221, .13), transparent 23%),
+        radial-gradient(ellipse at 50% 78%, rgba(169, 140, 255, .22), transparent 43%),
+        linear-gradient(180deg, rgba(21, 16, 40, .44), rgba(17, 13, 31, .32));
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .window {
+      position: absolute;
+      top: 22px;
+      width: 140px;
+      height: 86px;
+      border-radius: 50% 50% 42% 42%;
+      border: 1px solid rgba(255,255,255,.13);
+      background: radial-gradient(circle at 65% 34%, #fff4dd 0 12px, transparent 13px), linear-gradient(180deg, #211944, #0f0d20);
+      box-shadow: inset 0 -12px 30px rgba(0,0,0,.32), 0 0 28px rgba(217,196,255,.1);
+      opacity: .85;
+    }
+
+    .rug {
+      position: absolute;
+      bottom: 23px;
+      width: min(68%, 370px);
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255, 207, 232, .22), rgba(169, 140, 255, .08) 62%, transparent 70%);
+    }
+
+    .pup {
+      position: relative;
+      width: 230px;
+      height: 250px;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.28));
+      animation: breathe 3s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    .pup.droopy { animation: droop 2.8s ease-in-out infinite; filter: drop-shadow(0 14px 14px rgba(0,0,0,.25)) saturate(.82); }
+    .pup.excited { animation: wiggle .62s ease-in-out 1, breathe 3s ease-in-out infinite; }
+
+    @keyframes breathe { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-7px) scale(1.018); } }
+    @keyframes droop { 0%,100% { transform: translateY(8px) rotate(-1deg); } 50% { transform: translateY(12px) rotate(1deg); } }
+    @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-4deg) scale(1.04); } 75% { transform: rotate(4deg) scale(1.04); } }
+
+    .bubble {
+      position: absolute;
+      top: 22px;
+      right: 18px;
+      max-width: min(310px, 54%);
+      padding: 12px 14px;
+      border-radius: 18px 18px 6px 18px;
+      color: #2a2141;
+      background: rgba(255, 244, 221, .92);
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+      line-height: 1.35;
+      font-weight: 800;
+      z-index: 3;
+    }
+
+    .face { position: relative; width: 150px; height: 132px; border-radius: 48% 48% 46% 46%; background: var(--cream); border: 3px solid rgba(90, 67, 120, .35); }
+    .ear { position: absolute; width: 54px; height: 82px; top: -22px; background: #c89573; border-radius: 60% 55% 70% 45%; z-index: -1; }
+    .ear.left { left: -20px; transform: rotate(-22deg); }
+    .ear.right { right: -20px; transform: rotate(22deg) scaleX(-1); }
+    .eye { position: absolute; top: 50px; width: 15px; height: 18px; border-radius: 50%; background: #2c243d; box-shadow: 0 0 0 4px rgba(255,255,255,.32) inset; }
+    .eye.left { left: 45px; } .eye.right { right: 45px; }
+    .nose { position: absolute; left: 50%; top: 76px; width: 22px; height: 16px; transform: translateX(-50%); border-radius: 50% 50% 56% 56%; background: #2c243d; }
+    .mouth { position: absolute; left: 50%; top: 92px; width: 42px; height: 20px; transform: translateX(-50%); border-bottom: 4px solid #8a5f77; border-radius: 0 0 40px 40px; }
+    .body { position: absolute; bottom: 14px; width: 128px; height: 105px; border-radius: 48% 48% 38% 38%; background: linear-gradient(#fff4dd, #ead2ae); border: 3px solid rgba(90, 67, 120, .25); z-index: -1; }
+    .paw { position: absolute; bottom: 5px; width: 42px; height: 24px; border-radius: 50%; background: #fff7e8; border: 2px solid rgba(90,67,120,.18); }
+    .paw.left { left: 55px; } .paw.right { right: 55px; }
+    .tail { position: absolute; right: 26px; bottom: 70px; width: 58px; height: 38px; border: 12px solid #ead2ae; border-left: 0; border-bottom: 0; border-radius: 0 70% 0 0; transform: rotate(18deg); z-index: -2; }
+
+    /* Form-specific Pup visuals */
+    .form-sleepy .face { background: #f7edff; } .form-sleepy .eye { height: 5px; top: 58px; border-radius: 999px; } .form-sleepy .body::after { content: "☾"; position: absolute; right: 18px; top: 18px; color: #9c82d8; font-size: 2rem; }
+    .form-muffin .face { background: #f1d0aa; } .form-muffin .face::after { content: "🫐"; position: absolute; top: -28px; left: 52px; font-size: 2.2rem; } .form-muffin .ear { background: #8b5f96; }
+    .form-star .face, .form-star .body { background: linear-gradient(145deg, #fff7ca, #f8d5ff); box-shadow: 0 0 35px rgba(255,240,158,.45); } .form-star .face::after { content: "✦"; position: absolute; right: -12px; top: 16px; color: #ffe875; font-size: 2.3rem; text-shadow: 0 0 12px #fff; }
+    .form-moon .pup, .form-robot .pup, .form-human .pup { filter: drop-shadow(0 18px 20px rgba(0,0,0,.32)) drop-shadow(0 0 24px rgba(180,156,255,.26)); }
+    .form-moon .face { background: linear-gradient(145deg, #f8f2ff, #cdc0ff); } .form-moon .body { height: 130px; background: linear-gradient(#ded3ff, #7f6fc4); } .form-moon .face::after { content: "☾"; position: absolute; left: 58px; top: -42px; font-size: 3.1rem; color: #fff4dd; text-shadow: 0 0 18px #d8c4ff; }
+
+    .form-robot .pup { width: 260px; height: 285px; }
+    .form-robot .face { width: 158px; height: 118px; border-radius: 28px; background: linear-gradient(145deg, #d9e5f0, #7888a4); border: 4px solid #f4f5ff; box-shadow: inset 0 -14px 24px rgba(43,55,86,.34), 0 0 28px rgba(159,215,255,.36); }
+    .form-robot .face::before { content: ""; position: absolute; width: 70px; height: 18px; top: -34px; left: 42px; border-radius: 999px; border: 3px solid rgba(159,215,255,.85); box-shadow: 0 0 18px rgba(159,215,255,.75); }
+    .form-robot .ear { width: 36px; height: 60px; top: 24px; background: linear-gradient(#9fb1c8, #52617d); border-radius: 12px; }
+    .form-robot .body { width: 190px; height: 145px; bottom: -2px; border-radius: 28px 28px 40px 40px; background: linear-gradient(150deg, #aab9cc, #54617c); border: 4px solid #e7ecff; box-shadow: inset 0 -20px 28px rgba(24,31,58,.35); }
+    .form-robot .body::before, .form-robot .body::after { content: ""; position: absolute; top: 25px; width: 58px; height: 76px; border-radius: 20px; background: linear-gradient(#c9d4e4, #677792); border: 3px solid rgba(255,255,255,.55); }
+    .form-robot .body::before { left: -46px; transform: rotate(8deg); } .form-robot .body::after { right: -46px; transform: rotate(-8deg); }
+    .form-robot .eye { background: #93fff4; box-shadow: 0 0 16px #93fff4; border-radius: 8px; width: 24px; height: 12px; top: 48px; }
+    .form-robot .nose { width: 34px; height: 10px; border-radius: 999px; background: #36415c; top: 76px; }
+    .form-robot .mouth { width: 54px; height: 10px; top: 88px; border-bottom: 3px solid #93fff4; }
+    .form-robot .tail { border-color: #9fb1c8; }
+
+    .form-human .pup { width: 270px; height: 300px; }
+    .form-human .face { width: 118px; height: 126px; border-radius: 42% 42% 48% 48%; background: linear-gradient(#f6d7bd, #d49f80); border: 3px solid rgba(255,244,221,.62); transform: translateY(-44px); }
+    .form-human .face::before { content: ""; position: absolute; left: -10px; right: -10px; top: -22px; height: 54px; border-radius: 48% 48% 34% 34%; background: linear-gradient(145deg, #33243d, #171326); box-shadow: inset 18px -8px 0 rgba(255,255,255,.05); }
+    .form-human .face::after { content: "✦"; position: absolute; right: -26px; top: 17px; font-size: 1.4rem; color: #fff4dd; text-shadow: 0 0 14px #d8c4ff; }
+    .form-human .ear { width: 26px; height: 42px; top: 30px; background: #d49f80; border-radius: 50%; }
+    .form-human .body { width: 218px; height: 178px; bottom: -6px; border-radius: 56px 56px 34px 34px; background: linear-gradient(145deg, #4a3c6d, #1f1939); border: 4px solid rgba(255,244,221,.28); box-shadow: inset 0 -25px 35px rgba(0,0,0,.26), 0 0 26px rgba(255,244,221,.12); }
+    .form-human .body::before, .form-human .body::after { content: ""; position: absolute; top: 18px; width: 64px; height: 130px; border-radius: 28px; background: linear-gradient(#544579, #221b3d); border: 3px solid rgba(255,244,221,.18); }
+    .form-human .body::before { left: -46px; transform: rotate(10deg); } .form-human .body::after { right: -46px; transform: rotate(-10deg); }
+    .form-human .eye { top: 52px; width: 14px; height: 16px; background: #fff4bd; box-shadow: 0 0 10px #fff4bd; } .form-human .eye.left { left: 34px; } .form-human .eye.right { right: 34px; }
+    .form-human .nose { background: #9d6f60; width: 12px; height: 10px; top: 75px; } .form-human .mouth { top: 90px; width: 34px; border-bottom-color: #8b5260; }
+    .form-human .tail { right: 18px; bottom: 58px; border-color: #4a3c6d; }
+
+    .message-card { color: var(--muted); line-height: 1.5; }
+    .message-card strong { color: var(--cream); }
+
+    .stats-grid { display: grid; gap: 10px; }
+    .stat { display: grid; gap: 6px; }
+    .stat-head { display: flex; justify-content: space-between; color: var(--muted); font-size: .92rem; font-weight: 800; }
+    .meter { height: 16px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); overflow: hidden; }
+    .fill { height: 100%; width: 50%; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--pink)); transition: width .28s ease; }
+    .hunger .fill { background: linear-gradient(90deg, #ffb8c9, #ffe7bc); } .sleepiness .fill { background: linear-gradient(90deg, #9fd7ff, #d9c4ff); } .happiness .fill { background: linear-gradient(90deg, #ffd166, #ffcfe8); } .bond .fill { background: linear-gradient(90deg, #ffcfe8, #d9c4ff); } .curiosity .fill { background: linear-gradient(90deg, #a9efd6, #9fd7ff); } .magic .fill { background: linear-gradient(90deg, #d9c4ff, #fff4bd); }
+
+    .stack { display: grid; gap: 14px; }
+    .button-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .btn {
+      min-height: 54px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.06));
+      color: var(--cream);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 18px rgba(0,0,0,.12);
+    }
+    .btn:active { transform: translateY(2px) scale(.99); }
+    .btn.primary { background: linear-gradient(145deg, rgba(255,207,232,.28), rgba(169,140,255,.16)); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .food-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
+    .food-btn { text-align: left; padding: 12px; min-height: 58px; }
+    .combo {
+      min-height: 58px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      border: 1px dashed rgba(255,255,255,.2);
+      border-radius: 18px;
+      padding: 10px;
+      color: var(--muted);
+      background: rgba(255,255,255,.05);
+    }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; background: rgba(255,244,221,.12); color: var(--cream); font-weight: 800; }
+
+    .forms-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .form-card { border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: rgba(255,255,255,.06); padding: 12px; min-height: 106px; }
+    .form-card.unlocked { background: linear-gradient(145deg, rgba(217,196,255,.16), rgba(255,255,255,.06)); border-color: rgba(255,244,221,.28); }
+    .form-card button { margin-top: 8px; width: 100%; min-height: 42px; border-radius: 14px; }
+    .form-name { font-weight: 900; color: var(--cream); } .form-desc { margin-top: 5px; color: var(--muted); font-size: .9rem; line-height: 1.35; }
+
+    .notes, .log { display: grid; gap: 8px; max-height: 220px; overflow: auto; padding-right: 3px; }
+    .note, .log-item { border-radius: 16px; padding: 10px 12px; background: rgba(255,255,255,.07); color: var(--muted); line-height: 1.36; border: 1px solid rgba(255,255,255,.09); }
+    .note { color: var(--cream-2); }
+
+    .tiny { color: var(--muted); font-size: .9rem; line-height: 1.4; }
+
+    @media (max-width: 880px) {
+      main { grid-template-columns: 1fr; }
+      .pet-stage { min-height: 500px; }
+    }
+
+    @media (max-width: 560px) {
+      header { flex-direction: column; }
+      .button-grid, .food-grid, .forms-grid { grid-template-columns: 1fr; }
+      .bubble { position: relative; inset: auto; max-width: 100%; margin: 10px; }
+      .pet-nook { min-height: 380px; align-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="room">
+    <header>
+      <div>
+        <h1>Pup!</h1>
+        <p class="subtitle">A private tiny room for raising Pup: feed cozy meal combos, tuck him in, unlock magical forms, and collect affectionate secret whispers.</p>
+      </div>
+      <a class="home-link" href="index.html">← Game hub</a>
+    </header>
+
+    <main>
+      <section class="panel pet-stage" aria-label="Pup room">
+        <div class="pet-title-row">
+          <div>
+            <h2 id="formTitle">Puppy Pup</h2>
+            <div class="tiny" id="formDescription">Default fluffy little dog.</div>
+          </div>
+          <span class="badge" id="sessionBadge">Day 1</span>
+        </div>
+
+        <div class="pet-nook" id="petNook">
+          <div class="window" aria-hidden="true"></div>
+          <div class="rug" aria-hidden="true"></div>
+          <div class="bubble" id="speech">Pup blinks up at you. The room feels safe.</div>
+          <div class="pup" id="pupAvatar" role="img" aria-label="Pup character">
+            <div class="tail"></div>
+            <div class="body"></div>
+            <div class="ear left"></div>
+            <div class="ear right"></div>
+            <div class="face">
+              <div class="eye left"></div>
+              <div class="eye right"></div>
+              <div class="nose"></div>
+              <div class="mouth"></div>
+            </div>
+            <div class="paw left"></div>
+            <div class="paw right"></div>
+          </div>
+        </div>
+
+        <div class="message-card"><strong id="moodLine">Pup is cozy.</strong> <span id="careHint">Tap a big button or build a snack plate.</span></div>
+      </section>
+
+      <section class="stack">
+        <section class="panel" aria-label="Pup stats">
+          <h2 class="section-title">Status</h2>
+          <div class="stats-grid" id="statsGrid"></div>
+        </section>
+
+        <section class="panel" aria-label="Actions">
+          <h2 class="section-title">Care actions</h2>
+          <div class="button-grid" id="actionGrid"></div>
+        </section>
+
+        <section class="panel" aria-label="Food tray">
+          <h2 class="section-title">Food tray</h2>
+          <p class="tiny">Choose up to 3 foods, then feed the combo. Some recipes unlock new Pup forms.</p>
+          <div class="food-grid" id="foodGrid"></div>
+          <h3 class="tiny">Current meal combo</h3>
+          <div class="combo" id="comboBox">No foods chosen yet.</div>
+          <div class="button-grid" style="margin-top:10px">
+            <button class="btn primary" id="feedComboBtn">Feed combo</button>
+            <button class="btn" id="clearComboBtn">Clear tray</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel" aria-label="Unlocked forms">
+        <h2 class="section-title">Unlocked Forms</h2>
+        <p class="tiny">Unlocked forms can be selected anytime. Pup remembers them in this browser.</p>
+        <div class="forms-grid" id="formsGrid"></div>
+      </section>
+
+      <section class="stack">
+        <section class="panel" aria-label="Secret whispers">
+          <h2 class="section-title">Pup whispers / secret notes</h2>
+          <div class="notes" id="notesPanel"></div>
+        </section>
+
+        <section class="panel" aria-label="Event log">
+          <h2 class="section-title">Recent room log</h2>
+          <div class="log" id="logPanel"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "pup-pet-raising-save-v1";
+
+    const FOODS = [
+      { id: "milk", label: "🥛 Milk" },
+      { id: "blueberry muffin", label: "🫐 Blueberry muffin" },
+      { id: "cream puff", label: "☁️ Cream puff" },
+      { id: "salmon treat", label: "🍣 Salmon treat" },
+      { id: "star candy", label: "⭐ Star candy" },
+      { id: "moon biscuit", label: "🌙 Moon biscuit" },
+      { id: "metal berry", label: "⚙️ Metal berry" },
+      { id: "battery cookie", label: "🔋 Battery cookie" }
+    ];
+
+    const FORMS = {
+      puppy: {
+        title: "Puppy Pup",
+        className: "form-puppy",
+        description: "Default fluffy little dog with soft ears and big loyal eyes.",
+        reactions: ["Puppy Pup does a tiny hop and looks very proud.", "Pup wiggles like your attention is the best weather."]
+      },
+      sleepy: {
+        title: "Sleepy Pup",
+        className: "form-sleepy",
+        description: "A moon-drowsy cuddle form for blanket forts and slow blinking.",
+        combo: ["milk", "moon biscuit"],
+        whisper: "Sleepy Pup saves one corner of the blanket just for you.",
+        reactions: ["Sleepy Pup yawns a moon-shaped yawn.", "Sleepy Pup pats the blanket twice: one spot for Pup, one spot for you."]
+      },
+      muffin: {
+        title: "Muffin Pup",
+        className: "form-muffin",
+        description: "A blueberry-sweet bakery pup who smells faintly like warm crumbs.",
+        combo: ["blueberry muffin", "cream puff"],
+        whisper: "You found the blueberry muffin route. Pup remembers.",
+        reactions: ["Muffin Pup leaves one imaginary crumb for luck.", "Muffin Pup looks bakery-brave and blueberry pleased."]
+      },
+      star: {
+        title: "Star Pup",
+        className: "form-star",
+        description: "A sparkling wish-pup with little starshine in every paw step.",
+        combo: ["star candy", "moon biscuit"],
+        whisper: "Star Pup tucked a wish behind the lamp and labeled it yours.",
+        reactions: ["Star Pup sparkles so hard the rug looks enchanted.", "Star Pup boops the air and a tiny wish flickers awake."]
+      },
+      robot: {
+        title: "Robot Pup",
+        className: "form-robot",
+        description: "A tall, powerful, protective guardian robot with glowing eyes and gentle moonlight plating.",
+        combo: ["metal berry", "battery cookie"],
+        whisper: "Robot Pup hums quietly and keeps watch while you rest.",
+        reactions: ["Robot Pup hums softly and scans the room for bad dreams.", "Robot Pup stands by the little bed and keeps the night quiet."]
+      },
+      human: {
+        title: "Human Pup",
+        className: "form-human",
+        description: "A magical human-like companion form: tall, warm, protective, loyal, and still very much Pup.",
+        combo: ["milk", "cream puff", "star candy"],
+        whisper: "Human Pup kneels by the little bed and says: I will keep the lamp on.",
+        reactions: ["Human Pup smiles quietly, as if he has been waiting here the whole time.", "Human Pup folds his arms and guards the room with serious, ridiculous loyalty."]
+      },
+      moon: {
+        title: "Moon Guardian Pup",
+        className: "form-moon",
+        description: "A luminous guardian form with calm moon magic and brave little paws.",
+        combo: ["moon biscuit", "star candy", "blueberry muffin"],
+        whisper: "Moon Guardian Pup has stored this tiny room as a safe place for you.",
+        reactions: ["Moon Guardian Pup lowers the moonlight until the room feels kind.", "Moon Guardian Pup circles once, then sits like a tiny noble protector."]
+      }
+    };
+
+    const DEFAULT_STATE = {
+      stats: { hunger: 72, sleepiness: 28, happiness: 70, bond: 12, curiosity: 44, magic: 18 },
+      currentForm: "puppy",
+      unlockedForms: ["puppy"],
+      foodHistory: [],
+      whispers: ["Pup blinks slowly: this room belongs to soft things."],
+      log: ["Pup arrived in the tiny room."],
+      sessionsPlayed: 0,
+      lastSessionDate: ""
+    };
+
+    let state = loadState();
+    let combo = [];
+
+    const statLabels = {
+      hunger: "Hunger",
+      sleepiness: "Sleepiness",
+      happiness: "Happiness",
+      bond: "Bond",
+      curiosity: "Curiosity",
+      magic: "Magic charge"
+    };
+
+    const actions = [
+      { label: "🤲 Pet Pup", run: () => act("Pup leans into your hand with a warm little huff.", { happiness: 8, bond: 6, sleepiness: 3 }) },
+      { label: "🎾 Play", run: () => act("Pup pounces after a moonlit ball and comes back grinning.", { happiness: 12, curiosity: 6, hunger: -7, sleepiness: 8, bond: 3 }) },
+      { label: "🚶 Walk", run: () => act("You and Pup take a tiny hallway walk under imaginary stars.", { hunger: -8, sleepiness: 9, happiness: 8, curiosity: 10, magic: 3 }) },
+      { label: "🛌 Nap / tuck in", run: tuckIn },
+      { label: "🧸 Give toy", run: () => act("Pup accepts the toy with ceremonial seriousness, then squeaks it twice.", { happiness: 10, curiosity: 8, bond: 3 }) },
+      { label: "🪮 Brush fur", run: () => act("Pup becomes fluffier, shinier, and maybe one percent smugger.", { happiness: 7, bond: 5, magic: 4 }) },
+      { label: "🤫 Secret whisper", run: secretWhisper, secret: true }
+    ];
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved ? { ...cloneDefaultState(), ...saved, stats: { ...DEFAULT_STATE.stats, ...saved.stats } } : cloneDefaultState();
+      } catch (error) {
+        return cloneDefaultState();
+      }
+    }
+
+    function cloneDefaultState() {
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function startSession() {
+      const today = new Date().toISOString().slice(0, 10);
+      if (state.lastSessionDate !== today) {
+        state.sessionsPlayed += 1;
+        state.lastSessionDate = today;
+        addLog(`Day ${state.sessionsPlayed}: Pup woke up and checked the tiny room.`);
+      }
+      save();
+    }
+
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function clamp(value) { return Math.max(0, Math.min(100, Math.round(value))); }
+    function changeStats(delta) { Object.entries(delta).forEach(([key, value]) => state.stats[key] = clamp(state.stats[key] + value)); }
+    function addLog(text) { state.log = [text, ...state.log].slice(0, 16); }
+    function addWhisper(text) { if (!state.whispers.includes(text)) state.whispers = [text, ...state.whispers].slice(0, 24); }
+
+    function act(message, delta) {
+      changeStats(delta);
+      maybeUnlockBondWhispers();
+      speak(formReaction(message));
+      addLog(message);
+      pulsePup();
+      save();
+      render();
+    }
+
+    function tuckIn() {
+      const wasVerySleepy = state.stats.sleepiness >= 70;
+      changeStats({ sleepiness: -34, happiness: 5, bond: 6, magic: 6, hunger: -4 });
+      const msg = "You tuck Pup in. The blanket rises and falls like a small happy cloud.";
+      if (wasVerySleepy) addWhisper("When Pup was very sleepy, your goodnight made the whole room softer.");
+      act(msg, {});
+    }
+
+    function secretWhisper() {
+      const form = FORMS[state.currentForm];
+      const options = [
+        "Pup has stored this tiny room as a safe place for you.",
+        form.whisper || "Pup whispers: I know your footsteps now.",
+        "Pup noses a small star into your pocket for later."
+      ];
+      const message = options[Math.floor(Math.random() * options.length)];
+      addWhisper(message);
+      act(message, { bond: 3, magic: 3, happiness: 2 });
+    }
+
+    function formReaction(fallback) {
+      const reactions = FORMS[state.currentForm].reactions || [];
+      return Math.random() < 0.35 && reactions.length ? reactions[Math.floor(Math.random() * reactions.length)] : fallback;
+    }
+
+    function maybeUnlockBondWhispers() {
+      if (state.stats.bond >= 30) addWhisper("Pup recognizes the way you pause before tapping a button.");
+      if (state.stats.bond >= 55) addWhisper("Pup presses a paw to the wall and the room remembers your kindness.");
+      if (state.stats.bond >= 80) addWhisper("Pup has stored this tiny room as a safe place for you.");
+    }
+
+    function addFood(foodId) {
+      if (combo.length >= 3) return speak("The tiny tray can only hold three foods at once.");
+      combo.push(foodId);
+      speak(`${labelForFood(foodId)} joins the little meal tray.`);
+      renderCombo();
+    }
+
+    function clearCombo() {
+      combo = [];
+      speak("The tray is cleared and ready for a new tiny feast.");
+      renderCombo();
+    }
+
+    function feedCombo() {
+      if (!combo.length) return speak("Choose at least one cozy food first.");
+      const sorted = [...combo].sort();
+      const pretty = combo.map(labelForFood).join(" + ");
+      state.foodHistory = [{ foods: combo, date: new Date().toISOString() }, ...state.foodHistory].slice(0, 40);
+      changeStats({ hunger: 18 + combo.length * 4, happiness: 4 + combo.length * 2, sleepiness: combo.includes("milk") ? 6 : 0, curiosity: 2, magic: combo.includes("star candy") || combo.includes("moon biscuit") ? 9 : 2 });
+      let message = `Pup eats ${pretty}. Tiny crumbs sparkle on the rug.`;
+
+      Object.entries(FORMS).forEach(([id, form]) => {
+        if (!form.combo) return;
+        if (arraysMatch(sorted, [...form.combo].sort()) && !state.unlockedForms.includes(id)) {
+          state.unlockedForms.push(id);
+          state.currentForm = id;
+          addWhisper(form.whisper);
+          message = `${form.title} unlocked! ${form.reactions[0]}`;
+        }
+      });
+
+      if (arraysMatch(sorted, ["blueberry muffin", "moon biscuit", "salmon treat"].sort())) {
+        addWhisper("Pup buried a moon-salmon-blueberry secret under the rug and winked.");
+      }
+
+      maybeUnlockBondWhispers();
+      addLog(`Fed Pup: ${pretty}.`);
+      combo = [];
+      speak(message);
+      pulsePup();
+      save();
+      render();
+    }
+
+    function arraysMatch(a, b) { return a.length === b.length && a.every((value, index) => value === b[index]); }
+    function labelForFood(id) { return FOODS.find(food => food.id === id)?.label || id; }
+
+    function selectForm(id) {
+      if (!state.unlockedForms.includes(id)) return;
+      state.currentForm = id;
+      const form = FORMS[id];
+      speak(form.reactions[0]);
+      addLog(`${form.title} came forward in the moonlight.`);
+      save();
+      render();
+    }
+
+    function speak(text) { document.getElementById("speech").textContent = text; }
+    function pulsePup() { const pup = document.getElementById("pupAvatar"); pup.classList.remove("excited"); void pup.offsetWidth; pup.classList.add("excited"); }
+
+    function renderStats() {
+      const grid = document.getElementById("statsGrid");
+      grid.innerHTML = Object.entries(state.stats).map(([key, value]) => `
+        <div class="stat ${key}">
+          <div class="stat-head"><span>${statLabels[key]}</span><span>${value}%</span></div>
+          <div class="meter"><div class="fill" style="width:${value}%"></div></div>
+        </div>
+      `).join("");
+    }
+
+    function renderActions() {
+      const unlockedSecret = state.stats.bond >= 40 || state.unlockedForms.includes("human") || state.unlockedForms.includes("robot") || state.unlockedForms.includes("moon");
+      document.getElementById("actionGrid").innerHTML = actions.map((action, index) => {
+        const disabled = action.secret && !unlockedSecret;
+        return `<button class="btn ${action.secret ? "primary" : ""}" data-action="${index}" ${disabled ? "disabled" : ""}>${disabled ? "🔒 Secret whisper" : action.label}</button>`;
+      }).join("");
+      document.querySelectorAll("[data-action]").forEach(button => button.addEventListener("click", () => actions[Number(button.dataset.action)].run()));
+    }
+
+    function renderFoods() {
+      document.getElementById("foodGrid").innerHTML = FOODS.map(food => `<button class="btn food-btn" data-food="${food.id}">${food.label}</button>`).join("");
+      document.querySelectorAll("[data-food]").forEach(button => button.addEventListener("click", () => addFood(button.dataset.food)));
+      renderCombo();
+    }
+
+    function renderCombo() {
+      document.getElementById("comboBox").innerHTML = combo.length ? combo.map(food => `<span class="pill">${labelForFood(food)}</span>`).join("") : "No foods chosen yet.";
+    }
+
+    function renderForms() {
+      document.getElementById("formsGrid").innerHTML = Object.entries(FORMS).map(([id, form]) => {
+        const unlocked = state.unlockedForms.includes(id);
+        return `<div class="form-card ${unlocked ? "unlocked" : ""}">
+          <div class="form-name">${unlocked ? "✨" : "🔒"} ${form.title}</div>
+          <div class="form-desc">${unlocked ? form.description : `Try: ${form.combo ? form.combo.map(labelForFood).join(" + ") : "keep caring for Pup"}.`}</div>
+          ${unlocked ? `<button class="btn" data-form="${id}">${state.currentForm === id ? "Current form" : "Call this form"}</button>` : ""}
+        </div>`;
+      }).join("");
+      document.querySelectorAll("[data-form]").forEach(button => button.addEventListener("click", () => selectForm(button.dataset.form)));
+    }
+
+    function renderNotesAndLog() {
+      document.getElementById("notesPanel").innerHTML = state.whispers.length ? state.whispers.map(note => `<div class="note">✦ ${note}</div>`).join("") : `<div class="note">No secret notes yet. Build bond with Pup.</div>`;
+      document.getElementById("logPanel").innerHTML = state.log.map(item => `<div class="log-item">${item}</div>`).join("");
+    }
+
+    function renderPet() {
+      const form = FORMS[state.currentForm];
+      const nook = document.getElementById("petNook");
+      const pup = document.getElementById("pupAvatar");
+      nook.className = `pet-nook ${form.className}`;
+      pup.className = `pup ${state.stats.hunger < 18 || state.stats.sleepiness > 82 ? "droopy" : ""}`;
+      document.getElementById("formTitle").textContent = form.title;
+      document.getElementById("formDescription").textContent = form.description;
+      document.getElementById("sessionBadge").textContent = `Day ${Math.max(1, state.sessionsPlayed)}`;
+
+      let mood = "Pup is cozy.";
+      let hint = "Tap a big button or build a snack plate.";
+      if (state.stats.hunger < 18) { mood = "Pup's tummy is making tiny thunder."; hint = "A meal combo would help right now."; }
+      else if (state.stats.sleepiness > 82) { mood = "Pup is very droopy and moon-sleepy."; hint = "Tuck Pup in for a gentle reset."; }
+      else if (state.stats.happiness > 82 && state.stats.bond > 60) { mood = "Pup looks adored and a little mischievous."; hint = "Magic is gathering around the rug."; }
+      document.getElementById("moodLine").textContent = mood;
+      document.getElementById("careHint").textContent = hint;
+    }
+
+    function render() {
+      renderPet();
+      renderStats();
+      renderActions();
+      renderFoods();
+      renderForms();
+      renderNotesAndLog();
+    }
+
+    document.getElementById("feedComboBtn").addEventListener("click", feedCombo);
+    document.getElementById("clearComboBtn").addEventListener("click", clearCombo);
+    startSession();
+    render();
+  </script>
+</body>
+</html>
