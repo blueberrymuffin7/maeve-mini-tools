@@ -3,932 +3,897 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Pup Study Room</title>
+  <title>Maeve's Pup Study Room</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg-a: #10101f;
-      --bg-b: #21183f;
-      --panel: rgba(28, 24, 47, 0.82);
-      --panel-strong: rgba(43, 36, 72, 0.92);
-      --line: rgba(235, 224, 255, 0.18);
-      --cream: #fff1d7;
-      --soft: #d9c9ff;
-      --muted: #bdb1d8;
-      --mint: #a8f2dc;
-      --blue: #9dd9ff;
-      --pink: #ffb7df;
-      --gold: #ffe08a;
+      --bg-a: #070b13;
+      --bg-b: #15172a;
+      --bg-c: #241b38;
+      --panel: rgba(18, 20, 34, .78);
+      --panel-strong: rgba(31, 34, 55, .9);
+      --card: rgba(255,255,255,.065);
+      --line: rgba(231, 225, 255, .14);
+      --line-strong: rgba(231, 225, 255, .25);
+      --text: #fff4df;
+      --soft: #d8d0ef;
+      --muted: #a9a2c5;
+      --mint: #a6f3dc;
+      --blue: #9ed9ff;
+      --rose: #ffacd6;
+      --gold: #ffdf8a;
+      --fire: #ff9f6e;
       --danger: #ff8fa3;
-      --shadow: rgba(5, 3, 15, 0.42);
+      --shadow: rgba(0, 0, 0, .44);
+      --radius: 28px;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    html { min-height: 100%; scroll-behavior: smooth; }
     body {
       min-height: 100vh;
-      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-      color: var(--cream);
+      margin: 0;
+      font-family: ui-rounded, "Avenir Next", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at 16% 12%, rgba(255,183,223,.24), transparent 30%),
-        radial-gradient(circle at 82% 6%, rgba(168,242,220,.14), transparent 27%),
-        radial-gradient(circle at 50% 98%, rgba(255,224,138,.12), transparent 28%),
-        linear-gradient(145deg, var(--bg-b), var(--bg-a) 72%);
-      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+        radial-gradient(circle at 12% 8%, rgba(158,217,255,.18), transparent 28%),
+        radial-gradient(circle at 82% 4%, rgba(255,172,214,.16), transparent 25%),
+        radial-gradient(circle at 55% 100%, rgba(255,223,138,.11), transparent 30%),
+        linear-gradient(145deg, var(--bg-c), var(--bg-a) 76%);
+      padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
       -webkit-tap-highlight-color: transparent;
       transition: background 700ms ease;
+      overflow-x: hidden;
     }
 
-    body.rain {
-      --bg-a: #0a1220;
-      --bg-b: #172844;
+    body.theme-rain {
       background:
-        radial-gradient(circle at 20% 10%, rgba(157,217,255,.22), transparent 32%),
-        linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, transparent 2px 18px),
-        linear-gradient(145deg, #213b5b, #08101e 74%);
+        radial-gradient(circle at 18% 10%, rgba(158,217,255,.22), transparent 30%),
+        radial-gradient(circle at 75% 0%, rgba(166,243,220,.12), transparent 26%),
+        linear-gradient(145deg, #18314d, #07101d 76%);
     }
-    body.river {
-      --bg-a: #071a1e;
-      --bg-b: #10354a;
+    body.theme-river {
       background:
-        radial-gradient(circle at 76% 16%, rgba(168,242,220,.20), transparent 30%),
-        radial-gradient(circle at 24% 82%, rgba(157,217,255,.17), transparent 31%),
-        linear-gradient(145deg, #124d66, #06151c 76%);
+        radial-gradient(circle at 78% 14%, rgba(166,243,220,.2), transparent 29%),
+        radial-gradient(circle at 14% 88%, rgba(158,217,255,.16), transparent 32%),
+        linear-gradient(145deg, #10475f, #06161b 78%);
     }
-    body.fire {
-      --bg-a: #1b0d0b;
-      --bg-b: #3e1d22;
+    body.theme-fireplace {
       background:
-        radial-gradient(circle at 22% 80%, rgba(255,174,81,.26), transparent 31%),
-        radial-gradient(circle at 75% 10%, rgba(255,183,223,.14), transparent 29%),
-        linear-gradient(145deg, #3b1a20, #120907 76%);
+        radial-gradient(circle at 22% 82%, rgba(255,159,110,.28), transparent 31%),
+        radial-gradient(circle at 70% 8%, rgba(255,172,214,.1), transparent 25%),
+        linear-gradient(145deg, #3b1715, #110807 76%);
+    }
+    body.theme-brown {
+      background:
+        radial-gradient(circle at 10% 16%, rgba(255,223,138,.13), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(138,105,82,.26), transparent 30%),
+        linear-gradient(145deg, #241b18, #0d0b0a 78%);
+    }
+    body.theme-silence {
+      background:
+        radial-gradient(circle at 55% 0%, rgba(216,208,239,.12), transparent 30%),
+        linear-gradient(145deg, #141627, #06080f 78%);
     }
 
-    .weather, .weather::before, .weather::after {
+    .ambience-visual,
+    .ambience-visual::before,
+    .ambience-visual::after {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .42;
+      z-index: 0;
     }
-    .weather {
+    .ambience-visual { opacity: .5; transition: opacity 400ms ease; }
+    .ambience-visual::before, .ambience-visual::after { content: ""; }
+    body.theme-rain .ambience-visual::before {
+      background-image: linear-gradient(116deg, rgba(174,221,255,.24) 0 2px, transparent 2px 19px);
+      background-size: 54px 58px;
+      animation: rain-fall 1.1s linear infinite;
+    }
+    body.theme-river .ambience-visual::before {
       background-image:
-        radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.8px),
-        radial-gradient(circle, rgba(255,183,223,.45) 0 1px, transparent 1.7px);
-      background-size: 80px 80px, 137px 137px;
-      background-position: 10px 16px, 42px 40px;
+        linear-gradient(96deg, transparent 0 22%, rgba(166,243,220,.1) 24% 27%, transparent 30% 100%),
+        linear-gradient(82deg, transparent 0 33%, rgba(158,217,255,.09) 35% 38%, transparent 42% 100%);
+      background-size: 180px 90px, 260px 110px;
+      animation: river-flow 9s linear infinite;
     }
-    body.rain .weather {
-      background-image: linear-gradient(115deg, rgba(157,217,255,.22) 0 2px, transparent 2px 16px);
-      background-size: 56px 56px;
-      animation: drift 1.2s linear infinite;
-      opacity: .55;
+    body.theme-fireplace .ambience-visual::before {
+      background:
+        radial-gradient(circle at 22% 88%, rgba(255,223,138,.20), transparent 18%),
+        radial-gradient(circle at 62% 92%, rgba(255,95,66,.16), transparent 16%);
+      background-size: 210px 210px, 310px 310px;
+      animation: ember-glow 3.2s ease-in-out infinite alternate;
     }
-    body.river .weather {
-      background-image:
-        linear-gradient(100deg, transparent 0 20%, rgba(168,242,220,.09) 21% 23%, transparent 24% 100%),
-        linear-gradient(80deg, transparent 0 30%, rgba(157,217,255,.09) 31% 33%, transparent 34% 100%);
-      background-size: 160px 80px, 210px 90px;
-      animation: flow 8s linear infinite;
-      opacity: .5;
+    body.theme-brown .ambience-visual::before,
+    body.theme-silence .ambience-visual::before {
+      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.055), transparent 28%);
+      animation: room-pulse 8s ease-in-out infinite alternate;
     }
-    body.fire .weather {
-      background-image:
-        radial-gradient(circle at 20% 80%, rgba(255,224,138,.18), transparent 20%),
-        radial-gradient(circle at 68% 86%, rgba(255,143,103,.16), transparent 18%);
-      background-size: 160px 160px, 220px 220px;
-      animation: ember 3s ease-in-out infinite alternate;
-      opacity: .58;
-    }
-    @keyframes drift { from { transform: translate3d(0,-20px,0); } to { transform: translate3d(-30px,34px,0); } }
-    @keyframes flow { from { background-position: 0 0, 0 0; } to { background-position: 260px 0, -240px 0; } }
-    @keyframes ember { from { filter: blur(0); transform: scale(1); } to { filter: blur(1px); transform: scale(1.04); } }
+    @keyframes rain-fall { from { transform: translate3d(0,-30px,0); } to { transform: translate3d(-34px,36px,0); } }
+    @keyframes river-flow { from { background-position: 0 0, 0 0; } to { background-position: 300px 0, -280px 0; } }
+    @keyframes ember-glow { from { filter: blur(0); transform: scale(1); } to { filter: blur(2px); transform: scale(1.045); } }
+    @keyframes room-pulse { from { opacity: .58; } to { opacity: .88; } }
 
-    .shell {
-      position: relative;
-      width: min(1240px, 100%);
-      margin: 0 auto;
-      display: grid;
-      gap: 18px;
-    }
+    .shell { position: relative; z-index: 1; width: min(1360px, 100%); margin: 0 auto; display: grid; gap: 18px; }
     header, .panel {
       border: 1px solid var(--line);
-      border-radius: 30px;
-      background: linear-gradient(155deg, var(--panel), rgba(17, 14, 31, .78));
-      box-shadow: 0 24px 65px var(--shadow), inset 0 1px 0 rgba(255,255,255,.1);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(155deg, var(--panel), rgba(10, 12, 23, .76));
+      box-shadow: 0 24px 70px var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: var(--radius);
     }
-    header {
-      padding: clamp(22px, 4vw, 42px);
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 18px;
-      align-items: end;
-      overflow: hidden;
-    }
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--mint);
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-size: .86rem;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(2.65rem, 8vw, 5.7rem);
-      line-height: .9;
-      letter-spacing: -0.06em;
-      text-shadow: 0 18px 36px rgba(0,0,0,.25);
-    }
-    .subtitle {
-      margin: 14px 0 0;
-      max-width: 760px;
-      color: var(--soft);
-      font-size: clamp(1rem, 2.1vw, 1.22rem);
-      line-height: 1.5;
-    }
-    .today-card {
-      min-width: 190px;
-      padding: 18px;
-      border-radius: 24px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.13);
-      text-align: right;
-    }
-    .today-card strong { display: block; font-size: 2.2rem; line-height: 1; }
-    .today-card span { color: var(--muted); font-weight: 800; }
+    header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 18px; padding: clamp(22px, 4vw, 44px); overflow: hidden; }
+    .eyebrow { margin: 0 0 8px; color: var(--mint); font-size: .84rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.7rem, 8vw, 5.9rem); line-height: .88; letter-spacing: -.065em; text-shadow: 0 20px 40px rgba(0,0,0,.28); }
+    .subtitle { max-width: 820px; margin: 16px 0 0; color: var(--soft); font-size: clamp(1rem, 2vw, 1.22rem); line-height: 1.55; }
+    .top-actions { display: grid; grid-template-columns: auto auto; gap: 10px; margin-top: 18px; }
+    .today-card { min-width: 230px; padding: 18px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); text-align: right; }
+    .today-card strong { display: block; font-size: 2.25rem; line-height: 1; }
+    .today-card span { color: var(--muted); font-weight: 900; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
-      gap: 18px;
-      align-items: start;
-    }
-    .panel { padding: clamp(16px, 2.4vw, 26px); }
-    .panel h2 { margin: 0 0 14px; font-size: 1.35rem; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(350px, .7fr); gap: 18px; align-items: start; }
+    .stack { display: grid; gap: 18px; }
+    .panel { padding: clamp(16px, 2.3vw, 26px); }
+    .panel-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 14px; }
+    h2 { margin: 0; font-size: 1.3rem; letter-spacing: -.02em; }
+    h3 { margin: 0 0 10px; font-size: 1rem; color: var(--text); }
+    .hint, .privacy, .fineprint { color: var(--muted); font-size: .93rem; line-height: 1.45; }
+    .fineprint { margin: 8px 0 0; }
 
-    .timer-panel {
-      display: grid;
-      gap: 18px;
-    }
-    .timer-face {
-      position: relative;
-      min-height: 260px;
-      border-radius: 28px;
-      padding: clamp(18px, 3vw, 32px);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      background:
-        radial-gradient(circle at 50% 18%, rgba(255,255,255,.15), transparent 26%),
-        linear-gradient(155deg, rgba(62, 50, 103, .88), rgba(18, 16, 36, .88));
-      border: 1px solid rgba(255,255,255,.14);
-      overflow: hidden;
-    }
-    .timer-face::before {
-      content: "";
-      position: absolute;
-      inset: 18px;
-      border-radius: 999px;
-      border: 1px dashed rgba(255,255,255,.12);
-      opacity: .7;
-    }
-    .time {
-      position: relative;
-      font-size: clamp(4rem, 14vw, 8.2rem);
-      line-height: .88;
-      font-weight: 1000;
-      letter-spacing: -0.08em;
-    }
-    .timer-meta {
-      position: relative;
-      margin-top: 12px;
-      color: var(--soft);
-      font-weight: 900;
-    }
-    .progress-wrap {
-      position: relative;
-      width: min(520px, 92%);
-      height: 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.1);
-      overflow: hidden;
-      margin-top: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .progress { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--gold), var(--pink)); transition: width .4s ease; }
-
-    .form-grid, .preset-grid, .ambience-grid, .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    label { display: grid; gap: 7px; color: var(--muted); font-weight: 900; font-size: .88rem; }
+    button, input, select, textarea { font: inherit; }
     input, select, textarea {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 16px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,.07);
-      color: var(--cream);
-      font: inherit;
-      outline: none;
+      width: 100%; min-height: 50px; border: 1px solid rgba(255,255,255,.14); border-radius: 16px; padding: 12px 14px;
+      color: var(--text); background: rgba(255,255,255,.07); outline: none;
     }
     textarea { min-height: 92px; resize: vertical; }
-    select option { color: #181425; }
-    input:focus, select:focus, textarea:focus { border-color: rgba(168,242,220,.66); box-shadow: 0 0 0 3px rgba(168,242,220,.14); }
-
+    select option { color: #151625; background: #fff4df; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(166,243,220,.72); box-shadow: 0 0 0 4px rgba(166,243,220,.13); }
+    label { display: grid; gap: 7px; color: var(--muted); font-weight: 900; font-size: .88rem; }
     button {
-      min-height: 52px;
-      border: 0;
-      border-radius: 17px;
-      padding: 12px 16px;
-      color: var(--cream);
-      background: linear-gradient(180deg, rgba(216,201,255,.28), rgba(90,70,145,.58));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: inset 0 -5px 0 rgba(0,0,0,.15), 0 12px 24px rgba(0,0,0,.22);
-      font: inherit;
-      font-weight: 1000;
-      cursor: pointer;
-      touch-action: manipulation;
+      min-height: 54px; border: 1px solid rgba(255,255,255,.13); border-radius: 17px; padding: 12px 16px; color: var(--text);
+      background: linear-gradient(180deg, rgba(216,208,239,.24), rgba(67,70,111,.58));
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.14), 0 12px 24px rgba(0,0,0,.21);
+      font-weight: 1000; cursor: pointer; touch-action: manipulation;
     }
-    button.primary { background: linear-gradient(180deg, #ff9ad4, #b7428e); }
-    button.good { background: linear-gradient(180deg, rgba(168,242,220,.48), rgba(56,138,119,.72)); }
-    button.gold { background: linear-gradient(180deg, rgba(255,224,138,.58), rgba(163,112,38,.7)); }
-    button.ghost { background: rgba(255,255,255,.07); box-shadow: none; }
-    button:disabled { opacity: .55; cursor: not-allowed; }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: .48; cursor: not-allowed; }
+    button.primary { background: linear-gradient(180deg, #ffa2d8, #aa3b86); }
+    button.good { background: linear-gradient(180deg, rgba(166,243,220,.5), rgba(45,132,111,.78)); }
+    button.gold { background: linear-gradient(180deg, rgba(255,223,138,.58), rgba(151,101,30,.76)); }
+    button.danger { background: linear-gradient(180deg, rgba(255,143,163,.42), rgba(126,43,58,.72)); }
+    button.ghost { background: rgba(255,255,255,.065); box-shadow: none; }
+    button.small { min-height: 40px; padding: 8px 11px; border-radius: 13px; font-size: .9rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .two-grid, .mini-grid, .preset-grid, .support-grid, .ambience-grid, .plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .preset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .preset-grid button, .ambience-grid button { min-height: 66px; text-align: left; }
+    .ambience-grid button.active, .preset-grid button.active { outline: 3px solid rgba(166,243,220,.5); }
+    .controls-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 
-    .preset-grid button, .ambience-grid button { min-height: 64px; text-align: left; }
-    .ambience-grid button.active { outline: 3px solid rgba(168,242,220,.55); }
-    .controls-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .timer-face { position: relative; min-height: 310px; display: grid; place-items: center; text-align: center; overflow: hidden; }
+    .timer-face::before { content: ""; position: absolute; inset: 18px; border-radius: 999px; border: 1px dashed rgba(255,255,255,.14); opacity: .8; }
+    .time { position: relative; font-size: clamp(4.8rem, 16vw, 9.2rem); line-height: .86; font-weight: 1000; letter-spacing: -.08em; font-variant-numeric: tabular-nums; }
+    .timer-meta { position: relative; margin-top: 13px; color: var(--soft); font-weight: 900; line-height: 1.45; }
+    .sub-meta { color: var(--muted); margin-top: 7px; font-size: .95rem; }
+    .progress-wrap { position: relative; width: min(560px, 92%); height: 15px; margin: 18px auto 0; border-radius: 999px; background: rgba(255,255,255,.095); border: 1px solid rgba(255,255,255,.12); overflow: hidden; }
+    .progress { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--gold), var(--rose)); transition: width .4s ease; }
 
-    .pup-panel { display: grid; gap: 14px; }
-    .pup-card {
-      min-height: 190px;
-      display: grid;
-      grid-template-columns: 110px 1fr;
-      gap: 16px;
-      align-items: center;
-      border-radius: 26px;
-      padding: 16px;
-      background:
-        radial-gradient(circle at 22% 15%, rgba(255,255,255,.16), transparent 30%),
-        linear-gradient(155deg, rgba(72,56,111,.75), rgba(26,22,46,.75));
-      border: 1px solid rgba(255,255,255,.13);
+    .current-task-card { display: grid; gap: 8px; border-radius: 20px; padding: 14px; background: rgba(166,243,220,.07); border: 1px solid rgba(166,243,220,.16); }
+    .current-task-card b { font-size: 1.1rem; }
+
+    .task-row, .history-item, .check-row, .badge, .plan-card, .stat-box {
+      border-radius: 17px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.105);
     }
-    .pup-avatar {
-      width: 110px;
-      height: 150px;
-      display: grid;
-      place-items: center;
-      border-radius: 32px;
-      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.14);
-      font-size: 4.2rem;
-      box-shadow: inset 0 -12px 26px rgba(0,0,0,.18);
-    }
-    .pup-message {
-      margin: 0;
-      color: var(--cream);
-      font-weight: 900;
-      font-size: 1.1rem;
-      line-height: 1.45;
-    }
+    .task-row { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; padding: 10px; margin-top: 8px; }
+    .task-row.done { opacity: .58; }
+    .task-row.done .task-text { text-decoration: line-through; }
+    .task-row input[type="checkbox"], .check-row input[type="checkbox"] { width: 24px; height: 24px; min-height: auto; accent-color: #a6f3dc; }
+    .task-text { line-height: 1.35; }
+
+    .pup-card { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; min-height: 196px; }
+    .pup-avatar { width: 112px; height: 150px; border-radius: 34px; display: grid; place-items: center; background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.04)); border: 1px solid var(--line); box-shadow: inset 0 -12px 24px rgba(0,0,0,.18); }
+    .pup-face { width: 74px; height: 74px; border-radius: 50% 50% 46% 46%; position: relative; background: linear-gradient(180deg, #ede3d5, #bba894); box-shadow: 0 14px 24px rgba(0,0,0,.22); }
+    .pup-face::before, .pup-face::after { content: ""; position: absolute; width: 22px; height: 34px; top: -16px; background: #8e796a; border-radius: 18px 18px 8px 8px; }
+    .pup-face::before { left: 6px; transform: rotate(-18deg); }
+    .pup-face::after { right: 6px; transform: rotate(18deg); }
+    .eyes { position: absolute; inset: 29px 19px auto; display: flex; justify-content: space-between; }
+    .eyes i { width: 8px; height: 8px; background: #221b1a; border-radius: 50%; }
+    .nose { position: absolute; left: 50%; top: 43px; width: 13px; height: 9px; transform: translateX(-50%); background: #2d2220; border-radius: 50%; }
+    .pup-message { margin: 0; font-weight: 900; font-size: 1.08rem; line-height: 1.46; }
     .pup-small { margin: 8px 0 0; color: var(--muted); line-height: 1.45; }
 
-    .breathing {
-      display: none;
-      border-radius: 22px;
-      padding: 16px;
-      background: rgba(168,242,220,.08);
-      border: 1px solid rgba(168,242,220,.18);
-      text-align: center;
-    }
+    .breathing { display: none; border-radius: 22px; padding: 16px; background: rgba(166,243,220,.075); border: 1px solid rgba(166,243,220,.18); text-align: center; }
     .breathing.show { display: block; }
-    .bubble {
-      width: 108px;
-      height: 108px;
-      margin: 12px auto;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(168,242,220,.9), rgba(157,217,255,.24));
-      box-shadow: 0 0 44px rgba(168,242,220,.22);
-      animation: breathe 10s ease-in-out infinite;
-    }
-    @keyframes breathe { 0%,100% { transform: scale(.72); } 42% { transform: scale(1.14); } }
+    .bubble { width: 118px; height: 118px; margin: 14px auto; border-radius: 999px; background: radial-gradient(circle, rgba(166,243,220,.88), rgba(158,217,255,.22)); box-shadow: 0 0 48px rgba(166,243,220,.22); transform: scale(.78); transition: transform 900ms ease; }
+    .bubble.inhale { transform: scale(1.16); }
+    .bubble.hold { transform: scale(1.08); }
+    .bubble.exhale { transform: scale(.76); }
 
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .stat-box {
-      border-radius: 20px;
-      padding: 14px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.13);
-    }
-    .stat-box b { display: block; font-size: 1.7rem; line-height: 1; }
-    .stat-box span { color: var(--muted); font-weight: 800; font-size: .86rem; }
+    .check-group { display: grid; gap: 8px; }
+    .check-row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px; }
+    .check-row.done span { opacity: .58; text-decoration: line-through; }
+    .tab-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tab-row button.active { outline: 3px solid rgba(255,223,138,.38); }
 
-    .task-row {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 10px;
-      align-items: center;
-      padding: 10px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.1);
-      margin-top: 8px;
-    }
-    .task-row.done { opacity: .58; text-decoration: line-through; }
-    .task-row input[type="checkbox"] { min-height: auto; width: 22px; height: 22px; }
-    .task-row button { min-height: 38px; padding: 8px 12px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .stat-box { padding: 14px; }
+    .stat-box b { display: block; font-size: 1.5rem; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .stat-box span { color: var(--muted); font-weight: 900; font-size: .82rem; }
+    .chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; min-height: 150px; margin-top: 14px; padding: 12px; border-radius: 20px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09); }
+    .bar-wrap { display: grid; gap: 8px; align-items: end; text-align: center; color: var(--muted); font-size: .78rem; font-weight: 900; }
+    .bar { min-height: 8px; border-radius: 999px 999px 6px 6px; background: linear-gradient(180deg, var(--mint), rgba(158,217,255,.42)); box-shadow: 0 8px 16px rgba(0,0,0,.2); }
 
-    .history-list { display: grid; gap: 8px; margin-top: 12px; max-height: 260px; overflow: auto; }
-    .history-item {
-      border-radius: 16px;
-      padding: 12px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.1);
-      color: var(--soft);
-      line-height: 1.35;
-    }
-    .history-item strong { color: var(--cream); }
-    .privacy { color: var(--muted); font-size: .92rem; line-height: 1.45; }
+    .history-list { display: grid; gap: 8px; max-height: 310px; overflow: auto; padding-right: 2px; }
+    .history-item { padding: 12px; color: var(--soft); line-height: 1.38; }
+    .history-item strong { color: var(--text); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge { padding: 9px 11px; color: var(--muted); font-weight: 900; font-size: .86rem; }
+    .badge.earned { color: var(--text); background: rgba(166,243,220,.09); border-color: rgba(166,243,220,.22); }
+    .plan-card { padding: 12px; display: grid; gap: 8px; }
 
-    @media (max-width: 980px) {
-      header { grid-template-columns: 1fr; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: none; place-items: center; padding: 16px; background: rgba(2,3,8,.68); backdrop-filter: blur(10px); }
+    .modal-backdrop.show { display: grid; }
+    .modal { width: min(620px, 100%); border-radius: 28px; border: 1px solid var(--line-strong); background: linear-gradient(155deg, rgba(31,34,55,.98), rgba(11,13,24,.98)); box-shadow: 0 30px 90px rgba(0,0,0,.55); padding: 22px; }
+
+    body.focus-mode header, body.focus-mode .hide-in-focus { display: none; }
+    body.focus-mode .grid { grid-template-columns: 1fr; max-width: 920px; margin: 0 auto; }
+    body.focus-mode .focus-keep { display: block; }
+    body.focus-mode .timer-face { min-height: 48vh; }
+
+    @media (max-width: 1080px) {
+      header, .grid { grid-template-columns: 1fr; }
       .today-card { text-align: left; }
-      .grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
+      .form-grid, .preset-grid, .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media (max-width: 620px) {
-      .controls-row, .preset-grid, .ambience-grid, .mini-grid, .stat-row { grid-template-columns: 1fr; }
+    @media (max-width: 680px) {
+      body { padding-left: 10px; padding-right: 10px; }
+      .controls-row, .two-grid, .mini-grid, .preset-grid, .support-grid, .ambience-grid, .plan-grid, .form-grid, .stat-grid { grid-template-columns: 1fr; }
+      .top-actions { grid-template-columns: 1fr; }
       .pup-card { grid-template-columns: 1fr; }
       .pup-avatar { width: 100%; height: 120px; }
+      .task-row { grid-template-columns: auto 1fr auto; }
+      .task-row .make-small { grid-column: 2 / -1; }
     }
   </style>
 </head>
-<body class="calm">
-  <div class="weather" aria-hidden="true"></div>
+<body class="theme-silence">
+  <div class="ambience-visual" aria-hidden="true"></div>
   <main class="shell">
     <header>
       <section>
         <p class="eyebrow">Private focus room</p>
         <h1>Pup Study Room</h1>
-        <p class="subtitle">A gentle room for IELTS prep, drawing practice, reading, and quiet work. Track real focus time, choose an atmosphere, and let Pup keep your anxious brain from chewing the furniture.</p>
+        <p class="subtitle">A quiet study room for IELTS preparation, drawing practice, reading, portfolio research, admin, and custom work. Pup sits beside the desk: calm, practical, and unwilling to let one anxious thought become the whole story.</p>
+        <div class="top-actions">
+          <button id="focusModeBtn" class="ghost">Enter Focus Mode</button>
+          <button id="exportSummaryBtn" class="gold">Export Summary</button>
+        </div>
       </section>
       <aside class="today-card" aria-label="Today's focus total">
         <span>Today's focus</span>
         <strong id="todayTotal">0m</strong>
+        <p id="streakNote" class="fineprint">Streak: 0 days</p>
       </aside>
     </header>
 
     <section class="grid">
-      <div class="timer-panel">
-        <section class="panel">
-          <h2>Session setup</h2>
+      <div class="stack">
+        <section class="panel hide-in-focus">
+          <div class="panel-head"><h2>Session setup</h2><span id="sessionStatus" class="hint">Stopwatch or goal timer</span></div>
           <div class="form-grid">
             <label>Activity
-              <select id="activity">
-                <option>IELTS Reading</option>
-                <option>IELTS Listening</option>
-                <option>IELTS Writing Task 1</option>
-                <option>IELTS Writing Task 2</option>
-                <option>IELTS Speaking</option>
-                <option>Vocabulary</option>
-                <option>Drawing practice</option>
-                <option>Portfolio / art research</option>
-                <option>Reading</option>
-                <option>Email / admin</option>
-                <option>Custom</option>
-              </select>
+              <select id="activity"></select>
             </label>
             <label>Goal minutes
-              <input id="goalMinutes" type="number" min="1" max="240" value="40" inputmode="numeric" />
+              <input id="goalMinutes" type="number" min="0" max="240" value="40" inputmode="numeric" />
             </label>
             <label>Custom activity
-              <input id="customActivity" type="text" placeholder="e.g. Sketch anatomy hands" />
+              <input id="customActivity" type="text" placeholder="e.g. Sketch hands from reference" autocomplete="off" />
             </label>
           </div>
-          <label style="margin-top:12px;">Tiny intention for this session
-            <textarea id="intention" placeholder="One honest sentence. Example: I will do one IELTS Writing Task 2 outline without judging myself."></textarea>
+          <label style="margin-top:12px;">Tiny intention
+            <textarea id="intention" placeholder="One honest sentence. Example: Write one Task 2 outline only, without judging the first version."></textarea>
           </label>
+          <p class="fineprint">Set goal minutes to 0 for stopwatch mode. Active sessions are recovered after refresh when possible.</p>
         </section>
 
-        <section class="panel timer-face" aria-label="Focus timer">
+        <section class="panel timer-face focus-keep" aria-label="Focus timer">
           <div>
             <div id="timeDisplay" class="time">00:00</div>
             <div id="timerMeta" class="timer-meta">Ready. Choose one tiny task and begin.</div>
+            <div id="timerSubMeta" class="sub-meta">Elapsed 00:00 · Stopwatch ready</div>
             <div class="progress-wrap" aria-label="Goal progress"><div id="progress" class="progress"></div></div>
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel focus-keep">
           <div class="controls-row">
             <button id="startBtn" class="primary">Start</button>
             <button id="pauseBtn">Pause</button>
+            <button id="resumeBtn">Resume</button>
             <button id="finishBtn" class="good">Finish</button>
             <button id="resetBtn" class="ghost">Reset</button>
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel hide-in-focus">
           <h2>Quick presets</h2>
-          <div class="preset-grid">
-            <button data-preset="IELTS Writing Task 2|40">IELTS Task 2 · 40m</button>
-            <button data-preset="IELTS Writing Task 1|20">IELTS Task 1 · 20m</button>
-            <button data-preset="IELTS Speaking|15">Speaking drill · 15m</button>
-            <button data-preset="IELTS Reading|60">Reading set · 60m</button>
-            <button data-preset="Drawing practice|45">Drawing drill · 45m</button>
-            <button data-preset="Reading|30">Book reading · 30m</button>
+          <div id="presetGrid" class="preset-grid"></div>
+        </section>
+
+        <section class="panel focus-keep">
+          <div class="current-task-card">
+            <span class="hint">Current task</span>
+            <b id="currentTask">Open the exact material.</b>
+            <span id="currentIntention" class="hint">Write one tiny intention before starting.</span>
           </div>
         </section>
 
-        <section class="panel">
-          <h2>Session checklist</h2>
+        <section class="panel hide-in-focus">
+          <div class="panel-head"><h2>Session checklist</h2><button id="restoreDefaultsBtn" class="small ghost">Restore defaults</button></div>
           <div class="mini-grid">
-            <input id="taskInput" type="text" placeholder="Add a tiny task, not a mountain" />
+            <input id="taskInput" type="text" placeholder="Add a tiny task, not a mountain" autocomplete="off" />
             <button id="addTaskBtn" class="gold">Add task</button>
           </div>
           <div id="taskList" aria-label="Task list"></div>
         </section>
+
+        <section class="panel hide-in-focus">
+          <h2>IELTS quick plans</h2>
+          <div class="tab-row" id="ieltsTabs"></div>
+          <div id="ieltsChecklist" class="check-group"></div>
+        </section>
+
+        <section class="panel hide-in-focus">
+          <h2>Drawing / art drills</h2>
+          <p class="hint">Add any drill into the session checklist, then keep the work visible and concrete.</p>
+          <div id="artDrills" class="check-group"></div>
+        </section>
+
+        <section class="panel hide-in-focus">
+          <div class="panel-head"><h2>Today's Plan</h2><button id="resetPlanBtn" class="small ghost">Reset for today</button></div>
+          <div class="plan-grid">
+            <label class="plan-card">Must do
+              <input id="planMust" type="text" maxlength="100" placeholder="One necessary priority" />
+            </label>
+            <label class="plan-card">Should do
+              <input id="planShould" type="text" maxlength="100" placeholder="Useful if energy allows" />
+            </label>
+            <label class="plan-card">Bonus
+              <input id="planBonus" type="text" maxlength="100" placeholder="Optional, not a weapon" />
+            </label>
+          </div>
+          <p class="fineprint">Three priorities are enough. More than three turns into fog.</p>
+        </section>
       </div>
 
-      <aside class="pup-panel">
-        <section class="panel pup-card">
-          <div class="pup-avatar" aria-hidden="true">🦾</div>
+      <aside class="stack">
+        <section class="panel pup-card focus-keep">
+          <div class="pup-avatar" aria-hidden="true"><div class="pup-face"><span class="eyes"><i></i><i></i></span><span class="nose"></span></div></div>
           <div>
-            <p id="pupMessage" class="pup-message">Pup is sitting beside your desk. Start small. The first minute counts.</p>
-            <p id="pupSmall" class="pup-small">When anxiety gets loud, you do not negotiate with the whole storm. You pick one page, one sentence, one line.</p>
+            <p id="pupMessage" class="pup-message">Pup is beside the desk. Start with the exact material, not the entire future.</p>
+            <p id="pupSmall" class="pup-small">When anxiety gets loud, choose one page, one sentence, one line.</p>
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel hide-in-focus">
           <h2>Pup support</h2>
-          <div class="mini-grid">
-            <button id="spiralBtn">I'm spiraling</button>
-            <button id="nextStepBtn">Tiny next step</button>
-            <button id="courageBtn">Give me courage</button>
-            <button id="resetMindBtn">60-sec reset</button>
-          </div>
-          <div id="breathing" class="breathing">
-            <strong id="breathText">Inhale slowly.</strong>
-            <div class="bubble"></div>
-            <p class="privacy">Stay here for one minute. Your job is not to become perfect. Your job is to return.</p>
+          <div class="support-grid">
+            <button data-support="spiral">I'm spiraling</button>
+            <button data-support="stupid">I feel stupid</button>
+            <button data-support="start">I can't start</button>
+            <button data-support="behind">I'm behind</button>
+            <button data-support="tiny">Tiny next step</button>
+            <button id="resetMindBtn">60-second reset</button>
+            <button data-support="firm" class="gold">Give me a firmer push</button>
           </div>
         </section>
 
-        <section class="panel">
-          <h2>Atmosphere</h2>
-          <div class="ambience-grid">
-            <button data-sound="rain">Rain room</button>
-            <button data-sound="river">River desk</button>
-            <button data-sound="fire">Fireplace</button>
-            <button data-sound="off">Silence</button>
+        <section class="panel hide-in-focus" id="resetPanel">
+          <h2>60-second reset</h2>
+          <div id="breathing" class="breathing">
+            <strong id="breathText">Press start reset when you need it.</strong>
+            <div id="breathBubble" class="bubble"></div>
+            <p id="breathNext" class="privacy">No ceremony. Calm the body, then choose one visible action.</p>
           </div>
+          <button id="startBreathBtn" class="good" style="width:100%; margin-top:10px;">Start 60-second reset</button>
+        </section>
+
+        <section class="panel focus-keep">
+          <h2>Ambience</h2>
+          <div class="ambience-grid" id="ambienceGrid"></div>
           <label style="margin-top:12px;">Volume
             <input id="volume" type="range" min="0" max="100" value="35" />
           </label>
-          <p class="privacy">The ambience is generated inside your browser. No audio files, no external libraries.</p>
+          <p id="audioStatus" class="privacy">Sound starts only after you tap an ambience button. If audio is unavailable, the visual room still works.</p>
         </section>
 
-        <section class="panel">
-          <h2>Stats</h2>
-          <div class="stat-row">
+        <section class="panel hide-in-focus">
+          <h2>Stats dashboard</h2>
+          <div class="stat-grid">
             <div class="stat-box"><b id="weekTotal">0m</b><span>This week</span></div>
-            <div class="stat-box"><b id="sessionCount">0</b><span>Sessions</span></div>
+            <div class="stat-box"><b id="sessionCount">0</b><span>Total sessions</span></div>
             <div class="stat-box"><b id="bestDay">0m</b><span>Best day</span></div>
+            <div class="stat-box"><b id="streak">0</b><span>Current streak</span></div>
+            <div class="stat-box"><b id="ieltsTotal">0m</b><span>IELTS</span></div>
+            <div class="stat-box"><b id="artTotal">0m</b><span>Art / drawing</span></div>
+            <div class="stat-box"><b id="readingTotal">0m</b><span>Reading</span></div>
+            <div class="stat-box"><b id="adminTotal">0m</b><span>Admin</span></div>
           </div>
+          <div id="weekChart" class="chart" aria-label="Seven day focus chart"></div>
         </section>
 
-        <section class="panel">
+        <section class="panel hide-in-focus">
+          <h2>Quiet achievements</h2>
+          <div id="badges" class="badge-row"></div>
+        </section>
+
+        <section class="panel hide-in-focus">
           <h2>Recent sessions</h2>
           <div id="historyList" class="history-list"></div>
+        </section>
+
+        <section class="panel hide-in-focus">
+          <h2>Privacy and local data</h2>
+          <p class="privacy">This is a public webpage. Study data is stored only in this browser's localStorage. Do not type passwords, school IDs, passport numbers, financial information, or private medical details.</p>
           <div class="mini-grid" style="margin-top:12px;">
-            <button id="copySummaryBtn" class="ghost">Copy summary</button>
-            <button id="clearDataBtn" class="ghost">Clear data</button>
+            <button id="copySummaryBtn" class="ghost">Copy Summary</button>
+            <button id="clearDataBtn" class="danger">Clear Local Data</button>
           </div>
-          <p class="privacy">Your session history is stored only in this browser's localStorage. Since this page is public, do not type private school IDs, health details, or passwords into it.</p>
         </section>
       </aside>
     </section>
   </main>
 
+  <div id="reflectionModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reflectionTitle">
+    <section class="modal">
+      <h2 id="reflectionTitle">Finish reflection</h2>
+      <p class="hint">Optional. Keep it short and factual; this is evidence, not a trial.</p>
+      <label>What did I actually do?
+        <textarea id="reflectDid" placeholder="Example: Wrote a Task 2 outline and one rough introduction."></textarea>
+      </label>
+      <label style="margin-top:10px;">What is the next small step?
+        <textarea id="reflectNext" placeholder="Example: Write body paragraph 1 tomorrow."></textarea>
+      </label>
+      <label style="margin-top:10px;">How hard did it feel? 1–5
+        <select id="reflectHard">
+          <option value="">Skip rating</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+        </select>
+      </label>
+      <div class="mini-grid" style="margin-top:14px;">
+        <button id="saveReflectionBtn" class="good">Save reflection</button>
+        <button id="skipReflectionBtn" class="ghost">Skip</button>
+      </div>
+    </section>
+  </div>
+
   <script>
-    const storeKey = "pupStudyRoomSessionsV1";
-    const taskKey = "pupStudyRoomTasksV1";
+    "use strict";
+
+    // ---------- Data and safe storage ----------
+    const KEYS = {
+      sessions: "pupStudyRoomSessionsV2",
+      tasks: "pupStudyRoomTasksV2",
+      active: "pupStudyRoomActiveSessionV2",
+      plan: "pupStudyRoomDailyPlanV2",
+      ambience: "pupStudyRoomAmbienceV2"
+    };
     const $ = id => document.getElementById(id);
-
-    const activityEl = $("activity");
-    const customActivityEl = $("customActivity");
-    const goalMinutesEl = $("goalMinutes");
-    const intentionEl = $("intention");
-    const timeDisplay = $("timeDisplay");
-    const timerMeta = $("timerMeta");
-    const progressEl = $("progress");
-    const startBtn = $("startBtn");
-    const pauseBtn = $("pauseBtn");
-    const finishBtn = $("finishBtn");
-    const resetBtn = $("resetBtn");
-    const pupMessage = $("pupMessage");
-    const pupSmall = $("pupSmall");
-    const volumeEl = $("volume");
-    const breathing = $("breathing");
-    const breathText = $("breathText");
-
-    let elapsed = 0;
-    let timer = null;
-    let startedAt = null;
-    let running = false;
-    let sessions = loadSessions();
-    let tasks = loadTasks();
-    let audio = null;
-    let currentSound = "off";
-    let breathTimer = null;
-
+    const todayKey = date => date.toISOString().slice(0, 10);
+    const defaultTasks = [
+      "Open the exact material",
+      "Write one tiny intention",
+      "Put phone away or face down",
+      "Do the first 5 minutes without judging"
+    ];
+    const activities = [
+      ["IELTS Writing Task 2", "IELTS", 40], ["IELTS Writing Task 1", "IELTS", 20], ["IELTS Reading Set", "IELTS", 60],
+      ["IELTS Listening Drill", "IELTS", 30], ["IELTS Speaking Practice", "IELTS", 15], ["Vocabulary Review", "IELTS", 25],
+      ["Drawing Drill", "Art", 45], ["Portfolio / art research", "Art", 45], ["Reading", "Reading", 30], ["Email / admin", "Admin", 25], ["Custom", "Custom", 0]
+    ];
+    const ieltsPlans = {
+      "Writing Task 2": ["Understand question", "Decide position", "Make 2 main points", "Write intro", "Write body paragraphs", "Check grammar and cohesion"],
+      "Speaking practice": ["Warm-up", "Answer clearly", "Add one example", "Repair one grammar mistake"],
+      "Reading plan": ["Skim passage", "Underline names/dates/keywords", "Answer easier questions first", "Review uncertain answers"]
+    };
+    const artDrills = ["10 gesture sketches", "5 hand studies", "1 value study", "1 material study", "20 minutes observational drawing", "15 minutes composition thumbnails"];
+    const ambienceOptions = [["rain", "Rain"], ["river", "River"], ["fireplace", "Fireplace"], ["brown", "Brown noise"], ["silence", "Silence"]];
     const supportLines = {
-      spiral: [
-        "Stop arguing with the entire future. Put your eyes on the next three minutes.",
-        "Anxiety is making the task look bigger than it is. We cut it open. One tiny action first.",
-        "You are not behind in this room. You are here, and here is enough to restart."
-      ],
-      courage: [
-        "You do not need confidence before working. Work first. Confidence can arrive late and still be useful.",
-        "Bad drafts count. Shaky practice counts. Slow pages count. The nervous version of you is still allowed to build skills.",
-        "I am not asking for perfect. I am asking for one clean attempt. Give me that."
-      ],
-      next: [
-        "Open the material. Write the date. Choose the smallest visible step. Begin there.",
-        "Make a rough outline, not a masterpiece. Rough is the bridge.",
-        "Set a 5-minute gate. After 5 minutes, you may renegotiate. Not before."
-      ]
+      spiral: ["Do not solve your entire future right now. Put your eyes on the next three minutes.", "Anxiety is making the task look huge. We shrink it, then touch the first edge.", "You are allowed to be anxious and still continue."],
+      stupid: ["A bad draft is not evidence that you are bad. It is raw material.", "The first version is allowed to be ugly. Skills grow through visible attempts.", "Feeling slow is not the same as being incapable. Keep the task factual."],
+      start: ["You do not need to feel ready. You need a small enough first step.", "Stop negotiating with the fog. Open the page, write the first sentence.", "Start badly for five minutes. Then we can improve the shape."],
+      behind: ["No dramatic punishment. We shrink the task and restart.", "Being behind is information, not a verdict. Choose the next useful action.", "Do not pay for yesterday by ruining today. Work the next ten minutes cleanly."],
+      tiny: ["Open the material and write one line. That is the whole assignment for now.", "Make one outline, one sketch, or one paragraph. Small enough to begin means correct size.", "Choose a five-minute gate. No judging before the gate."],
+      firm: ["I am not asking for perfect. I am asking for one honest attempt.", "Close the extra tabs. Put the phone down. Begin the first visible step now.", "You can feel resistant and still move your hand. Start the timer."],
+      milestones: ["Quarter mark. Do not speed up to impress anyone. Stay steady.", "Halfway. The work is no longer imaginary; it exists.", "Three quarters. Finish calmly, not frantically.", "Goal reached. If you continue, it is extra. If you stop, it counts."],
+      complete: ["One item done. Let evidence replace the spiral.", "Good. The checklist is not judging you; it is guiding you.", "That step is finished. Put your attention on the next one."],
+      inactive: ["If you drifted, return without punishment. Touch the next visible task.", "No shame spiral. Notice, breathe, restart."]
     };
 
+    const state = {
+      sessions: migrateSessions(), tasks: readJson(KEYS.tasks, readJson("pupStudyRoomTasksV1", null)), active: null,
+      timerId: null, elapsedBeforePause: 0, startedAtMs: null, running: false, pendingSession: null,
+      reached: new Set(), lastInteraction: Date.now(), anxiousFinish: false, selectedIelts: "Writing Task 2",
+      audio: null, sound: readJson(KEYS.ambience, { kind: "silence", volume: 35 }).kind || "silence"
+    };
+    if (!Array.isArray(state.tasks)) state.tasks = defaultTasks.map(text => ({ id: uid(), text, done: false }));
+
+    function readJson(key, fallback) {
+      try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (error) { return fallback; }
+    }
+    function migrateSessions() {
+      const current = readJson(KEYS.sessions, null);
+      if (Array.isArray(current)) return current;
+      const legacy = readJson("pupStudyRoomSessionsV1", []);
+      if (!Array.isArray(legacy)) return [];
+      return legacy.map(item => ({
+        id: item.id || uid(),
+        activity: item.activity || "Study session",
+        category: item.category || inferCategory(item.activity || ""),
+        durationSeconds: item.durationSeconds || item.seconds || Math.max(0, Number(item.minutes || 0) * 60),
+        goalMinutes: item.goalMinutes || 0,
+        intention: item.intention || "",
+        startTime: item.startTime || item.startedAt || new Date().toISOString(),
+        finishTime: item.finishTime || item.finishedAt || new Date().toISOString(),
+        reachedGoal: item.reachedGoal ?? true,
+        reflection: item.reflection || null
+      }));
+    }
+    function inferCategory(activity) {
+      const lower = String(activity).toLowerCase();
+      if (lower.includes("ielts") || lower.includes("vocabulary") || lower.includes("speaking") || lower.includes("listening")) return "IELTS";
+      if (lower.includes("draw") || lower.includes("sketch") || lower.includes("art") || lower.includes("portfolio")) return "Art";
+      if (lower.includes("read")) return "Reading";
+      if (lower.includes("email") || lower.includes("admin")) return "Admin";
+      return "Custom";
+    }
+    function writeJson(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (error) { return false; }
+    }
+    function removeKey(key) { try { localStorage.removeItem(key); } catch (error) {} }
+    function uid() { return `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+    function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+    function randomFrom(lines) { return lines[Math.floor(Math.random() * lines.length)]; }
+
+    // ---------- Element references ----------
+    const els = {
+      activity: $("activity"), customActivity: $("customActivity"), goalMinutes: $("goalMinutes"), intention: $("intention"),
+      timeDisplay: $("timeDisplay"), timerMeta: $("timerMeta"), timerSubMeta: $("timerSubMeta"), progress: $("progress"), sessionStatus: $("sessionStatus"),
+      start: $("startBtn"), pause: $("pauseBtn"), resume: $("resumeBtn"), finish: $("finishBtn"), reset: $("resetBtn"),
+      pupMessage: $("pupMessage"), pupSmall: $("pupSmall"), taskInput: $("taskInput"), taskList: $("taskList"), currentTask: $("currentTask"), currentIntention: $("currentIntention"),
+      breathing: $("breathing"), breathText: $("breathText"), breathBubble: $("breathBubble"), breathNext: $("breathNext"), volume: $("volume"), audioStatus: $("audioStatus"),
+      reflectionModal: $("reflectionModal"), reflectDid: $("reflectDid"), reflectNext: $("reflectNext"), reflectHard: $("reflectHard")
+    };
+
+    // ---------- Setup rendering ----------
+    function init() {
+      renderActivities(); renderPresets(); renderAmbienceButtons(); renderIeltsTabs(); renderIeltsChecklist(); renderArtDrills();
+      restoreActiveSession(); loadPlan(); applyAmbience(state.sound, false); renderTasks(); renderStats(); renderHistory(); updateTimerView(); wireEvents(); preventAccidentalLoss();
+      setPup("Pup is beside the desk. Start with the exact material, not the entire future.", "When anxiety gets loud, choose one page, one sentence, one line.");
+    }
+    function renderActivities() {
+      els.activity.innerHTML = activities.map(([name]) => `<option>${escapeHtml(name)}</option>`).join("");
+      els.activity.value = "IELTS Writing Task 2";
+    }
+    function renderPresets() {
+      const labels = [
+        ["IELTS Writing Task 2", 40, "IELTS Writing Task 2 · 40 min"], ["IELTS Writing Task 1", 20, "IELTS Writing Task 1 · 20 min"],
+        ["IELTS Reading Set", 60, "IELTS Reading Set · 60 min"], ["IELTS Listening Drill", 30, "IELTS Listening Drill · 30 min"],
+        ["IELTS Speaking Practice", 15, "IELTS Speaking Practice · 15 min"], ["Vocabulary Review", 25, "Vocabulary Review · 25 min"],
+        ["Drawing Drill", 45, "Drawing Drill · 45 min"], ["Reading", 30, "Reading · 30 min"], ["Custom", 0, "Custom"]
+      ];
+      $("presetGrid").innerHTML = labels.map(([activity, minutes, label]) => `<button data-preset="${escapeAttr(activity)}|${minutes}">${escapeHtml(label)}</button>`).join("");
+    }
+    function renderAmbienceButtons() {
+      $("ambienceGrid").innerHTML = ambienceOptions.map(([kind, label]) => `<button data-sound="${kind}">${label}</button>`).join("");
+    }
+    function renderIeltsTabs() {
+      $("ieltsTabs").innerHTML = Object.keys(ieltsPlans).map(name => `<button class="small ghost" data-ielts-tab="${escapeAttr(name)}">${escapeHtml(name)}</button>`).join("");
+    }
+    function renderIeltsChecklist() {
+      document.querySelectorAll("[data-ielts-tab]").forEach(btn => btn.classList.toggle("active", btn.dataset.ieltsTab === state.selectedIelts));
+      $("ieltsChecklist").innerHTML = ieltsPlans[state.selectedIelts].map(item => `
+        <label class="check-row"><input type="checkbox" data-plan-check="${escapeAttr(item)}"><span>${escapeHtml(item)}</span><button class="small ghost" data-add-plan="${escapeAttr(item)}" type="button">Add</button></label>
+      `).join("");
+    }
+    function renderArtDrills() {
+      $("artDrills").innerHTML = artDrills.map(item => `
+        <label class="check-row"><input type="checkbox" data-art-check="${escapeAttr(item)}"><span>${escapeHtml(item)}</span><button class="small ghost" data-add-art="${escapeAttr(item)}" type="button">Add</button></label>
+      `).join("");
+    }
+
+    // ---------- Timer ----------
     function currentActivity() {
-      return activityEl.value === "Custom" && customActivityEl.value.trim()
-        ? customActivityEl.value.trim()
-        : activityEl.value;
+      return els.activity.value === "Custom" && els.customActivity.value.trim() ? els.customActivity.value.trim() : els.activity.value;
     }
-
-    function format(seconds) {
-      const h = Math.floor(seconds / 3600);
-      const m = Math.floor((seconds % 3600) / 60);
-      const s = seconds % 60;
-      if (h > 0) return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    function categoryFor(activity = currentActivity()) {
+      const matched = activities.find(([name]) => name === activity);
+      if (matched && matched[0] !== "Custom") return matched[1];
+      const lower = activity.toLowerCase();
+      if (lower.includes("ielts") || lower.includes("vocabulary") || lower.includes("speaking") || lower.includes("listening")) return "IELTS";
+      if (lower.includes("draw") || lower.includes("sketch") || lower.includes("art") || lower.includes("portfolio")) return "Art";
+      if (lower.includes("read")) return "Reading";
+      if (lower.includes("email") || lower.includes("admin")) return "Admin";
+      return "Custom";
     }
-
+    function goalSeconds() { return Math.max(0, Number(els.goalMinutes.value || 0) * 60); }
+    function elapsedSeconds() {
+      if (!state.running || !state.startedAtMs) return state.elapsedBeforePause;
+      return state.elapsedBeforePause + Math.floor((Date.now() - state.startedAtMs) / 1000);
+    }
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = seconds % 60;
+      return h ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
     function prettyMinutes(minutes) {
-      if (minutes < 60) return `${minutes}m`;
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
+      const rounded = Math.round(minutes);
+      if (rounded < 60) return `${rounded}m`;
+      const h = Math.floor(rounded / 60), m = rounded % 60;
       return m ? `${h}h ${m}m` : `${h}h`;
     }
-
-    function updateTimer() {
-      timeDisplay.textContent = format(elapsed);
-      const goalSeconds = Math.max(60, Number(goalMinutesEl.value || 0) * 60);
-      const pct = Math.min(100, Math.round((elapsed / goalSeconds) * 100));
-      progressEl.style.width = `${pct}%`;
-      const left = Math.max(0, goalSeconds - elapsed);
-      timerMeta.textContent = running
-        ? `${currentActivity()} · ${pct}% · ${format(left)} left`
-        : elapsed > 0
-          ? `${currentActivity()} · paused at ${format(elapsed)}`
-          : "Ready. Choose one tiny task and begin.";
-      if (running && elapsed > 0 && elapsed % 300 === 0) {
-        setPup("Still here. Five more minutes are now behind you. Keep going.", "Momentum is not loud. It is a quiet machine.");
+    function startSession() {
+      markInteraction();
+      if (state.running) return;
+      if (!state.active) {
+        state.active = { id: uid(), activity: currentActivity(), category: categoryFor(), goalMinutes: Number(els.goalMinutes.value || 0), intention: els.intention.value.trim(), startTime: new Date().toISOString(), anxious: state.anxiousFinish };
+        state.elapsedBeforePause = 0; state.reached = new Set();
       }
+      state.startedAtMs = Date.now(); state.running = true; tick(); state.timerId = window.setInterval(tick, 1000); saveActive();
+      setPup(`Good. ${state.active.activity} has begun. Do not evaluate yet. Work first.`, "The first version is allowed to be rough. Rough is workable.");
     }
-
-    function start() {
-      if (running) return;
-      running = true;
-      if (!startedAt) startedAt = new Date();
-      timer = window.setInterval(() => {
-        elapsed += 1;
-        updateTimer();
-      }, 1000);
-      setPup(`Good. ${currentActivity()} has begun. Do not evaluate yet. Work first.`, "The first page is allowed to be clumsy.");
-      updateTimer();
-    }
-
-    function pause() {
-      if (!running) return;
-      running = false;
-      window.clearInterval(timer);
-      timer = null;
+    function pauseSession() {
+      markInteraction();
+      if (!state.running) return;
+      state.elapsedBeforePause = elapsedSeconds(); state.running = false; state.startedAtMs = null; clearInterval(state.timerId); saveActive(); updateTimerView();
       setPup("Paused. No guilt. Decide clearly: return, break, or finish.", "Fog gets worse when you hover. Pick one door.");
-      updateTimer();
     }
-
-    function reset() {
-      running = false;
-      window.clearInterval(timer);
-      timer = null;
-      elapsed = 0;
-      startedAt = null;
+    function resumeSession() { startSession(); setPup("Returned after a pause. That matters.", "No punishment. Put your eyes back on the next three minutes."); }
+    function resetSession(force = false) {
+      markInteraction();
+      if (!force && elapsedSeconds() > 30 && !confirm("Reset this active session without saving it?")) return;
+      clearInterval(state.timerId); state.active = null; state.running = false; state.startedAtMs = null; state.elapsedBeforePause = 0; state.reached = new Set(); removeKey(KEYS.active); updateTimerView();
       setPup("Reset done. Clean table. New attempt.", "Nothing dramatic happened. We simply start again.");
-      updateTimer();
     }
-
-    function finish() {
-      if (elapsed < 30) {
-        setPup("Too tiny to archive. Either work a little longer or reset.", "Give the record at least thirty seconds of truth.");
-        return;
-      }
-      running = false;
-      window.clearInterval(timer);
-      timer = null;
-      const minutes = Math.max(1, Math.round(elapsed / 60));
-      const session = {
-        id: Date.now(),
-        activity: currentActivity(),
-        minutes,
-        seconds: elapsed,
-        intention: intentionEl.value.trim(),
-        startedAt: startedAt ? startedAt.toISOString() : new Date().toISOString(),
-        finishedAt: new Date().toISOString()
+    function requestFinish() {
+      markInteraction();
+      const seconds = elapsedSeconds();
+      if (seconds < 30) { setPup("Too tiny to archive. Work a little longer or reset.", "Give the record at least thirty seconds of truth."); return; }
+      pauseSession();
+      const goal = goalSeconds();
+      state.pendingSession = {
+        id: state.active?.id || uid(), activity: state.active?.activity || currentActivity(), category: state.active?.category || categoryFor(), durationSeconds: seconds,
+        goalMinutes: Number(els.goalMinutes.value || state.active?.goalMinutes || 0), intention: state.active?.intention || els.intention.value.trim(),
+        startTime: state.active?.startTime || new Date(Date.now() - seconds * 1000).toISOString(), finishTime: new Date().toISOString(),
+        reachedGoal: goal > 0 ? seconds >= goal : true, anxious: state.anxiousFinish
       };
-      sessions.unshift(session);
-      sessions = sessions.slice(0, 80);
-      saveSessions();
-      setPup(`Archived: ${prettyMinutes(minutes)} of ${session.activity}. That is real work.`, "Your anxious brain may discount it. I will not.");
-      elapsed = 0;
-      startedAt = null;
-      intentionEl.value = "";
-      updateTimer();
-      renderStats();
-      renderHistory();
+      els.reflectionModal.classList.add("show");
     }
-
-    function setPup(main, small) {
-      pupMessage.textContent = main;
-      pupSmall.textContent = small || "Stay close to the next visible action.";
+    function saveFinishedSession(withReflection) {
+      const session = state.pendingSession;
+      if (!session) return;
+      if (withReflection) session.reflection = { did: els.reflectDid.value.trim(), next: els.reflectNext.value.trim(), hard: els.reflectHard.value };
+      state.sessions.unshift(session); state.sessions = state.sessions.slice(0, 200); writeJson(KEYS.sessions, state.sessions);
+      els.reflectionModal.classList.remove("show"); els.reflectDid.value = ""; els.reflectNext.value = ""; els.reflectHard.value = "";
+      state.pendingSession = null; state.active = null; state.elapsedBeforePause = 0; state.startedAtMs = null; state.running = false; state.reached = new Set(); state.anxiousFinish = false; removeKey(KEYS.active);
+      els.intention.value = ""; updateTimerView(); renderStats(); renderHistory();
+      setPup(`Archived: ${prettyMinutes(session.durationSeconds / 60)} of ${session.activity}. That is real work.`, "Your anxious brain may discount it. I will not.");
     }
-
-    function loadSessions() {
-      try { return JSON.parse(localStorage.getItem(storeKey)) || []; } catch { return []; }
+    function tick() {
+      updateTimerView(); saveActive(); checkMilestones(); checkInactivity();
     }
-    function saveSessions() { localStorage.setItem(storeKey, JSON.stringify(sessions)); }
-    function loadTasks() {
-      try { return JSON.parse(localStorage.getItem(taskKey)) || defaultTasks(); } catch { return defaultTasks(); }
+    function updateTimerView() {
+      const seconds = elapsedSeconds(), goal = goalSeconds(), pct = goal ? clamp((seconds / goal) * 100, 0, 100) : 0, remaining = Math.max(0, goal - seconds);
+      els.timeDisplay.textContent = formatTime(seconds); els.progress.style.width = goal ? `${pct}%` : seconds ? "100%" : "0%";
+      const mode = goal ? `${Math.round(pct)}% · ${formatTime(remaining)} remaining` : "Stopwatch mode";
+      els.timerMeta.textContent = state.running ? `${currentActivity()} · ${mode}` : seconds ? `${currentActivity()} · paused at ${formatTime(seconds)}` : "Ready. Choose one tiny task and begin.";
+      els.timerSubMeta.textContent = `Elapsed ${formatTime(seconds)}${goal ? ` · Goal ${formatTime(goal)}` : " · No goal set"}`;
+      els.sessionStatus.textContent = state.running ? "Session active" : seconds ? "Paused" : (goal ? "Goal timer" : "Stopwatch");
+      els.start.disabled = state.running; els.pause.disabled = !state.running; els.resume.disabled = state.running || seconds === 0; els.finish.disabled = seconds < 30;
+      renderCurrentTask();
     }
-    function saveTasks() { localStorage.setItem(taskKey, JSON.stringify(tasks)); }
-    function defaultTasks() {
-      return [
-        { id: 1, text: "Open the exact material I will use", done: false },
-        { id: 2, text: "Write one tiny session intention", done: false },
-        { id: 3, text: "Put phone away or face down", done: false }
-      ];
-    }
-
-    function sameDay(a, b) {
-      return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-    }
-    function dateKey(date) {
-      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
-    }
-
-    function renderStats() {
-      const now = new Date();
-      const todayMinutes = sessions.filter(s => sameDay(new Date(s.finishedAt), now)).reduce((sum, s) => sum + s.minutes, 0);
-      const weekStart = new Date(now);
-      weekStart.setDate(now.getDate() - 6);
-      weekStart.setHours(0,0,0,0);
-      const weekMinutes = sessions.filter(s => new Date(s.finishedAt) >= weekStart).reduce((sum, s) => sum + s.minutes, 0);
-      const byDay = {};
-      sessions.forEach(s => {
-        const key = dateKey(new Date(s.finishedAt));
-        byDay[key] = (byDay[key] || 0) + s.minutes;
+    function checkMilestones() {
+      const goal = goalSeconds(); if (!state.running || !goal) return;
+      const pct = elapsedSeconds() / goal;
+      [0.25, 0.5, 0.75, 1].forEach((mark, index) => {
+        if (pct >= mark && !state.reached.has(mark)) { state.reached.add(mark); setPup(supportLines.milestones[index], mark === 1 ? "Goal reached. Finish or continue by choice." : "Stay with the next visible action."); }
       });
-      const best = Math.max(0, ...Object.values(byDay));
-      $("todayTotal").textContent = prettyMinutes(todayMinutes);
-      $("weekTotal").textContent = prettyMinutes(weekMinutes);
-      $("sessionCount").textContent = String(sessions.length);
-      $("bestDay").textContent = prettyMinutes(best);
+    }
+    function saveActive() {
+      if (!state.active) return removeKey(KEYS.active);
+      writeJson(KEYS.active, { active: state.active, elapsedBeforePause: elapsedSeconds(), running: state.running, savedAt: Date.now(), goalMinutes: Number(els.goalMinutes.value || 0), activityValue: els.activity.value, customActivity: els.customActivity.value, intention: els.intention.value });
+    }
+    function restoreActiveSession() {
+      const saved = readJson(KEYS.active, null); if (!saved?.active) return;
+      state.active = saved.active; state.elapsedBeforePause = Number(saved.elapsedBeforePause || 0); state.running = false; state.startedAtMs = null;
+      if (saved.activityValue) els.activity.value = saved.activityValue; els.customActivity.value = saved.customActivity || ""; els.goalMinutes.value = saved.goalMinutes || saved.active.goalMinutes || 0; els.intention.value = saved.intention || saved.active.intention || "";
+      setPup("I recovered the previous session after refresh. Check the timer, then resume or finish.", "No lost work. We keep the thread in our hands.");
+    }
+    function preventAccidentalLoss() {
+      window.addEventListener("beforeunload", event => { if (state.active && elapsedSeconds() > 30) { saveActive(); event.preventDefault(); event.returnValue = ""; } });
     }
 
-    function renderHistory() {
-      const list = $("historyList");
-      if (!sessions.length) {
-        list.innerHTML = `<div class="history-item">No sessions yet. Start one small block and let the room remember it.</div>`;
-        return;
-      }
-      list.innerHTML = sessions.slice(0, 10).map(s => {
-        const date = new Date(s.finishedAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-        const note = s.intention ? `<br><span>${escapeHtml(s.intention)}</span>` : "";
-        return `<div class="history-item"><strong>${escapeHtml(s.activity)}</strong> · ${prettyMinutes(s.minutes)}<br><span>${date}</span>${note}</div>`;
-      }).join("");
-    }
-
-    function escapeHtml(text) {
-      return text.replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
-    }
-
+    // ---------- Tasks and checklists ----------
     function renderTasks() {
-      const list = $("taskList");
-      list.innerHTML = tasks.map(task => `
-        <div class="task-row ${task.done ? "done" : ""}" data-id="${task.id}">
-          <input type="checkbox" ${task.done ? "checked" : ""} aria-label="Mark task done" />
-          <span>${escapeHtml(task.text)}</span>
-          <button class="ghost" type="button">Remove</button>
-        </div>
-      `).join("");
-      list.querySelectorAll(".task-row").forEach(row => {
-        const id = Number(row.dataset.id);
-        row.querySelector("input").addEventListener("change", e => {
-          const task = tasks.find(t => t.id === id);
-          if (task) task.done = e.target.checked;
-          saveTasks();
-          renderTasks();
-        });
-        row.querySelector("button").addEventListener("click", () => {
-          tasks = tasks.filter(t => t.id !== id);
-          saveTasks();
-          renderTasks();
-        });
-      });
+      els.taskList.innerHTML = state.tasks.map(task => `
+        <div class="task-row ${task.done ? "done" : ""}" data-task-id="${task.id}">
+          <input type="checkbox" ${task.done ? "checked" : ""} aria-label="Mark task done">
+          <span class="task-text">${escapeHtml(task.text)}</span>
+          <button class="small ghost make-small" type="button">Make smaller</button>
+          <button class="small ghost remove-task" type="button">Remove</button>
+        </div>`).join("");
+      writeJson(KEYS.tasks, state.tasks); renderCurrentTask();
     }
-
-    function addTask() {
-      const input = $("taskInput");
-      const text = input.value.trim();
+    function renderCurrentTask() {
+      const next = state.tasks.find(task => !task.done) || state.tasks[0];
+      els.currentTask.textContent = next ? next.text : "Choose one small next action.";
+      els.currentIntention.textContent = els.intention.value.trim() || "Write one tiny intention before starting.";
+    }
+    function addTask(text = els.taskInput.value.trim()) {
       if (!text) return;
-      tasks.unshift({ id: Date.now(), text, done: false });
-      input.value = "";
-      saveTasks();
-      renderTasks();
+      state.tasks.push({ id: uid(), text, done: false }); els.taskInput.value = ""; renderTasks(); setPup("Task added. Keep it small enough that your hand knows what to do.", "A clear task lowers the temperature.");
+    }
+    function toggleTask(id, done) {
+      const task = state.tasks.find(item => item.id === id); if (!task) return;
+      task.done = done; renderTasks(); if (done) setPup(randomFrom(supportLines.complete), "Evidence collected. Continue gently.");
+    }
+    function removeTask(id) { state.tasks = state.tasks.filter(task => task.id !== id); renderTasks(); }
+    function smallerTask(text) {
+      const lower = text.toLowerCase();
+      if (lower.includes("ielts") && lower.includes("writing")) return "Write one Task 2 outline only.";
+      if (lower.includes("reading")) return "Read one paragraph and mark three keywords.";
+      if (lower.includes("draw") || lower.includes("sketch")) return "Make one rough 3-minute sketch.";
+      if (lower.includes("admin") || lower.includes("email")) return "Open the message and write the first two lines.";
+      if (lower.includes("portfolio")) return "Save one useful reference and write why it helps.";
+      return "Do the first visible 5-minute piece only.";
     }
 
-    function randomLine(type) {
-      const arr = supportLines[type];
-      return arr[Math.floor(Math.random() * arr.length)];
+    // ---------- Stats, history, planning, achievements ----------
+    function sessionMinutes(session) { return (session.durationSeconds || (session.seconds || 0) || (session.minutes || 0) * 60) / 60; }
+    function sameDay(a, b) { return todayKey(a) === todayKey(b); }
+    function startOfWeek(date) { const d = new Date(date); const day = (d.getDay() + 6) % 7; d.setHours(0,0,0,0); d.setDate(d.getDate() - day); return d; }
+    function renderStats() {
+      const now = new Date(), weekStart = startOfWeek(now);
+      const todaySessions = state.sessions.filter(s => sameDay(new Date(s.finishTime || s.finishedAt), now));
+      const weekSessions = state.sessions.filter(s => new Date(s.finishTime || s.finishedAt) >= weekStart);
+      const totalByCat = cat => state.sessions.filter(s => (s.category || categoryFor(s.activity)) === cat).reduce((sum, s) => sum + sessionMinutes(s), 0);
+      const todayTotal = todaySessions.reduce((sum, s) => sum + sessionMinutes(s), 0), weekTotal = weekSessions.reduce((sum, s) => sum + sessionMinutes(s), 0);
+      $("todayTotal").textContent = prettyMinutes(todayTotal); $("weekTotal").textContent = prettyMinutes(weekTotal); $("sessionCount").textContent = state.sessions.length;
+      $("bestDay").textContent = prettyMinutes(bestDayMinutes()); const streak = currentStreak(); $("streak").textContent = streak; $("streakNote").textContent = `Streak: ${streak} day${streak === 1 ? "" : "s"}`;
+      $("ieltsTotal").textContent = prettyMinutes(totalByCat("IELTS")); $("artTotal").textContent = prettyMinutes(totalByCat("Art")); $("readingTotal").textContent = prettyMinutes(totalByCat("Reading")); $("adminTotal").textContent = prettyMinutes(totalByCat("Admin"));
+      renderChart(); renderBadges({ todayTotal, weekTotal, ielts: totalByCat("IELTS"), art: totalByCat("Art") });
     }
+    function dailyTotals() {
+      return state.sessions.reduce((map, s) => { const key = todayKey(new Date(s.finishTime || s.finishedAt)); map[key] = (map[key] || 0) + sessionMinutes(s); return map; }, {});
+    }
+    function bestDayMinutes() { return Math.max(0, ...Object.values(dailyTotals())); }
+    function currentStreak() {
+      const totals = dailyTotals(); let streak = 0; const d = new Date(); d.setHours(0,0,0,0);
+      while (totals[todayKey(d)] > 0) { streak += 1; d.setDate(d.getDate() - 1); }
+      return streak;
+    }
+    function renderChart() {
+      const totals = dailyTotals(), days = [], now = new Date();
+      for (let i = 6; i >= 0; i--) { const d = new Date(now); d.setDate(now.getDate() - i); days.push(d); }
+      const max = Math.max(20, ...days.map(d => totals[todayKey(d)] || 0));
+      $("weekChart").innerHTML = days.map(d => { const mins = totals[todayKey(d)] || 0; const height = Math.max(8, (mins / max) * 112); return `<div class="bar-wrap"><div class="bar" style="height:${height}px" title="${Math.round(mins)} minutes"></div><span>${d.toLocaleDateString(undefined, { weekday: "short" })}</span></div>`; }).join("");
+    }
+    function renderBadges(stats) {
+      const returned = state.sessions.some(s => sessionMinutes(s) > 0) && readJson(KEYS.active, null) === null;
+      const badges = [
+        ["First session", state.sessions.length >= 1], ["25 minutes total", state.sessions.reduce((a,s) => a + sessionMinutes(s), 0) >= 25], ["2-hour week", stats.weekTotal >= 120],
+        ["IELTS hour logged", stats.ielts >= 60], ["Art hour logged", stats.art >= 60], ["Returned after a pause", returned], ["Finished while anxious", state.sessions.some(s => s.anxious)]
+      ];
+      $("badges").innerHTML = badges.map(([label, earned]) => `<span class="badge ${earned ? "earned" : ""}">${earned ? "✓ " : "○ "}${label}</span>`).join("");
+    }
+    function renderHistory() {
+      const list = state.sessions.slice(0, 12);
+      $("historyList").innerHTML = list.length ? list.map(s => {
+        const date = new Date(s.finishTime || s.finishedAt); const reflection = s.reflection?.next ? `<br><span>Next: ${escapeHtml(s.reflection.next)}</span>` : "";
+        return `<div class="history-item"><strong>${escapeHtml(s.activity)}</strong> · ${escapeHtml(s.category || categoryFor(s.activity))} · ${prettyMinutes(sessionMinutes(s))}<br><span>${date.toLocaleString()} · ${s.reachedGoal ? "goal reached" : "goal not reached yet"}</span>${reflection}</div>`;
+      }).join("") : `<div class="history-item">No sessions saved yet. Start with one honest attempt.</div>`;
+    }
+    function loadPlan() {
+      const saved = readJson(KEYS.plan, {}); const key = todayKey(new Date()); const plan = saved.date === key ? saved : { date: key };
+      $("planMust").value = plan.must || ""; $("planShould").value = plan.should || ""; $("planBonus").value = plan.bonus || "";
+    }
+    function savePlan() { writeJson(KEYS.plan, { date: todayKey(new Date()), must: $("planMust").value.trim(), should: $("planShould").value.trim(), bonus: $("planBonus").value.trim() }); }
 
+    // ---------- Pup, reset, ambience ----------
+    function setPup(main, small) { els.pupMessage.textContent = main; els.pupSmall.textContent = small || "Stay close to the next visible action."; }
+    function markInteraction() { state.lastInteraction = Date.now(); }
+    function checkInactivity() {
+      if (state.running && Date.now() - state.lastInteraction > 12 * 60 * 1000) { markInteraction(); setPup(randomFrom(supportLines.inactive), "The timer is still here. Come back gently."); }
+    }
     function startBreathing() {
-      breathing.classList.add("show");
-      let count = 60;
-      window.clearInterval(breathTimer);
-      breathText.textContent = "Inhale. Pup is counting the room smaller.";
-      breathTimer = window.setInterval(() => {
-        count -= 1;
-        const phase = count % 10 > 4 ? "Exhale slowly." : "Inhale slowly.";
-        breathText.textContent = `${phase} ${count}s`;
-        if (count <= 0) {
-          window.clearInterval(breathTimer);
-          breathText.textContent = "Done. Now choose one tiny visible action.";
-          setPup("You returned. That matters. Now take the smallest next step before the fog regroups.", "One sentence. One sketch line. One IELTS question.");
-        }
+      markInteraction(); els.breathing.classList.add("show"); $("resetPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      let remaining = 60; const phases = [{ name: "Inhale slowly", className: "inhale", seconds: 4 }, { name: "Hold gently", className: "hold", seconds: 2 }, { name: "Exhale longer", className: "exhale", seconds: 6 }]; let phaseIndex = 0, phaseLeft = phases[0].seconds;
+      setPup("Stay with the reset. Nothing mystical. Just lower the noise enough to choose one action.", "Your only job for sixty seconds is breathing and returning.");
+      clearInterval(window.breathTimer);
+      window.breathTimer = setInterval(() => {
+        const phase = phases[phaseIndex]; els.breathText.textContent = `${phase.name}. ${remaining}s`; els.breathBubble.className = `bubble ${phase.className}`;
+        remaining -= 1; phaseLeft -= 1;
+        if (phaseLeft <= 0) { phaseIndex = (phaseIndex + 1) % phases.length; phaseLeft = phases[phaseIndex].seconds; }
+        if (remaining < 0) { clearInterval(window.breathTimer); const next = suggestNextAction(); els.breathText.textContent = "Reset complete."; els.breathBubble.className = "bubble"; els.breathNext.textContent = `Next small action: ${next}`; setPup("Reset complete. Now do one small action before the fog starts bargaining again.", next); }
       }, 1000);
+    }
+    function suggestNextAction() {
+      const cat = categoryFor();
+      if (cat === "IELTS") return "Write one outline point or answer one question only.";
+      if (cat === "Art") return "Make one rough sketch without correcting it.";
+      if (cat === "Reading") return "Read one page and mark one useful sentence.";
+      if (cat === "Admin") return "Open the item and write the first practical line.";
+      return "Work for five minutes on the smallest visible piece.";
     }
 
     class Ambience {
-      constructor() {
-        this.ctx = null;
-        this.master = null;
-        this.nodes = [];
-        this.crackleTimer = null;
-      }
+      constructor() { this.ctx = null; this.master = null; this.nodes = []; this.crackleTimer = null; }
       async ensure() {
-        if (!this.ctx) {
-          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-          this.master = this.ctx.createGain();
-          this.master.gain.value = Number(volumeEl.value) / 100 * 0.45;
-          this.master.connect(this.ctx.destination);
-        }
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) throw new Error("Web Audio API unsupported");
+        if (!this.ctx) { this.ctx = new AudioContext(); this.master = this.ctx.createGain(); this.master.gain.value = Number(els.volume.value) / 100 * .42; this.master.connect(this.ctx.destination); }
         if (this.ctx.state === "suspended") await this.ctx.resume();
       }
-      setVolume(value) {
-        if (this.master) this.master.gain.setTargetAtTime(Number(value) / 100 * 0.45, this.ctx.currentTime, 0.05);
-      }
-      stop() {
-        this.nodes.forEach(n => { try { n.stop && n.stop(); } catch {} try { n.disconnect && n.disconnect(); } catch {} });
-        this.nodes = [];
-        window.clearInterval(this.crackleTimer);
-        this.crackleTimer = null;
-      }
-      noiseBuffer(seconds = 2) {
-        const length = this.ctx.sampleRate * seconds;
-        const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
-        return buffer;
-      }
-      loopNoise({ low = 300, high = 2600, gain = .18, type = "bandpass" }) {
-        const source = this.ctx.createBufferSource();
-        source.buffer = this.noiseBuffer(3);
-        source.loop = true;
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = type;
-        filter.frequency.value = high;
-        filter.Q.value = .7;
-        const g = this.ctx.createGain();
-        g.gain.value = gain;
-        source.connect(filter).connect(g).connect(this.master);
-        source.start();
-        this.nodes.push(source, filter, g);
-        if (low) {
-          const lowFilter = this.ctx.createBiquadFilter();
-          lowFilter.type = "highpass";
-          lowFilter.frequency.value = low;
-        }
-      }
+      setVolume(value) { if (this.master && this.ctx) this.master.gain.setTargetAtTime(Number(value) / 100 * .42, this.ctx.currentTime, .05); }
+      stop() { this.nodes.forEach(node => { try { if (node.stop) node.stop(); } catch (e) {} try { node.disconnect(); } catch (e) {} }); this.nodes = []; clearInterval(this.crackleTimer); this.crackleTimer = null; }
+      noiseBuffer(seconds = 2) { const length = this.ctx.sampleRate * seconds, buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate), data = buffer.getChannelData(0); for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1; return buffer; }
+      noise({ type = "lowpass", frequency = 1000, gain = .12, q = .8 }) { const source = this.ctx.createBufferSource(), filter = this.ctx.createBiquadFilter(), g = this.ctx.createGain(); source.buffer = this.noiseBuffer(3); source.loop = true; filter.type = type; filter.frequency.value = frequency; filter.Q.value = q; g.gain.value = gain; source.connect(filter).connect(g).connect(this.master); source.start(); this.nodes.push(source, filter, g); }
       async play(kind) {
-        await this.ensure();
-        this.stop();
-        if (kind === "off") return;
-        if (kind === "rain") {
-          this.loopNoise({ high: 1800, gain: .22, type: "bandpass" });
-          this.loopNoise({ high: 5200, gain: .05, type: "highpass" });
-        }
-        if (kind === "river") {
-          this.loopNoise({ high: 520, gain: .22, type: "lowpass" });
-          this.loopNoise({ high: 1400, gain: .08, type: "bandpass" });
-        }
-        if (kind === "fire") {
-          this.loopNoise({ high: 750, gain: .10, type: "lowpass" });
-          this.crackleTimer = window.setInterval(() => {
-            const osc = this.ctx.createOscillator();
-            const g = this.ctx.createGain();
-            osc.type = "triangle";
-            osc.frequency.value = 120 + Math.random() * 260;
-            g.gain.setValueAtTime(0, this.ctx.currentTime);
-            g.gain.linearRampToValueAtTime(.08, this.ctx.currentTime + .012);
-            g.gain.exponentialRampToValueAtTime(.001, this.ctx.currentTime + .12);
-            osc.connect(g).connect(this.master);
-            osc.start();
-            osc.stop(this.ctx.currentTime + .14);
-          }, 180 + Math.random() * 260);
-        }
+        await this.ensure(); this.stop(); if (kind === "silence") return;
+        if (kind === "rain") { this.noise({ type: "bandpass", frequency: 1700, gain: .22 }); this.noise({ type: "highpass", frequency: 4800, gain: .045 }); }
+        if (kind === "river") { this.noise({ type: "lowpass", frequency: 520, gain: .24 }); this.noise({ type: "bandpass", frequency: 1200, gain: .075 }); }
+        if (kind === "brown") { this.noise({ type: "lowpass", frequency: 360, gain: .30, q: .5 }); }
+        if (kind === "fireplace") { this.noise({ type: "lowpass", frequency: 760, gain: .095 }); this.crackleTimer = setInterval(() => this.crackle(), 180); }
       }
+      crackle() { if (!this.ctx || Math.random() < .45) return; const osc = this.ctx.createOscillator(), g = this.ctx.createGain(); osc.type = "triangle"; osc.frequency.value = 110 + Math.random() * 300; g.gain.setValueAtTime(.0001, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(.075, this.ctx.currentTime + .012); g.gain.exponentialRampToValueAtTime(.0001, this.ctx.currentTime + .13); osc.connect(g).connect(this.master); osc.start(); osc.stop(this.ctx.currentTime + .15); this.nodes.push(osc, g); }
+    }
+    async function applyAmbience(kind, shouldPlay) {
+      state.sound = kind; document.body.classList.remove("theme-rain", "theme-river", "theme-fireplace", "theme-brown", "theme-silence"); document.body.classList.add(`theme-${kind}`); document.querySelectorAll("[data-sound]").forEach(btn => btn.classList.toggle("active", btn.dataset.sound === kind)); writeJson(KEYS.ambience, { kind, volume: Number(els.volume.value) });
+      if (!shouldPlay || kind === "silence") { if (state.audio) state.audio.stop(); return; }
+      try { if (!state.audio) state.audio = new Ambience(); await state.audio.play(kind); els.audioStatus.textContent = `${ambienceOptions.find(a => a[0] === kind)?.[1] || "Ambience"} is playing. Audio was started by your tap.`; }
+      catch (error) { els.audioStatus.textContent = "Audio is not available in this browser right now. The visual ambience still works."; setPup("The sound system refused, but the room still works without audio.", "No external files are needed. Keep studying with the visual room."); }
     }
 
-    function setSound(kind) {
-      currentSound = kind;
-      document.body.className = kind === "off" ? "calm" : kind;
-      document.querySelectorAll("[data-sound]").forEach(btn => btn.classList.toggle("active", btn.dataset.sound === kind));
-      if (!audio) audio = new Ambience();
-      audio.play(kind);
-      const label = kind === "off" ? "Silence" : kind[0].toUpperCase() + kind.slice(1);
-      setPup(`${label} selected. Shape the room before the room shapes you.`, "Atmosphere is not decoration. It is scaffolding.");
+    // ---------- Events and utilities ----------
+    function wireEvents() {
+      ["pointerdown", "keydown", "touchstart"].forEach(name => window.addEventListener(name, markInteraction, { passive: true }));
+      els.start.addEventListener("click", startSession); els.pause.addEventListener("click", pauseSession); els.resume.addEventListener("click", resumeSession); els.finish.addEventListener("click", requestFinish); els.reset.addEventListener("click", () => resetSession(false));
+      [els.activity, els.customActivity, els.goalMinutes, els.intention].forEach(el => el.addEventListener("input", () => { updateTimerView(); saveActive(); }));
+      $("presetGrid").addEventListener("click", event => { const btn = event.target.closest("[data-preset]"); if (!btn) return; const [activity, minutes] = btn.dataset.preset.split("|"); els.activity.value = activity; els.goalMinutes.value = minutes; setPup(`${activity}, ${minutes || "custom"} minutes. A clear container calms the animal brain.`, "Now write one tiny intention and start."); updateTimerView(); });
+      $("addTaskBtn").addEventListener("click", () => addTask()); els.taskInput.addEventListener("keydown", event => { if (event.key === "Enter") addTask(); });
+      els.taskList.addEventListener("click", event => { const row = event.target.closest(".task-row"); if (!row) return; if (event.target.matches("input[type='checkbox']")) toggleTask(row.dataset.taskId, event.target.checked); if (event.target.matches(".remove-task")) removeTask(row.dataset.taskId); if (event.target.matches(".make-small")) { const task = state.tasks.find(t => t.id === row.dataset.taskId); if (task) { task.text = smallerTask(task.text); task.done = false; renderTasks(); setPup("Good. Smaller is not weaker. Smaller is how we restart.", task.text); } } });
+      $("restoreDefaultsBtn").addEventListener("click", () => { state.tasks = defaultTasks.map(text => ({ id: uid(), text, done: false })); renderTasks(); });
+      $("ieltsTabs").addEventListener("click", event => { const btn = event.target.closest("[data-ielts-tab]"); if (!btn) return; state.selectedIelts = btn.dataset.ieltsTab; renderIeltsChecklist(); });
+      document.body.addEventListener("click", event => { const addPlan = event.target.closest("[data-add-plan]"); const addArt = event.target.closest("[data-add-art]"); if (addPlan) addTask(addPlan.dataset.addPlan); if (addArt) addTask(addArt.dataset.addArt); const check = event.target.closest(".check-row input"); if (check) { check.closest(".check-row").classList.toggle("done", check.checked); if (check.checked) setPup(randomFrom(supportLines.complete), "One more small piece is no longer floating in your head."); } });
+      document.querySelectorAll("[data-support]").forEach(btn => btn.addEventListener("click", () => { state.anxiousFinish = true; setPup(randomFrom(supportLines[btn.dataset.support]), btn.dataset.support === "firm" ? "Firm does not mean cruel. It means clear." : "Return to one visible action."); }));
+      $("resetMindBtn").addEventListener("click", startBreathing); $("startBreathBtn").addEventListener("click", startBreathing);
+      $("ambienceGrid").addEventListener("click", event => { const btn = event.target.closest("[data-sound]"); if (btn) applyAmbience(btn.dataset.sound, true); });
+      els.volume.addEventListener("input", event => { if (state.audio) state.audio.setVolume(event.target.value); writeJson(KEYS.ambience, { kind: state.sound, volume: Number(event.target.value) }); });
+      const savedAmbience = readJson(KEYS.ambience, { volume: 35 }); els.volume.value = savedAmbience.volume ?? 35;
+      [$("planMust"), $("planShould"), $("planBonus")].forEach(input => input.addEventListener("input", savePlan)); $("resetPlanBtn").addEventListener("click", () => { $("planMust").value = ""; $("planShould").value = ""; $("planBonus").value = ""; savePlan(); });
+      $("saveReflectionBtn").addEventListener("click", () => saveFinishedSession(true)); $("skipReflectionBtn").addEventListener("click", () => saveFinishedSession(false));
+      $("focusModeBtn").addEventListener("click", () => { document.body.classList.toggle("focus-mode"); $("focusModeBtn").textContent = document.body.classList.contains("focus-mode") ? "Exit Focus Mode" : "Enter Focus Mode"; });
+      $("copySummaryBtn").addEventListener("click", copySummary); $("exportSummaryBtn").addEventListener("click", copySummary); $("clearDataBtn").addEventListener("click", clearLocalData);
     }
+    async function copySummary() {
+      const text = buildSummary();
+      try { await navigator.clipboard.writeText(text); setPup("Summary copied. Evidence collected.", "Your work is not just a vague feeling now. It has timestamps."); }
+      catch (error) { window.prompt("Copy this summary:", text); }
+    }
+    function buildSummary() {
+      const now = new Date(), weekStart = startOfWeek(now), todaySessions = state.sessions.filter(s => sameDay(new Date(s.finishTime || s.finishedAt), now)), weekSessions = state.sessions.filter(s => new Date(s.finishTime || s.finishedAt) >= weekStart);
+      const total = list => prettyMinutes(list.reduce((sum, s) => sum + sessionMinutes(s), 0));
+      return [`Maeve's Pup Study Room summary`, `Date: ${now.toLocaleDateString()}`, `Today: ${total(todaySessions)}`, `This week: ${total(weekSessions)}`, `Sessions total: ${state.sessions.length}`, "", "Today:", ...todaySessions.map(s => `- ${s.activity} (${s.category || categoryFor(s.activity)}): ${prettyMinutes(sessionMinutes(s))}`)].join("\n");
+    }
+    function clearLocalData() {
+      if (!confirm("Clear Study Room localStorage data on this browser? This removes sessions, active timer, tasks, plan, and ambience preference.")) return;
+      Object.values(KEYS).forEach(removeKey); state.sessions = []; state.tasks = defaultTasks.map(text => ({ id: uid(), text, done: false })); resetSession(true); renderTasks(); renderStats(); renderHistory(); loadPlan(); setPup("Local Study Room data cleared from this browser.", "The page is public, but the saved study data was local to this device.");
+    }
+    function escapeHtml(value) { return String(value).replace(/[&<>"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char])); }
+    function escapeAttr(value) { return escapeHtml(value).replace(/'/g, "&#39;"); }
 
-    document.querySelectorAll("[data-preset]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const [activity, minutes] = btn.dataset.preset.split("|");
-        activityEl.value = activity;
-        goalMinutesEl.value = minutes;
-        setPup(`${activity}, ${minutes} minutes. Good. A clear container calms the animal brain.`, "Now write one tiny intention and start.");
-        updateTimer();
-      });
-    });
-    document.querySelectorAll("[data-sound]").forEach(btn => btn.addEventListener("click", () => setSound(btn.dataset.sound)));
-    volumeEl.addEventListener("input", e => { if (audio) audio.setVolume(e.target.value); });
-
-    startBtn.addEventListener("click", start);
-    pauseBtn.addEventListener("click", pause);
-    finishBtn.addEventListener("click", finish);
-    resetBtn.addEventListener("click", reset);
-    $("addTaskBtn").addEventListener("click", addTask);
-    $("taskInput").addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
-    $("spiralBtn").addEventListener("click", () => setPup(randomLine("spiral"), "Do not solve your life. Touch the next task."));
-    $("nextStepBtn").addEventListener("click", () => setPup(randomLine("next"), "The smaller the step, the sharper the blade."));
-    $("courageBtn").addEventListener("click", () => setPup(randomLine("courage"), "A nervous attempt is still an attempt."));
-    $("resetMindBtn").addEventListener("click", startBreathing);
-
-    $("copySummaryBtn").addEventListener("click", async () => {
-      const today = new Date();
-      const todaySessions = sessions.filter(s => sameDay(new Date(s.finishedAt), today));
-      const total = todaySessions.reduce((sum, s) => sum + s.minutes, 0);
-      const lines = [`Pup Study Room summary`, `Today: ${prettyMinutes(total)}`, ...todaySessions.map(s => `- ${s.activity}: ${prettyMinutes(s.minutes)}`)];
-      try {
-        await navigator.clipboard.writeText(lines.join("\n"));
-        setPup("Summary copied. Evidence collected.", "Your work is not a vague feeling now. It has a timestamp.");
-      } catch {
-        setPup("Clipboard refused, but the summary is still here in the history list.", "Safari can be dramatic. We continue.");
-      }
-    });
-
-    $("clearDataBtn").addEventListener("click", () => {
-      if (!confirm("Clear all local Study Room session history on this device?")) return;
-      sessions = [];
-      saveSessions();
-      renderStats();
-      renderHistory();
-      setPup("Local history cleared. The room is empty again.", "Only this browser was cleared. The page itself stays public, your data was local.");
-    });
-
-    [activityEl, customActivityEl, goalMinutesEl].forEach(el => el.addEventListener("input", updateTimer));
-
-    updateTimer();
-    renderStats();
-    renderHistory();
-    renderTasks();
+    init();
   </script>
 </body>
 </html>
