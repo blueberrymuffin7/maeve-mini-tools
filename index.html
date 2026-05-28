@@ -1,12 +1,413 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maeve Mini Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pup Moon Garden</title>
+  <style>
+    :root {
+      --bg-1: #151329;
+      --bg-2: #0f0d1f;
+      --panel: rgba(34, 29, 61, 0.78);
+      --panel-border: rgba(198, 184, 255, 0.28);
+      --text: #f6f0ff;
+      --muted: #cfc4ef;
+      --accent: #c9a6ff;
+      --good: #8ef0cc;
+      --danger: #3a314d;
+      --tile: #282248;
+      --tile-glow: rgba(146, 124, 210, 0.3);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at 20% 10%, #27224c 0%, var(--bg-1) 42%, var(--bg-2) 100%);
+      color: var(--text);
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: clamp(12px, 3vw, 28px);
+    }
+
+    .game-shell {
+      width: min(94vw, 760px);
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      padding: clamp(14px, 2.5vw, 24px);
+      backdrop-filter: blur(4px);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      letter-spacing: 0.02em;
+      font-weight: 700;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: clamp(0.9rem, 2.2vw, 1rem);
+      line-height: 1.35;
+    }
+
+    .hud {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: rgba(100, 82, 160, 0.35);
+      border: 1px solid rgba(218, 203, 255, 0.24);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.95rem;
+      color: #f5edff;
+    }
+
+    .board-wrap {
+      margin-top: 14px;
+      background: rgba(17, 15, 34, 0.6);
+      border-radius: 18px;
+      border: 1px solid rgba(226, 211, 255, 0.2);
+      padding: clamp(10px, 2vw, 16px);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      user-select: none;
+    }
+
+    .tile {
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      background: linear-gradient(160deg, #2d2550, var(--tile));
+      border: 1px solid rgba(213, 196, 255, 0.14);
+      display: grid;
+      place-items: center;
+      font-size: clamp(1.25rem, 3.2vw, 1.7rem);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 12px var(--tile-glow);
+      transition: transform 0.12s ease;
+    }
+
+    .tile.paw {
+      background: linear-gradient(160deg, #5f4ba2, #4b3a84);
+      transform: translateY(-1px);
+    }
+
+    .tile.star { text-shadow: 0 0 10px rgba(255, 240, 130, 0.9); }
+    .tile.hole { background: radial-gradient(circle at 40% 35%, #4d4063 0, #1a152f 40%, #0a0913 100%); }
+    .tile.gate { background: linear-gradient(160deg, #4e3d77, #35295c); }
+
+    .status {
+      margin-top: 12px;
+      min-height: 2.6em;
+      color: #efe5ff;
+      font-size: 1rem;
+      line-height: 1.3;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(70, 56, 116, 0.32);
+      border: 1px solid rgba(208, 189, 255, 0.17);
+    }
+
+    .controls {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 78px);
+      grid-template-rows: repeat(3, 64px);
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid rgba(232, 220, 255, 0.34);
+      background: linear-gradient(170deg, #5a468f, #41336b);
+      color: #fff;
+      font-size: 1.35rem;
+      border-radius: 16px;
+      min-height: 64px;
+      min-width: 78px;
+      font-weight: 700;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .dpad .blank {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      width: min(100%, 340px);
+    }
+
+    .actions button {
+      flex: 1;
+      font-size: 1rem;
+      min-height: 56px;
+      border-radius: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Maeve Mini Tools</h1>
-  <p>This is the first tiny web tool in my Codex playground.</p>
+  <main class="game-shell">
+    <section class="header">
+      <h1>Pup Moon Garden</h1>
+      <p>Guide your little paw through moonlit tiles. Gather stars, avoid shadow holes, and slip through the moon gate.</p>
+    </section>
+
+    <section class="hud" aria-live="polite">
+      <div class="chip">Stars: <span id="starCount">0</span></div>
+      <div class="chip">Whispers: <span id="whisperCount">0</span></div>
+      <div class="chip">Level: <span id="levelCount">1</span></div>
+    </section>
+
+    <section class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="Pup Moon Garden board"></div>
+    </section>
+
+    <p id="status" class="status">The garden hums softly. Tap arrows to move your paw 🐾.</p>
+
+    <section class="controls" aria-label="movement controls">
+      <div class="dpad">
+        <button class="blank" aria-hidden="true" tabindex="-1"></button>
+        <button data-dir="up" aria-label="Move up">↑</button>
+        <button class="blank" aria-hidden="true" tabindex="-1"></button>
+        <button data-dir="left" aria-label="Move left">←</button>
+        <button data-dir="down" aria-label="Move down">↓</button>
+        <button data-dir="right" aria-label="Move right">→</button>
+        <button class="blank" aria-hidden="true" tabindex="-1"></button>
+        <button id="restartBtn" aria-label="Restart level">↺</button>
+        <button class="blank" aria-hidden="true" tabindex="-1"></button>
+      </div>
+      <div class="actions">
+        <button id="newGameBtn">New Dream</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SIZE = 7;
+    const boardEl = document.getElementById('board');
+    const statusEl = document.getElementById('status');
+    const starCountEl = document.getElementById('starCount');
+    const whisperCountEl = document.getElementById('whisperCount');
+    const levelCountEl = document.getElementById('levelCount');
+
+    const whispers = [
+      '“Moon petals remember every gentle step.”',
+      '“Tiny paws can open hidden skies.”',
+      '“The night garden trusts your quiet heart.”',
+      '“Soft courage glows brighter than fear.”',
+      '“Even shadows bow to kind starlight.”'
+    ];
+
+    const state = {
+      level: 1,
+      stars: 0,
+      whispersUnlocked: 0,
+      starSet: new Set(),
+      holeSet: new Set(),
+      paw: { x: 0, y: 0 },
+      gate: { x: SIZE - 1, y: SIZE - 1 },
+      active: true
+    };
+
+    function key(x, y) { return `${x},${y}`; }
+
+    function randomEmptyCell(blocked = new Set()) {
+      let x, y, k;
+      do {
+        x = Math.floor(Math.random() * SIZE);
+        y = Math.floor(Math.random() * SIZE);
+        k = key(x, y);
+      } while (blocked.has(k));
+      return { x, y, k };
+    }
+
+    function setupLevel() {
+      state.active = true;
+      state.starSet = new Set();
+      state.holeSet = new Set();
+      const blocked = new Set([key(state.paw.x, state.paw.y)]);
+
+      const gateCell = randomEmptyCell(blocked);
+      state.gate = { x: gateCell.x, y: gateCell.y };
+      blocked.add(gateCell.k);
+
+      const starTarget = 5;
+      for (let i = 0; i < starTarget; i++) {
+        const cell = randomEmptyCell(blocked);
+        state.starSet.add(cell.k);
+        blocked.add(cell.k);
+      }
+
+      const holeCount = Math.min(7, 2 + state.level);
+      for (let i = 0; i < holeCount; i++) {
+        const cell = randomEmptyCell(blocked);
+        state.holeSet.add(cell.k);
+        blocked.add(cell.k);
+      }
+
+      render();
+      setStatus(`Level ${state.level}: Gather stars and find the moon gate 🌙.`);
+    }
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    function maybeUnlockWhisper() {
+      const shouldUnlock = Math.floor(state.stars / 3);
+      if (shouldUnlock > state.whispersUnlocked) {
+        state.whispersUnlocked = shouldUnlock;
+        const phrase = whispers[(shouldUnlock - 1) % whispers.length];
+        setStatus(`Secret Pup whisper unlocked ✨ ${phrase}`);
+      }
+    }
+
+    function move(dx, dy) {
+      if (!state.active) return;
+      const nx = state.paw.x + dx;
+      const ny = state.paw.y + dy;
+      if (nx < 0 || ny < 0 || nx >= SIZE || ny >= SIZE) {
+        setStatus('A moon hedge blocks the way. Try another path.');
+        return;
+      }
+
+      state.paw = { x: nx, y: ny };
+      const k = key(nx, ny);
+
+      if (state.holeSet.has(k)) {
+        state.active = false;
+        render();
+        setStatus('Oh no—shadow hole! The paw drifts back to the beginning…');
+        return;
+      }
+
+      if (state.starSet.has(k)) {
+        state.starSet.delete(k);
+        state.stars += 1;
+        maybeUnlockWhisper();
+        if (state.active) setStatus('You found a star. The garden sparkles brighter.');
+      }
+
+      if (nx === state.gate.x && ny === state.gate.y) {
+        if (state.starSet.size === 0) {
+          state.level += 1;
+          setStatus('Moon gate opens softly. You pad into a deeper dream…');
+          setTimeout(setupLevel, 550);
+        } else {
+          setStatus(`The moon gate hums: “${state.starSet.size} stars still sleeping.”`);
+        }
+      }
+
+      render();
+    }
+
+    function render() {
+      boardEl.innerHTML = '';
+      starCountEl.textContent = state.stars;
+      whisperCountEl.textContent = state.whispersUnlocked;
+      levelCountEl.textContent = state.level;
+
+      for (let y = 0; y < SIZE; y++) {
+        for (let x = 0; x < SIZE; x++) {
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          let glyph = '·';
+          const k = key(x, y);
+
+          if (x === state.gate.x && y === state.gate.y) {
+            tile.classList.add('gate');
+            glyph = '🌙';
+          }
+          if (state.starSet.has(k)) {
+            tile.classList.add('star');
+            glyph = '⭐';
+          }
+          if (state.holeSet.has(k)) {
+            tile.classList.add('hole');
+            glyph = '◌';
+          }
+          if (x === state.paw.x && y === state.paw.y) {
+            tile.classList.add('paw');
+            glyph = '🐾';
+          }
+
+          tile.textContent = glyph;
+          boardEl.appendChild(tile);
+        }
+      }
+    }
+
+    function restartLevel() {
+      state.paw = { x: 0, y: 0 };
+      setupLevel();
+    }
+
+    function newGame() {
+      state.level = 1;
+      state.stars = 0;
+      state.whispersUnlocked = 0;
+      state.paw = { x: 0, y: 0 };
+      setupLevel();
+      setStatus('A new moon dream begins. Follow the quiet glow.');
+    }
+
+    document.querySelectorAll('[data-dir]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const dir = btn.getAttribute('data-dir');
+        if (dir === 'up') move(0, -1);
+        if (dir === 'down') move(0, 1);
+        if (dir === 'left') move(-1, 0);
+        if (dir === 'right') move(1, 0);
+      });
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      restartLevel();
+      setStatus('The moon rewinds the garden for you.');
+    });
+
+    document.getElementById('newGameBtn').addEventListener('click', newGame);
+
+    window.addEventListener('keydown', (e) => {
+      const map = {
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0]
+      };
+      if (map[e.key]) {
+        e.preventDefault();
+        move(...map[e.key]);
+      }
+    });
+
+    setupLevel();
+  </script>
 </body>
 </html>
