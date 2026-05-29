@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Puff Atelier</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --cream: #f8f0e4;
+      --cream-2: #fffaf2;
+      --ink: #252022;
+      --muted-ink: #6e6265;
+      --rose: #c7868e;
+      --rose-soft: #ead2d3;
+      --lavender: #c9bfd9;
+      --pearl: #e8e4df;
+      --champagne: #c3a46d;
+      --gold-soft: #eadcbd;
+      --panel: rgba(255, 250, 242, 0.82);
+      --panel-strong: rgba(255, 250, 242, 0.96);
+      --border: rgba(76, 59, 54, 0.13);
+      --shadow: rgba(75, 54, 50, 0.18);
+      --stage-accent: #ead2d3;
+      --hair-color: #2b2426;
+      --top-color: #efe5d2;
+      --bottom-color: #30292d;
+      --dress-color: transparent;
+      --outer-color: transparent;
+      --shoe-color: #2d2526;
+      --lip-color: #b9787d;
+      --blush-color: rgba(213, 132, 130, 0.28);
+      --shadow-color: rgba(151, 129, 152, 0.38);
+      --liner-color: transparent;
+      --sparkle-color: transparent;
+      --mark-color: transparent;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      min-height: 100%;
+      margin: 0;
+      font-family: "Avenir Next", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(234, 210, 211, 0.86), transparent 32%),
+        radial-gradient(circle at 88% 5%, rgba(201, 191, 217, 0.62), transparent 29%),
+        radial-gradient(circle at 54% 92%, rgba(234, 220, 189, 0.72), transparent 38%),
+        linear-gradient(135deg, #fbf4e9, #eee8e2 52%, #f6edf0);
+      padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .shell { width: min(1240px, 100%); margin: 0 auto; }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      padding: clamp(20px, 4vw, 36px);
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      background: linear-gradient(145deg, rgba(255,250,242,.94), rgba(248,240,228,.74));
+      box-shadow: 0 24px 70px var(--shadow), inset 0 1px 0 rgba(255,255,255,.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "atelier";
+      position: absolute;
+      right: 24px;
+      bottom: -16px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(4rem, 15vw, 10rem);
+      color: rgba(195, 164, 109, .12);
+      pointer-events: none;
+    }
+
+    .eyebrow { margin: 0 0 8px; text-transform: uppercase; letter-spacing: .16em; color: var(--champagne); font-weight: 800; font-size: .82rem; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.8rem, 8vw, 6.8rem); line-height: .9; letter-spacing: -.055em; }
+    .subtitle { margin: 14px 0 0; max-width: 620px; color: var(--muted-ink); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.55; }
+
+    .hub-link, .primary, .secondary, .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      border-radius: 999px;
+      border: 1px solid rgba(76, 59, 54, .14);
+      background: rgba(255,255,255,.62);
+      color: var(--ink);
+      padding: 11px 16px;
+      text-decoration: none;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(75,54,50,.08);
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+    .hub-link:hover, .primary:hover, .secondary:hover, .chip:hover,
+    .hub-link:focus-visible, .primary:focus-visible, .secondary:focus-visible, .chip:focus-visible { transform: translateY(-2px); border-color: rgba(195,164,109,.55); outline: none; }
+    .primary { background: var(--ink); color: var(--cream-2); }
+    .secondary.danger { color: #8d363d; }
+    .chip { min-height: 44px; font-size: .92rem; }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--cream-2); border-color: var(--ink); }
+
+    .workspace { display: grid; grid-template-columns: minmax(310px, 430px) 1fr; gap: clamp(16px, 3vw, 26px); margin-top: 22px; align-items: start; }
+    .stage-card, .panel, .note-card {
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--panel);
+      box-shadow: 0 18px 50px rgba(75, 54, 50, 0.12), inset 0 1px 0 rgba(255,255,255,.88);
+      backdrop-filter: blur(10px);
+    }
+
+    .stage-card { padding: clamp(16px, 3vw, 24px); position: sticky; top: 14px; }
+    .mirror {
+      min-height: 560px;
+      border-radius: 42px 42px 30px 30px;
+      border: 10px solid rgba(255,250,242,.85);
+      outline: 1px solid rgba(195,164,109,.32);
+      background: var(--scene-bg, linear-gradient(160deg, #f6ece6, #e9d8db));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), inset 0 30px 80px rgba(255,255,255,.42), 0 18px 45px rgba(75,54,50,.16);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      place-items: end center;
+      padding: 28px 16px 22px;
+    }
+    .scene-detail { position: absolute; inset: 0; pointer-events: none; opacity: .78; }
+    .caption { position: absolute; top: 18px; left: 18px; right: 18px; display: flex; justify-content: space-between; gap: 8px; color: rgba(37,32,34,.66); font: italic 1rem Georgia, serif; }
+
+    .doll { position: relative; width: 242px; height: 486px; transform: translateY(6px) rotate(var(--pose-tilt, 0deg)); transition: transform .28s ease; }
+    .asset-layer { position: absolute; inset: 0; pointer-events: none; }
+    /* Future art hook: replace any .css-* layer below with absolutely positioned PNG/SVG assets.
+       Suggested order: background props, base body, hair back, clothes, face makeup, accessories, hair front. */
+    .neck { position: absolute; top: 135px; left: 101px; width: 40px; height: 54px; background: #ecc9b4; border-radius: 16px; box-shadow: inset 0 -8px 0 rgba(161,106,87,.12); }
+    .head { position: absolute; top: 54px; left: 68px; width: 106px; height: 116px; background: #f0cdb8; border-radius: 48% 48% 52% 52%; box-shadow: inset -8px -10px 0 rgba(174,111,91,.08); z-index: 5; }
+    .ear { position: absolute; top: 102px; width: 18px; height: 28px; background: #e7bfa9; border-radius: 999px; z-index: 4; }
+    .ear.left { left: 59px; } .ear.right { right: 59px; }
+    .eye { position: absolute; top: 105px; width: 10px; height: 12px; background: #2f292b; border-radius: 50%; z-index: 8; }
+    .eye.left { left: 96px; } .eye.right { right: 96px; }
+    .eyeshadow { position: absolute; top: 99px; width: 25px; height: 10px; background: var(--shadow-color); border-radius: 50%; filter: blur(.2px); z-index: 7; }
+    .eyeshadow.left { left: 88px; } .eyeshadow.right { right: 88px; }
+    .liner { position: absolute; top: 105px; width: 24px; height: 9px; border-top: 3px solid var(--liner-color); border-radius: 50%; z-index: 9; }
+    .liner.left { left: 88px; transform: rotate(5deg); } .liner.right { right: 88px; transform: rotate(-5deg); }
+    .blush { position: absolute; top: 124px; width: 28px; height: 14px; background: var(--blush-color); border-radius: 50%; filter: blur(1px); z-index: 7; }
+    .blush.left { left: 80px; } .blush.right { right: 80px; }
+    .mouth { position: absolute; top: 139px; left: 112px; width: 20px; height: 9px; background: var(--lip-color); border-radius: 40% 40% 55% 55%; z-index: 8; transform: scaleX(var(--mouth-width, 1)); }
+    .sparkles, .marks { position: absolute; top: 83px; left: 72px; width: 98px; height: 80px; z-index: 10; color: var(--sparkle-color); }
+    .sparkles::before { content: "✦  ·  ✧"; position: absolute; top: 14px; left: 2px; font-size: 18px; letter-spacing: 20px; }
+    .sparkles::after { content: "•  ✦"; position: absolute; top: 45px; right: 2px; font-size: 13px; letter-spacing: 18px; }
+    .marks { color: var(--mark-color); }
+    .marks::before { content: var(--marks-text, ""); position: absolute; top: 39px; left: 16px; font-size: 13px; letter-spacing: 6px; }
+
+    .hair-back { position: absolute; top: 42px; left: 47px; width: 148px; height: var(--hair-back-h, 154px); background: var(--hair-color); border-radius: var(--hair-back-radius, 54px 54px 48px 48px); z-index: 2; box-shadow: inset -12px -10px 0 rgba(255,255,255,.04); }
+    .hair-front { position: absolute; top: 38px; left: 58px; width: 126px; height: 70px; background: var(--hair-color); border-radius: var(--hair-front-radius, 55px 55px 24px 24px); z-index: 11; }
+    .hair-front::after { content: ""; position: absolute; top: 20px; left: 28px; width: 70px; height: 26px; border-radius: 0 0 50% 50%; background: #f0cdb8; }
+    .braid { display: var(--braid-display, none); position: absolute; top: 128px; width: 28px; height: 140px; background: repeating-radial-gradient(circle at 50% 14px, var(--hair-color) 0 13px, rgba(0,0,0,.09) 14px 17px); border-radius: 999px; z-index: 3; }
+    .braid.left { left: 42px; transform: rotate(8deg); } .braid.right { right: 42px; transform: rotate(-8deg); }
+    .bun { display: var(--bun-display, none); position: absolute; top: 31px; left: 94px; width: 54px; height: 46px; background: var(--hair-color); border-radius: 50%; z-index: 12; }
+    .ponytail { display: var(--pony-display, none); position: absolute; top: 96px; right: 35px; width: 62px; height: 175px; background: var(--hair-color); border-radius: 40px 40px 80px 30px; transform: rotate(-13deg); z-index: 1; }
+
+    .body { position: absolute; top: 170px; left: 72px; width: 98px; height: 178px; background: #efc8b3; border-radius: 42px 42px 26px 26px; z-index: 3; }
+    .arm { position: absolute; top: 184px; width: 28px; height: 144px; background: #edc7b2; border-radius: 999px; z-index: 2; transform-origin: top; }
+    .arm.left { left: 54px; transform: rotate(10deg); } .arm.right { right: 54px; transform: rotate(-10deg); }
+    .leg { position: absolute; top: 320px; width: 30px; height: 116px; background: #edc7b2; border-radius: 999px; z-index: 1; }
+    .leg.left { left: 86px; } .leg.right { right: 86px; }
+    .top { position: absolute; top: 169px; left: 67px; width: 108px; height: 98px; background: var(--top-color); border-radius: var(--top-radius, 30px 30px 18px 18px); z-index: 6; box-shadow: inset 0 -12px 0 rgba(0,0,0,.05); }
+    .top::after { content: var(--top-detail, ""); position: absolute; inset: 12px 0 auto; text-align: center; color: rgba(37,32,34,.68); font-size: 20px; }
+    .bottom { position: absolute; top: 252px; left: 66px; width: 110px; height: var(--bottom-h, 90px); background: var(--bottom-color); clip-path: var(--bottom-shape, polygon(17% 0, 83% 0, 100% 100%, 0 100%)); border-radius: 0 0 18px 18px; z-index: 5; }
+    .dress { display: var(--dress-display, none); position: absolute; top: 168px; left: 55px; width: 132px; height: var(--dress-h, 186px); background: var(--dress-color); clip-path: polygon(34% 0, 66% 0, 96% 100%, 4% 100%); border-radius: 28px 28px 20px 20px; z-index: 7; box-shadow: inset 0 -18px 0 rgba(0,0,0,.05); }
+    .outer { display: var(--outer-display, none); position: absolute; top: 166px; left: 45px; width: 152px; height: 162px; border: 18px solid var(--outer-color); border-top-width: 28px; border-bottom-width: 0; border-radius: 34px 34px 20px 20px; z-index: 8; pointer-events: none; }
+    .shoe { position: absolute; top: 428px; width: 42px; height: 18px; background: var(--shoe-color); border-radius: 16px 16px 8px 8px; z-index: 9; }
+    .shoe.left { left: 75px; } .shoe.right { right: 75px; }
+    .accessory { position: absolute; z-index: 13; color: var(--champagne); font-weight: 900; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+    .accessory.ribbon { display: var(--ribbon-display, none); top: 47px; left: 71px; font-size: 27px; color: #9d4d57; }
+    .accessory.necklace { display: var(--necklace-display, none); top: 168px; left: 92px; width: 58px; height: 22px; border-bottom: 5px dotted var(--necklace-color, #f7ead0); border-radius: 50%; }
+    .accessory.bag { display: var(--bag-display, none); top: 247px; right: 28px; width: 43px; height: 52px; border-radius: 13px; background: #8f6570; box-shadow: inset 0 10px 0 rgba(255,255,255,.12); }
+    .accessory.bag::before { content:""; position:absolute; top:-17px; left:9px; width:25px; height:25px; border:4px solid #8f6570; border-bottom:0; border-radius:20px 20px 0 0; }
+    .accessory.glasses { display: var(--glasses-display, none); top: 103px; left: 83px; width: 76px; height: 22px; }
+    .accessory.glasses::before, .accessory.glasses::after { content:""; position:absolute; width:25px; height:18px; border:3px solid #4a4446; border-radius:50%; }
+    .accessory.glasses::before { left:0; } .accessory.glasses::after { right:0; } .accessory.glasses span { position:absolute; left:28px; top:8px; width:20px; border-top:3px solid #4a4446; }
+    .accessory.clip { display: var(--clip-display, none); top: 69px; right: 63px; width: 32px; height: 9px; border-radius: 999px; background: #d7c4f0; transform: rotate(-18deg); }
+
+    .scene-rainy .scene-detail::before { content:""; position:absolute; inset:56px 35px auto; height:180px; border:6px solid rgba(255,250,242,.55); border-radius:26px; background: repeating-linear-gradient(105deg, rgba(99,107,126,.18) 0 2px, transparent 2px 18px); }
+    .scene-cafe .scene-detail::before { content:"café"; position:absolute; top:78px; left:44px; font: italic 3.2rem Georgia, serif; color:rgba(99,70,64,.2); }
+    .scene-studio .scene-detail::before { content:""; position:absolute; left:32px; top:92px; width:86px; height:120px; border:7px solid rgba(94,72,66,.16); transform:rotate(-6deg); }
+    .scene-moon .scene-detail::before { content:"☾"; position:absolute; right:48px; top:70px; font-size:5rem; color:rgba(54,50,82,.26); }
+    .scene-museum .scene-detail::before { content:""; position:absolute; left:40px; right:40px; top:90px; height:132px; border:10px double rgba(195,164,109,.28); border-radius:4px; }
+
+    .stage-tools { display:grid; gap:12px; margin-top:16px; }
+    .summary { margin: 0; padding: 16px; border-radius: 22px; background: rgba(255,255,255,.52); color: var(--muted-ink); line-height: 1.55; }
+    .challenge { color: var(--champagne); font-weight: 900; }
+
+    .controls { display: grid; gap: 18px; }
+    .panel { padding: clamp(16px, 2.4vw, 22px); }
+    .panel h2 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 1.55rem; }
+    .panel p { margin: 0 0 14px; color: var(--muted-ink); line-height: 1.45; }
+    .group { margin-top: 16px; }
+    .group h3 { margin: 0 0 10px; font-size: .88rem; text-transform: uppercase; letter-spacing: .12em; color: var(--champagne); }
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .note-grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
+    .note-card { padding:18px; }
+    .note-card h2 { margin:0 0 8px; font-family: Georgia, serif; }
+    .note-card p { margin:0; color:var(--muted-ink); line-height:1.5; }
+
+    .save-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .name-input { min-height:48px; flex:1 1 220px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.7); padding:0 16px; color:var(--ink); }
+    .gallery { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px; margin-top:14px; }
+    .look-card { border:1px solid var(--border); border-radius:22px; padding:14px; background:rgba(255,255,255,.54); }
+    .look-card h3 { margin:0; font-size:1.08rem; }
+    .look-card .date { margin:4px 0 8px; color:var(--muted-ink); font-size:.9rem; }
+    .look-card p { margin:0 0 10px; font-size:.94rem; }
+
+    @media (max-width: 980px) {
+      .workspace { grid-template-columns: 1fr; }
+      .stage-card { position: static; }
+      .mirror { min-height: 530px; }
+      .note-grid, .gallery { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      body { padding-left: 10px; padding-right: 10px; }
+      .hero { flex-direction: column; border-radius: 26px; }
+      .hub-link { width: 100%; }
+      .doll { transform: translateY(12px) scale(.9) rotate(var(--pose-tilt, 0deg)); }
+      .mirror { min-height: 500px; padding-left: 4px; padding-right: 4px; }
+      .chip { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Private dressing studio</p>
+        <h1>Puff Atelier</h1>
+        <p class="subtitle">Makeup, dress-up, and tiny fashion experiments. Build a polished paper-doll look, save it privately, and let Pup make tasteful notes.</p>
+      </div>
+      <a class="hub-link" href="index.html" aria-label="Back to the main mini tools hub">← Mini tools hub</a>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-card" aria-labelledby="stage-title">
+        <h2 id="stage-title" class="eyebrow">Character stage</h2>
+        <div id="mirror" class="mirror scene-atelier" aria-label="Current Puff Atelier character look">
+          <div class="scene-detail" aria-hidden="true"></div>
+          <div class="caption"><span id="sceneName">Atelier Mirror</span><span id="moodText">Sweet</span></div>
+          <div id="doll" class="doll" aria-hidden="true">
+            <div class="asset-layer future-background-props"></div>
+            <div class="ponytail"></div><div class="hair-back"></div><div class="braid left"></div><div class="braid right"></div>
+            <div class="neck"></div><div class="ear left"></div><div class="ear right"></div><div class="head"></div><div class="bun"></div><div class="hair-front"></div>
+            <div class="eyeshadow left"></div><div class="eyeshadow right"></div><div class="liner left"></div><div class="liner right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="mouth"></div><div class="sparkles"></div><div class="marks"></div>
+            <div class="arm left"></div><div class="arm right"></div><div class="body"></div><div class="leg left"></div><div class="leg right"></div>
+            <div class="top"></div><div class="bottom"></div><div class="dress"></div><div class="outer"></div><div class="shoe left"></div><div class="shoe right"></div>
+            <div class="accessory ribbon">⌁</div><div class="accessory necklace"></div><div class="accessory bag"></div><div class="accessory glasses"><span></span></div><div class="accessory clip"></div>
+            <div class="asset-layer future-png-clothes"></div>
+          </div>
+        </div>
+        <div class="stage-tools">
+          <p id="summary" class="summary"></p>
+          <p id="challengeLine" class="summary">Current challenge: <span class="challenge">choose one when you feel like styling to a brief.</span></p>
+          <div class="actions" aria-label="Randomizer and challenge tools">
+            <button class="secondary" id="randomOutfit">Random Outfit</button>
+            <button class="secondary" id="randomMakeup">Random Makeup</button>
+            <button class="primary" id="surprise">Full Surprise Look</button>
+            <button class="secondary" id="reset">Soft Reset</button>
+            <button class="secondary" id="challenge">Style Challenge</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="controls">
+        <section class="note-grid" aria-label="Live look notes">
+          <article class="note-card"><h2>Look summary</h2><p id="lookSummary"></p></article>
+          <article class="note-card"><h2>Pup’s note</h2><p id="pupNote"></p></article>
+        </section>
+
+        <section class="panel" aria-labelledby="makeup-title"><h2 id="makeup-title">Makeup tray</h2><p>Tap a shade or detail. The remove button returns the face to a bare, fresh base.</p><div id="makeupControls"></div><div class="group"><button class="secondary" id="removeMakeup">Remove makeup</button></div></section>
+        <section class="panel" aria-labelledby="hair-title"><h2 id="hair-title">Hair board</h2><p>Choose a silhouette and color. Later, custom PNG hair art can replace these CSS layers.</p><div id="hairControls"></div></section>
+        <section class="panel" aria-labelledby="clothes-title"><h2 id="clothes-title">Wardrobe rail</h2><p>Mix tops, bottoms, dresses, coats, shoes, and small accessories for an atelier board look.</p><div id="clothingControls"></div></section>
+        <section class="panel" aria-labelledby="theme-title"><h2 id="theme-title">Theme, background, and mood</h2><p>Scenes and moods change the mirror atmosphere, captions, face energy, and styling note.</p><div id="themeControls"></div></section>
+        <section class="panel" aria-labelledby="save-title"><h2 id="save-title">Saved looks</h2><p>Looks stay only in this browser with localStorage. Nothing is uploaded or stored online.</p><div class="save-row"><input id="lookName" class="name-input" type="text" maxlength="42" placeholder="Name this look, e.g. Rainy Café Puff" /><button class="primary" id="saveLook">Save Look</button><button class="secondary danger" id="clearLooks">Clear all saved looks</button></div><div id="gallery" class="gallery" aria-live="polite"></div></section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "puffAtelierLooks.v1";
+    const options = {
+      blush: ["Bare", "Peach Cloud", "Rose Tea", "Soft Berry"],
+      lips: ["Bare", "Honey Rose", "Cherry Ink", "Mauve Velvet", "Cocoa Pink"],
+      eyeshadow: ["Bare", "Pearl Dust", "London Fog", "Rose Marble", "Midnight Plum"],
+      eyeliner: ["None", "Soft Brown", "Black Wing", "Tiny Flick"],
+      sparkle: ["None", "Moon Dust", "Gold Flecks", "Dew Glow"],
+      marks: ["None", "One Mole", "Cheek Moles", "Star Freckles"],
+      hair: ["Short Bob", "Long Waves", "Curly Hair", "Twin Braids", "Messy Bun", "Sleek Ponytail"],
+      hairColor: ["Black", "Dark Brown", "Soft Brown", "Blue Black", "Dusty Pink", "Silver"],
+      top: ["Cream Knit", "Black Ribbon Blouse", "White Tank", "Art School Shirt", "Velvet Camisole"],
+      bottom: ["Pleated Skirt", "Wide Trousers", "Denim Mini", "Long Black Skirt"],
+      dress: ["None", "Tea Dress", "Black Slip Dress", "Museum Dress", "Moonlit Gown"],
+      outer: ["None", "Oversized Cardigan", "Leather Jacket", "Trench Coat", "Studio Hoodie", "Wool Coat"],
+      shoes: ["Mary Janes", "Ballet Flats", "Black Boots", "Sneakers"],
+      accessory: ["None", "Ribbon", "Pearl Necklace", "Silver Necklace", "Tiny Bag", "Glasses", "Hair Clip"],
+      scene: ["Atelier Mirror", "Rainy Window", "London Café", "Art School Studio", "Moonlit Bedroom", "Museum Hall", "Soft Plain Background"],
+      mood: ["Sweet", "Cool", "Elegant", "Sleepy", "Academic", "Mysterious", "Art Student"]
+    };
+    const labels = { blush:"Blush", lips:"Lip color", eyeshadow:"Eye shadow", eyeliner:"Eyeliner", sparkle:"Face sparkle", marks:"Freckles / beauty marks", hair:"Hair style", hairColor:"Hair color", top:"Tops", bottom:"Bottoms", dress:"Dresses", outer:"Outerwear", shoes:"Shoes", accessory:"Accessories", scene:"Background scenes", mood:"Mood" };
+    const defaultState = { blush:"Rose Tea", lips:"Honey Rose", eyeshadow:"Pearl Dust", eyeliner:"Soft Brown", sparkle:"Dew Glow", marks:"None", hair:"Long Waves", hairColor:"Dark Brown", top:"Black Ribbon Blouse", bottom:"Pleated Skirt", dress:"None", outer:"Oversized Cardigan", shoes:"Mary Janes", accessory:"Pearl Necklace", scene:"Atelier Mirror", mood:"Sweet" };
+    let state = { ...defaultState };
+
+    const styleMaps = {
+      blush: { Bare:"transparent", "Peach Cloud":"rgba(231,149,112,.28)", "Rose Tea":"rgba(199,112,123,.28)", "Soft Berry":"rgba(153,72,92,.31)" },
+      lips: { Bare:"#d79685", "Honey Rose":"#bd777b", "Cherry Ink":"#8f2d3b", "Mauve Velvet":"#9b627f", "Cocoa Pink":"#9a6a63" },
+      eyeshadow: { Bare:"transparent", "Pearl Dust":"rgba(238,228,214,.78)", "London Fog":"rgba(118,119,132,.36)", "Rose Marble":"rgba(195,128,139,.35)", "Midnight Plum":"rgba(65,48,83,.44)" },
+      eyeliner: { None:"transparent", "Soft Brown":"#6b4a3f", "Black Wing":"#201b1d", "Tiny Flick":"#2e2528" },
+      sparkle: { None:"transparent", "Moon Dust":"rgba(255,255,255,.96)", "Gold Flecks":"#c3a46d", "Dew Glow":"rgba(255,255,255,.7)" },
+      marks: { None:["transparent", ""], "One Mole":["#5b403a", "•"], "Cheek Moles":["#5b403a", "•  •"], "Star Freckles":["#9a6a63", "✦ · ·"] },
+      hairColor: { Black:"#211d1f", "Dark Brown":"#44302a", "Soft Brown":"#8a6756", "Blue Black":"#1d2430", "Dusty Pink":"#b9808c", Silver:"#c9c7c3" },
+      top: { "Cream Knit":["#efe4cf", "✧", "30px 30px 20px 20px"], "Black Ribbon Blouse":["#2b2529", "⌁", "26px 26px 16px 16px"], "White Tank":["#fffaf2", "", "18px 18px 16px 16px"], "Art School Shirt":["#dad2c8", "✎", "22px 22px 12px 12px"], "Velvet Camisole":["#6f3344", "", "16px 16px 20px 20px"] },
+      bottom: { "Pleated Skirt":["#3a3136", "90px", "polygon(17% 0,83% 0,100% 100%,0 100%)"], "Wide Trousers":["#4d4743", "146px", "polygon(12% 0,88% 0,92% 100%,8% 100%)"], "Denim Mini":["#6d8399", "72px", "polygon(15% 0,85% 0,98% 100%,2% 100%)"], "Long Black Skirt":["#211d21", "138px", "polygon(22% 0,78% 0,92% 100%,8% 100%)"] },
+      dress: { None:["none", "transparent", "0"], "Tea Dress":["block", "#d7a2a3", "178px"], "Black Slip Dress":["block", "#272226", "176px"], "Museum Dress":["block", "#d7c6a1", "188px"], "Moonlit Gown":["block", "#77708d", "220px"] },
+      outer: { None:["none", "transparent"], "Oversized Cardigan":["block", "#d8c7b5"], "Leather Jacket":["block", "#242123"], "Trench Coat":["block", "#bfa77f"], "Studio Hoodie":["block", "#a8a5a2"], "Wool Coat":["block", "#5d4e55"] },
+      shoes: { "Mary Janes":"#211d1f", "Ballet Flats":"#d6a0a5", "Black Boots":"#1c191b", Sneakers:"#f7f0e7" },
+      scene: {
+        "Atelier Mirror":["scene-atelier", "linear-gradient(160deg, #f6ece6, #ead9da)"], "Rainy Window":["scene-rainy", "linear-gradient(160deg, #d9dee5, #efe8e1)"], "London Café":["scene-cafe", "linear-gradient(160deg, #ead8c7, #d9c0bd)"], "Art School Studio":["scene-studio", "linear-gradient(160deg, #eee2d0, #dedbd2)"], "Moonlit Bedroom":["scene-moon", "linear-gradient(160deg, #c8c3d6, #ece4ef)"], "Museum Hall":["scene-museum", "linear-gradient(160deg, #efe3ca, #d9c8ad)"], "Soft Plain Background":["scene-plain", "linear-gradient(160deg, #fffaf2, #e8e4df)"]
+      },
+      mood: { Sweet:["0deg", "1.08", "Sweet"], Cool:["-1.2deg", ".9", "Cool"], Elegant:[".6deg", "1", "Elegant"], Sleepy:["2deg", ".78", "Sleepy"], Academic:["-1deg", ".95", "Academic"], Mysterious:["1.4deg", ".82", "Mysterious"], "Art Student":["-1.6deg", "1.02", "Art Student"] }
+    };
+    const challenges = ["Rainy London Café", "First day at art school", "Library date with yourself", "Gallery opening", "Soft study day", "Midnight drawing session", "Interview but make it beautiful"];
+    const notes = [
+      "This one looks like you are about to read poetry and judge a chandelier.",
+      "The black ribbon blouse is doing dangerous little academia work.",
+      "Soft, but not harmless. Good.",
+      "This outfit has sketchbook-in-a-café energy.",
+      "Pup says the proportions are polite, but the mood has secrets.",
+      "A tiny museum guard would absolutely nod at this look."
+    ];
+
+    function pretty(text) { return text.toLowerCase(); }
+    function escapeHTML(text) { return String(text).replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "\'":"&#39;" }[char])); }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function root() { return document.documentElement.style; }
+
+    function makeGroup(target, key) {
+      const group = document.createElement("div"); group.className = "group";
+      group.innerHTML = `<h3>${labels[key]}</h3>`;
+      const chips = document.createElement("div"); chips.className = "chips";
+      options[key].forEach(value => {
+        const btn = document.createElement("button"); btn.className = "chip"; btn.type = "button"; btn.textContent = value;
+        btn.dataset.key = key; btn.dataset.value = value; btn.setAttribute("aria-pressed", state[key] === value);
+        btn.addEventListener("click", () => { state[key] = value; render(); });
+        chips.appendChild(btn);
+      });
+      group.appendChild(chips); target.appendChild(group);
+    }
+
+    function buildControls() {
+      ["blush","lips","eyeshadow","eyeliner","sparkle","marks"].forEach(k => makeGroup(document.getElementById("makeupControls"), k));
+      ["hair","hairColor"].forEach(k => makeGroup(document.getElementById("hairControls"), k));
+      ["top","bottom","dress","outer","shoes","accessory"].forEach(k => makeGroup(document.getElementById("clothingControls"), k));
+      ["scene","mood"].forEach(k => makeGroup(document.getElementById("themeControls"), k));
+    }
+
+    function applyHair() {
+      const hair = state.hair;
+      root().setProperty("--hair-color", styleMaps.hairColor[state.hairColor]);
+      root().setProperty("--braid-display", hair === "Twin Braids" ? "block" : "none");
+      root().setProperty("--bun-display", hair === "Messy Bun" ? "block" : "none");
+      root().setProperty("--pony-display", hair === "Sleek Ponytail" ? "block" : "none");
+      root().setProperty("--hair-back-h", hair === "Short Bob" ? "126px" : hair === "Curly Hair" ? "175px" : "154px");
+      root().setProperty("--hair-back-radius", hair === "Curly Hair" ? "48%" : "54px 54px 48px 48px");
+      root().setProperty("--hair-front-radius", hair === "Short Bob" ? "48px 48px 20px 20px" : hair === "Curly Hair" ? "48% 48% 24px 24px" : "55px 55px 24px 24px");
+    }
+
+    function applyClothes() {
+      const top = styleMaps.top[state.top], bottom = styleMaps.bottom[state.bottom], dress = styleMaps.dress[state.dress], outer = styleMaps.outer[state.outer];
+      root().setProperty("--top-color", top[0]); root().setProperty("--top-detail", JSON.stringify(top[1])); root().setProperty("--top-radius", top[2]);
+      root().setProperty("--bottom-color", bottom[0]); root().setProperty("--bottom-h", bottom[1]); root().setProperty("--bottom-shape", bottom[2]);
+      root().setProperty("--dress-display", dress[0]); root().setProperty("--dress-color", dress[1]); root().setProperty("--dress-h", dress[2]);
+      root().setProperty("--outer-display", outer[0]); root().setProperty("--outer-color", outer[1]); root().setProperty("--shoe-color", styleMaps.shoes[state.shoes]);
+      root().setProperty("--ribbon-display", state.accessory === "Ribbon" ? "block" : "none");
+      root().setProperty("--necklace-display", state.accessory.includes("Necklace") ? "block" : "none");
+      root().setProperty("--necklace-color", state.accessory === "Silver Necklace" ? "#d9dce0" : "#fff4df");
+      root().setProperty("--bag-display", state.accessory === "Tiny Bag" ? "block" : "none");
+      root().setProperty("--glasses-display", state.accessory === "Glasses" ? "block" : "none");
+      root().setProperty("--clip-display", state.accessory === "Hair Clip" ? "block" : "none");
+    }
+
+    function applyFace() {
+      root().setProperty("--blush-color", styleMaps.blush[state.blush]); root().setProperty("--lip-color", styleMaps.lips[state.lips]);
+      root().setProperty("--shadow-color", styleMaps.eyeshadow[state.eyeshadow]); root().setProperty("--liner-color", styleMaps.eyeliner[state.eyeliner]);
+      root().setProperty("--sparkle-color", styleMaps.sparkle[state.sparkle]); root().setProperty("--mark-color", styleMaps.marks[state.marks][0]); root().setProperty("--marks-text", JSON.stringify(styleMaps.marks[state.marks][1]));
+    }
+
+    function applySceneMood() {
+      const mirror = document.getElementById("mirror"); mirror.className = "mirror " + styleMaps.scene[state.scene][0]; mirror.style.setProperty("--scene-bg", styleMaps.scene[state.scene][1]);
+      root().setProperty("--pose-tilt", styleMaps.mood[state.mood][0]); root().setProperty("--mouth-width", styleMaps.mood[state.mood][1]);
+      document.getElementById("sceneName").textContent = state.scene; document.getElementById("moodText").textContent = styleMaps.mood[state.mood][2];
+    }
+
+    function outfitParts() { return state.dress === "None" ? `${pretty(state.top)} with ${pretty(state.bottom)}` : pretty(state.dress); }
+    function summaryText() { return `A ${pretty(state.mood)} look with ${pretty(state.blush)} blush, ${pretty(state.eyeshadow)} eyeshadow, ${outfitParts()}, ${pretty(state.outer)}, ${pretty(state.accessory)}, and ${pretty(state.shoes)}.`.replace("none, ", ""); }
+    function pupComment() {
+      if (state.top === "Black Ribbon Blouse") return notes[1];
+      if (state.scene === "London Café" || state.scene === "Rainy Window") return notes[3];
+      if (state.mood === "Mysterious" || state.dress === "Black Slip Dress") return "Soft candlelight, sharper thoughts. Pup approves the quiet drama.";
+      if (state.mood === "Academic") return notes[0];
+      return pick(notes);
+    }
+
+    function render() {
+      applyFace(); applyHair(); applyClothes(); applySceneMood();
+      document.querySelectorAll(".chip").forEach(btn => btn.setAttribute("aria-pressed", String(state[btn.dataset.key] === btn.dataset.value)));
+      const text = summaryText(); document.getElementById("summary").textContent = text; document.getElementById("lookSummary").textContent = text; document.getElementById("pupNote").textContent = pupComment();
+    }
+
+    function savedLooks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+    function storeLooks(looks) { localStorage.setItem(STORAGE_KEY, JSON.stringify(looks)); }
+    function renderGallery() {
+      const gallery = document.getElementById("gallery"); const looks = savedLooks(); gallery.innerHTML = "";
+      if (!looks.length) { gallery.innerHTML = `<p class="summary">No saved looks yet. Create something soft and dramatic, then save it here.</p>`; return; }
+      looks.forEach(look => {
+        const card = document.createElement("article"); card.className = "look-card";
+        card.innerHTML = `<h3>${escapeHTML(look.name)}</h3><div class="date">${escapeHTML(look.date)} · ${escapeHTML(look.state.mood)}</div><p>${escapeHTML(look.summary)}</p><div class="actions"><button class="secondary" type="button">Load</button><button class="secondary danger" type="button">Delete</button></div>`;
+        const [load, del] = card.querySelectorAll("button");
+        load.addEventListener("click", () => { state = { ...defaultState, ...look.state }; render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+        del.addEventListener("click", () => { storeLooks(savedLooks().filter(item => item.id !== look.id)); renderGallery(); });
+        gallery.appendChild(card);
+      });
+    }
+
+    function randomOutfit() { ["hair","hairColor","top","bottom","dress","outer","shoes","accessory","scene","mood"].forEach(k => state[k] = pick(options[k])); if (state.dress !== "None") state.bottom = pick(["Pleated Skirt", "Long Black Skirt"]); render(); }
+    function randomMakeup() { ["blush","lips","eyeshadow","eyeliner","sparkle","marks"].forEach(k => state[k] = pick(options[k])); render(); }
+    function removeMakeup() { Object.assign(state, { blush:"Bare", lips:"Bare", eyeshadow:"Bare", eyeliner:"None", sparkle:"None", marks:"None" }); render(); }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      buildControls(); render(); renderGallery();
+      document.getElementById("removeMakeup").addEventListener("click", removeMakeup);
+      document.getElementById("randomOutfit").addEventListener("click", randomOutfit);
+      document.getElementById("randomMakeup").addEventListener("click", randomMakeup);
+      document.getElementById("surprise").addEventListener("click", () => { randomOutfit(); randomMakeup(); });
+      document.getElementById("reset").addEventListener("click", () => { state = { ...defaultState }; render(); });
+      document.getElementById("challenge").addEventListener("click", () => { document.getElementById("challengeLine").innerHTML = `Current challenge: <span class="challenge">${pick(challenges)}</span>`; });
+      document.getElementById("saveLook").addEventListener("click", () => {
+        const name = document.getElementById("lookName").value.trim() || `${state.mood} Puff Look`;
+        const look = { id: Date.now().toString(36), name, date: new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }), state: { ...state }, summary: summaryText() };
+        storeLooks([look, ...savedLooks()].slice(0, 24)); document.getElementById("lookName").value = ""; renderGallery();
+      });
+      document.getElementById("clearLooks").addEventListener("click", () => { if (confirm("Delete all saved Puff Atelier looks from this browser?")) { storeLooks([]); renderGallery(); } });
+    });
+  </script>
+</body>
+</html>
