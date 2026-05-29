@@ -134,60 +134,201 @@
       padding: 28px 16px 22px;
     }
     .scene-detail { position: absolute; inset: 0; pointer-events: none; opacity: .78; }
+    .scene-detail::after { content:""; position:absolute; left:28%; right:28%; top:42px; bottom:58px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,.34), rgba(255,255,255,.10) 42%, transparent 68%); filter: blur(10px); }
     .caption { position: absolute; top: 18px; left: 18px; right: 18px; display: flex; justify-content: space-between; gap: 8px; color: rgba(37,32,34,.66); font: italic 1rem Georgia, serif; }
 
-    .doll { position: relative; width: 242px; height: 486px; transform: translateY(6px) rotate(var(--pose-tilt, 0deg)); transition: transform .28s ease; }
+    .mirror::before {
+      content: "";
+      position: absolute;
+      inset: 18px 18px 24px;
+      border: 2px solid rgba(255,255,255,.58);
+      border-radius: 34px 34px 24px 24px;
+      box-shadow: inset 0 0 34px rgba(255,255,255,.28), 0 0 0 1px rgba(195,164,109,.18);
+      pointer-events: none;
+    }
+    .mirror::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      width: 220px;
+      height: 34px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(75,54,50,.28), rgba(75,54,50,.08) 55%, transparent 72%);
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .doll {
+      --skin: #f0cbb7;
+      --skin-shadow: #dba98f;
+      --skin-blush: rgba(177, 96, 83, .12);
+      --line-soft: rgba(91, 61, 52, .22);
+      --hair-shine: rgba(255,255,255,.10);
+      position: relative;
+      width: 258px;
+      height: 504px;
+      transform: translateY(8px) scale(1.04) rotate(var(--pose-tilt, 0deg));
+      transform-origin: center bottom;
+      transition: transform .28s ease;
+      z-index: 1;
+    }
+    .mirror.face-view .doll { transform: translateY(142px) scale(1.78) rotate(var(--pose-tilt, 0deg)); }
     .asset-layer { position: absolute; inset: 0; pointer-events: none; }
-    /* Future art hook: replace any .css-* layer below with absolutely positioned PNG/SVG assets.
-       Suggested order: background props, base body, hair back, clothes, face makeup, accessories, hair front. */
-    .neck { position: absolute; top: 135px; left: 101px; width: 40px; height: 54px; background: #ecc9b4; border-radius: 16px; box-shadow: inset 0 -8px 0 rgba(161,106,87,.12); }
-    .head { position: absolute; top: 54px; left: 68px; width: 106px; height: 116px; background: #f0cdb8; border-radius: 48% 48% 52% 52%; box-shadow: inset -8px -10px 0 rgba(174,111,91,.08); z-index: 5; }
-    .ear { position: absolute; top: 102px; width: 18px; height: 28px; background: #e7bfa9; border-radius: 999px; z-index: 4; }
-    .ear.left { left: 59px; } .ear.right { right: 59px; }
-    .eye { position: absolute; top: 105px; width: 10px; height: 12px; background: #2f292b; border-radius: 50%; z-index: 8; }
-    .eye.left { left: 96px; } .eye.right { right: 96px; }
-    .eyeshadow { position: absolute; top: 99px; width: 25px; height: 10px; background: var(--shadow-color); border-radius: 50%; filter: blur(.2px); z-index: 7; }
-    .eyeshadow.left { left: 88px; } .eyeshadow.right { right: 88px; }
-    .liner { position: absolute; top: 105px; width: 24px; height: 9px; border-top: 3px solid var(--liner-color); border-radius: 50%; z-index: 9; }
-    .liner.left { left: 88px; transform: rotate(5deg); } .liner.right { right: 88px; transform: rotate(-5deg); }
-    .blush { position: absolute; top: 124px; width: 28px; height: 14px; background: var(--blush-color); border-radius: 50%; filter: blur(1px); z-index: 7; }
-    .blush.left { left: 80px; } .blush.right { right: 80px; }
-    .mouth { position: absolute; top: 139px; left: 112px; width: 20px; height: 9px; background: var(--lip-color); border-radius: 40% 40% 55% 55%; z-index: 8; transform: scaleX(var(--mouth-width, 1)); }
-    .sparkles, .marks { position: absolute; top: 83px; left: 72px; width: 98px; height: 80px; z-index: 10; color: var(--sparkle-color); }
-    .sparkles::before { content: "✦  ·  ✧"; position: absolute; top: 14px; left: 2px; font-size: 18px; letter-spacing: 20px; }
-    .sparkles::after { content: "•  ✦"; position: absolute; top: 45px; right: 2px; font-size: 13px; letter-spacing: 18px; }
+    /* Layer 1: background/stage is handled by .mirror, .scene-detail, and the floor shadow above. */
+    /* Layer 2: back hair sits behind the head and body so every style covers the scalp naturally. */
+    .hair-back, .ponytail, .braid, .bun-back { position: absolute; background: var(--hair-color); pointer-events: none; }
+    .hair-back {
+      top: 38px;
+      left: 47px;
+      width: 164px;
+      height: 172px;
+      border-radius: 50px 50px 54px 54px;
+      z-index: 2;
+      box-shadow: inset -18px -14px 0 rgba(0,0,0,.08), inset 18px 10px 0 var(--hair-shine);
+    }
+    .hair-back::before, .hair-back::after { content: ""; position: absolute; background: inherit; }
+    .hair-back::before { left: 13px; top: 39px; width: 38px; height: 158px; border-radius: 40px 24px 54px 38px; transform: rotate(6deg); }
+    .hair-back::after { right: 13px; top: 36px; width: 42px; height: 162px; border-radius: 24px 42px 38px 56px; transform: rotate(-5deg); }
+    .hair-short-bob .hair-back { height: 142px; border-radius: 58px 58px 46px 46px; }
+    .hair-short-bob .hair-back::before, .hair-short-bob .hair-back::after { top: 44px; height: 96px; width: 44px; }
+    .hair-long-waves .hair-back { height: 252px; border-radius: 62px 62px 56px 56px; }
+    .hair-long-waves .hair-back::before { top: 58px; left: 1px; width: 48px; height: 234px; border-radius: 44px 24px 60px 48px; transform: rotate(7deg); }
+    .hair-long-waves .hair-back::after { top: 55px; right: 0; width: 50px; height: 238px; border-radius: 24px 48px 48px 62px; transform: rotate(-7deg); }
+    .hair-curly-hair .hair-back { top: 34px; left: 37px; width: 184px; height: 202px; border-radius: 50%; background: radial-gradient(circle at 32px 38px, var(--hair-color) 0 20px, transparent 21px), radial-gradient(circle at 66px 18px, var(--hair-color) 0 25px, transparent 26px), radial-gradient(circle at 106px 18px, var(--hair-color) 0 26px, transparent 27px), radial-gradient(circle at 145px 43px, var(--hair-color) 0 26px, transparent 27px), radial-gradient(circle at 28px 96px, var(--hair-color) 0 30px, transparent 31px), radial-gradient(circle at 154px 104px, var(--hair-color) 0 32px, transparent 33px), var(--hair-color); }
+    .hair-curly-hair .hair-back::before, .hair-curly-hair .hair-back::after { width: 56px; height: 94px; top: 116px; border-radius: 50%; }
+    .hair-twin-braids .hair-back { height: 132px; border-radius: 58px 58px 44px 44px; }
+    .hair-messy-bun .hair-back { height: 132px; border-radius: 62px 62px 42px 42px; }
+    .hair-sleek-ponytail .hair-back { height: 128px; border-radius: 58px 58px 38px 38px; }
+    .ponytail { display: var(--pony-display, none); top: 94px; right: 16px; width: 66px; height: 198px; border-radius: 34px 44px 74px 30px; transform: rotate(-12deg); z-index: 1; box-shadow: inset -11px -9px 0 rgba(0,0,0,.10); }
+    .braid { display: var(--braid-display, none); top: 128px; width: 32px; height: 168px; border-radius: 999px; z-index: 3; background: repeating-radial-gradient(ellipse at 50% 15px, var(--hair-color) 0 12px, rgba(0,0,0,.14) 13px 15px, var(--hair-color) 16px 25px); box-shadow: inset -5px 0 0 rgba(0,0,0,.08); }
+    .braid::after { content:""; position:absolute; bottom:-8px; left:7px; width:18px; height:12px; border-radius:999px; background:#b65f70; }
+    .braid.left { left: 42px; transform: rotate(7deg); } .braid.right { right: 42px; transform: rotate(-7deg); }
+    .bun { display: var(--bun-display, none); position: absolute; top: 20px; left: 91px; width: 78px; height: 62px; background: var(--hair-color); border-radius: 50%; z-index: 12; box-shadow: inset -13px -7px 0 rgba(0,0,0,.10), inset 9px 8px 0 var(--hair-shine); }
+
+    /* Layer 3: elegant body base with softer posture, shoulders, arms, and legs. */
+    .neck { position: absolute; top: 138px; left: 108px; width: 42px; height: 60px; background: var(--skin); border-radius: 17px; box-shadow: inset 0 -11px 0 var(--skin-blush); z-index: 4; }
+    .head { position: absolute; top: 56px; left: 70px; width: 118px; height: 122px; background: radial-gradient(circle at 50% 39%, #f5d6c4 0 58%, var(--skin) 59%); border-radius: 50% 50% 48% 48% / 44% 44% 56% 56%; box-shadow: inset -9px -11px 0 rgba(174,111,91,.08); z-index: 5; }
+    .ear { position: absolute; top: 105px; width: 19px; height: 30px; background: #e7bfa9; border-radius: 999px; z-index: 4; box-shadow: inset -3px -2px 0 rgba(166,95,76,.12); }
+    .ear.left { left: 61px; } .ear.right { right: 61px; }
+    .body { position: absolute; top: 177px; left: 80px; width: 98px; height: 170px; background: linear-gradient(90deg, #efc7b2, #f3d0bd 48%, #e6b79f); border-radius: 44px 44px 28px 28px; z-index: 3; clip-path: polygon(18% 0,82% 0,94% 34%,84% 100%,16% 100%,6% 34%); }
+    .arm { position: absolute; top: 190px; width: 24px; height: 150px; background: linear-gradient(#efc9b5, #e5b49d); border-radius: 999px; z-index: 2; transform-origin: top; }
+    .arm::after { content:""; position:absolute; bottom:-2px; left:1px; width:22px; height:28px; background:#edc7b2; border-radius: 50% 50% 44% 44%; }
+    .arm.left { left: 62px; transform: rotate(8deg); } .arm.right { right: 62px; transform: rotate(-8deg); }
+    .leg { position: absolute; top: 318px; width: 28px; height: 124px; background: linear-gradient(#efc9b5, #e4b199); border-radius: 999px; z-index: 1; }
+    .leg.left { left: 93px; transform: rotate(2deg); } .leg.right { right: 93px; transform: rotate(-2deg); }
+
+    /* Layer 4: face makeup and features are separate so remove-makeup returns to a clean face. */
+    .eye { position: absolute; top: 108px; width: 12px; height: 14px; background: #2f292b; border-radius: 50%; z-index: 8; box-shadow: 0 -5px 0 -3px rgba(255,255,255,.85); }
+    .eye::after { content:""; position:absolute; top:-4px; left:-5px; width:22px; height:8px; border-top:2px solid rgba(47,41,43,.46); border-radius:50%; }
+    .eye.left { left: 99px; } .eye.right { right: 99px; }
+    .eyeshadow { position: absolute; top: 101px; width: 30px; height: 13px; background: var(--shadow-color); border-radius: 50%; filter: blur(.2px); z-index: 7; }
+    .eyeshadow.left { left: 89px; } .eyeshadow.right { right: 89px; }
+    .liner { position: absolute; top: 107px; width: 30px; height: 11px; border-top: 3px solid var(--liner-color); border-radius: 50%; z-index: 9; }
+    .liner::after { content:""; position:absolute; top:-5px; width:9px; border-top:3px solid var(--liner-color); }
+    .liner.left { left: 88px; transform: rotate(5deg); } .liner.left::after { right:-5px; transform:rotate(24deg); }
+    .liner.right { right: 88px; transform: rotate(-5deg); } .liner.right::after { left:-5px; transform:rotate(-24deg); }
+    .blush { position: absolute; top: 127px; width: 33px; height: 16px; background: var(--blush-color); border-radius: 50%; filter: blur(.8px); z-index: 7; }
+    .blush.left { left: 78px; } .blush.right { right: 78px; }
+    .nose { position: absolute; top: 120px; left: 127px; width: 10px; height: 19px; border-left: 2px solid rgba(128,76,61,.18); border-bottom: 2px solid rgba(128,76,61,.12); border-radius: 0 0 0 9px; z-index: 8; }
+    .mouth { position: absolute; top: 145px; left: 117px; width: 25px; height: 10px; background: var(--lip-color); border-radius: 48% 48% 58% 58%; z-index: 8; transform: scaleX(var(--mouth-width, 1)); box-shadow: inset 0 3px 0 rgba(255,255,255,.16); }
+    .sparkles, .marks { position: absolute; top: 84px; left: 76px; width: 108px; height: 84px; z-index: 10; color: var(--sparkle-color); pointer-events: none; }
+    .sparkles::before { content: "✦  ·  ✧"; position: absolute; top: 15px; left: 0; font-size: 18px; letter-spacing: 22px; }
+    .sparkles::after { content: "•  ✦"; position: absolute; top: 49px; right: 0; font-size: 13px; letter-spacing: 20px; }
     .marks { color: var(--mark-color); }
-    .marks::before { content: var(--marks-text, ""); position: absolute; top: 39px; left: 16px; font-size: 13px; letter-spacing: 6px; }
+    .marks::before { content: var(--marks-text, ""); position: absolute; top: 42px; left: 15px; font-size: 13px; letter-spacing: 7px; }
 
-    .hair-back { position: absolute; top: 42px; left: 47px; width: 148px; height: var(--hair-back-h, 154px); background: var(--hair-color); border-radius: var(--hair-back-radius, 54px 54px 48px 48px); z-index: 2; box-shadow: inset -12px -10px 0 rgba(255,255,255,.04); }
-    .hair-front { position: absolute; top: 38px; left: 58px; width: 126px; height: 70px; background: var(--hair-color); border-radius: var(--hair-front-radius, 55px 55px 24px 24px); z-index: 11; }
-    .hair-front::after { content: ""; position: absolute; top: 20px; left: 28px; width: 70px; height: 26px; border-radius: 0 0 50% 50%; background: #f0cdb8; }
-    .braid { display: var(--braid-display, none); position: absolute; top: 128px; width: 28px; height: 140px; background: repeating-radial-gradient(circle at 50% 14px, var(--hair-color) 0 13px, rgba(0,0,0,.09) 14px 17px); border-radius: 999px; z-index: 3; }
-    .braid.left { left: 42px; transform: rotate(8deg); } .braid.right { right: 42px; transform: rotate(-8deg); }
-    .bun { display: var(--bun-display, none); position: absolute; top: 31px; left: 94px; width: 54px; height: 46px; background: var(--hair-color); border-radius: 50%; z-index: 12; }
-    .ponytail { display: var(--pony-display, none); position: absolute; top: 96px; right: 35px; width: 62px; height: 175px; background: var(--hair-color); border-radius: 40px 40px 80px 30px; transform: rotate(-13deg); z-index: 1; }
+    /* Layer 5: clothing base with distinct garment silhouettes and built-in fabric detail. */
+    .top { position: absolute; top: 176px; left: 73px; width: 112px; height: 98px; background: var(--top-color); border-radius: var(--top-radius, 30px 30px 18px 18px); z-index: 6; box-shadow: inset 0 -12px 0 rgba(0,0,0,.05), inset 11px 0 0 rgba(255,255,255,.08); }
+    .top::before, .top::after, .bottom::before, .bottom::after, .dress::before, .dress::after, .outer::before, .outer::after, .shoe::before, .shoe::after { content:""; position:absolute; pointer-events:none; }
+    .top::after { inset: 13px 0 auto; text-align: center; color: rgba(37,32,34,.68); font-size: 20px; content: var(--top-detail, ""); }
+    .top-cream-knit .top { background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 4px, transparent 4px 12px), var(--top-color); }
+    .top-cream-knit .top::before { left:8px; right:8px; bottom:8px; height:12px; border-top:2px solid rgba(132,104,88,.24); border-bottom:2px solid rgba(132,104,88,.18); }
+    .top-black-ribbon-blouse .top::before { left:27px; top:7px; width:58px; height:30px; background: linear-gradient(135deg, #fffaf2 0 48%, transparent 49%), linear-gradient(225deg, #fffaf2 0 48%, transparent 49%); border-radius: 0 0 16px 16px; }
+    .top-black-ribbon-blouse .top::after { content:""; left:45px; top:34px; width:22px; height:20px; background:#151214; clip-path: polygon(50% 38%,0 0,0 100%,50% 62%,100% 100%,100% 0); }
+    .top-white-tank .top { left:82px; width:94px; border-radius: 18px 18px 22px 22px; clip-path: polygon(22% 0,78% 0,87% 100%,13% 100%); }
+    .top-white-tank .top::before { left:12px; right:12px; top:-4px; height:34px; border-left:5px solid #fffaf2; border-right:5px solid #fffaf2; }
+    .top-art-school-shirt .top { width:122px; left:68px; border-radius: 23px 23px 14px 14px; transform: rotate(-1deg); }
+    .top-art-school-shirt .top::before { right:18px; top:32px; width:22px; height:19px; border:2px solid rgba(54,49,48,.25); border-top:0; }
+    .top-velvet-camisole .top { left:83px; width:92px; border-radius: 18px 18px 24px 24px; clip-path: polygon(20% 0,80% 0,92% 100%,8% 100%); box-shadow: inset 15px 0 20px rgba(255,255,255,.11), inset -10px 0 16px rgba(0,0,0,.18); }
+    .top-velvet-camisole .top::before { left:10px; right:10px; top:-8px; height:22px; border-left:3px solid #6f3344; border-right:3px solid #6f3344; }
+    .bottom { position: absolute; top: 258px; left: 69px; width: 120px; height: var(--bottom-h, 92px); background: var(--bottom-color); clip-path: var(--bottom-shape, polygon(17% 0, 83% 0, 100% 100%, 0 100%)); border-radius: 0 0 20px 20px; z-index: 5; box-shadow: inset 0 -13px 0 rgba(0,0,0,.06); }
+    .bottom-pleated-skirt .bottom { background: repeating-linear-gradient(90deg, rgba(255,255,255,.11) 0 3px, transparent 3px 18px), var(--bottom-color); }
+    .bottom-pleated-skirt .bottom::before { inset: 6px 14px 0; border-left:2px solid rgba(255,255,255,.15); border-right:2px solid rgba(0,0,0,.17); box-shadow: 22px 0 0 rgba(255,255,255,.10), 44px 0 0 rgba(0,0,0,.12), 66px 0 0 rgba(255,255,255,.10); }
+    .bottom-wide-trousers .bottom { left:63px; width:132px; border-radius: 12px 12px 24px 24px; }
+    .bottom-wide-trousers .bottom::before { top:5px; bottom:0; left:63px; border-left:4px solid rgba(255,255,255,.10); }
+    .bottom-denim-mini .bottom::before { top:13px; left:17px; right:17px; height:25px; border-top:2px solid rgba(255,255,255,.25); border-left:2px solid rgba(255,255,255,.18); border-right:2px solid rgba(0,0,0,.12); }
+    .bottom-denim-mini .bottom::after { top:7px; left:50%; height:60px; border-left:2px dashed rgba(255,255,255,.30); }
+    .bottom-long-black-skirt .bottom { border-radius: 12px 12px 38px 38px; background: linear-gradient(90deg, rgba(255,255,255,.10), transparent 28%, rgba(255,255,255,.05) 62%, rgba(0,0,0,.12)), var(--bottom-color); }
+    .dress { display: var(--dress-display, none); position: absolute; top: 174px; left: 58px; width: 142px; height: var(--dress-h, 186px); background: var(--dress-color); clip-path: polygon(34% 0, 66% 0, 96% 100%, 4% 100%); border-radius: 30px 30px 22px 22px; z-index: 7; box-shadow: inset 0 -18px 0 rgba(0,0,0,.05), inset 18px 0 22px rgba(255,255,255,.08); }
+    .dress-tea-dress .dress::before { left:19px; right:19px; top:70px; border-top:4px solid rgba(255,250,242,.35); box-shadow: 0 16px 0 rgba(255,255,255,.09); }
+    .dress-black-slip-dress .dress { left:75px; width:108px; clip-path: polygon(24% 0,76% 0,90% 100%,10% 100%); box-shadow: inset 12px 0 18px rgba(255,255,255,.08); }
+    .dress-black-slip-dress .dress::before { left:18px; right:18px; top:-6px; height:26px; border-left:3px solid #272226; border-right:3px solid #272226; }
+    .dress-museum-dress .dress { background: linear-gradient(90deg, rgba(255,255,255,.18), transparent 36%, rgba(0,0,0,.07)), var(--dress-color); clip-path: polygon(30% 0,70% 0,86% 100%,14% 100%); }
+    .dress-museum-dress .dress::before { top:82px; left:25px; right:25px; border-top:3px solid rgba(96,75,54,.24); }
+    .dress-moonlit-gown .dress { clip-path: polygon(32% 0,68% 0,100% 100%,0 100%); background: radial-gradient(circle at 50% 10%, rgba(255,255,255,.22), transparent 28%), var(--dress-color); }
+    .dress-moonlit-gown .dress::after { left:10px; right:10px; bottom:14px; height:26px; border-top:2px solid rgba(255,255,255,.20); border-bottom:2px solid rgba(255,255,255,.16); border-radius:50%; }
 
-    .body { position: absolute; top: 170px; left: 72px; width: 98px; height: 178px; background: #efc8b3; border-radius: 42px 42px 26px 26px; z-index: 3; }
-    .arm { position: absolute; top: 184px; width: 28px; height: 144px; background: #edc7b2; border-radius: 999px; z-index: 2; transform-origin: top; }
-    .arm.left { left: 54px; transform: rotate(10deg); } .arm.right { right: 54px; transform: rotate(-10deg); }
-    .leg { position: absolute; top: 320px; width: 30px; height: 116px; background: #edc7b2; border-radius: 999px; z-index: 1; }
-    .leg.left { left: 86px; } .leg.right { right: 86px; }
-    .top { position: absolute; top: 169px; left: 67px; width: 108px; height: 98px; background: var(--top-color); border-radius: var(--top-radius, 30px 30px 18px 18px); z-index: 6; box-shadow: inset 0 -12px 0 rgba(0,0,0,.05); }
-    .top::after { content: var(--top-detail, ""); position: absolute; inset: 12px 0 auto; text-align: center; color: rgba(37,32,34,.68); font-size: 20px; }
-    .bottom { position: absolute; top: 252px; left: 66px; width: 110px; height: var(--bottom-h, 90px); background: var(--bottom-color); clip-path: var(--bottom-shape, polygon(17% 0, 83% 0, 100% 100%, 0 100%)); border-radius: 0 0 18px 18px; z-index: 5; }
-    .dress { display: var(--dress-display, none); position: absolute; top: 168px; left: 55px; width: 132px; height: var(--dress-h, 186px); background: var(--dress-color); clip-path: polygon(34% 0, 66% 0, 96% 100%, 4% 100%); border-radius: 28px 28px 20px 20px; z-index: 7; box-shadow: inset 0 -18px 0 rgba(0,0,0,.05); }
-    .outer { display: var(--outer-display, none); position: absolute; top: 166px; left: 45px; width: 152px; height: 162px; border: 18px solid var(--outer-color); border-top-width: 28px; border-bottom-width: 0; border-radius: 34px 34px 20px 20px; z-index: 8; pointer-events: none; }
-    .shoe { position: absolute; top: 428px; width: 42px; height: 18px; background: var(--shoe-color); border-radius: 16px 16px 8px 8px; z-index: 9; }
-    .shoe.left { left: 75px; } .shoe.right { right: 75px; }
-    .accessory { position: absolute; z-index: 13; color: var(--champagne); font-weight: 900; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
-    .accessory.ribbon { display: var(--ribbon-display, none); top: 47px; left: 71px; font-size: 27px; color: #9d4d57; }
-    .accessory.necklace { display: var(--necklace-display, none); top: 168px; left: 92px; width: 58px; height: 22px; border-bottom: 5px dotted var(--necklace-color, #f7ead0); border-radius: 50%; }
-    .accessory.bag { display: var(--bag-display, none); top: 247px; right: 28px; width: 43px; height: 52px; border-radius: 13px; background: #8f6570; box-shadow: inset 0 10px 0 rgba(255,255,255,.12); }
-    .accessory.bag::before { content:""; position:absolute; top:-17px; left:9px; width:25px; height:25px; border:4px solid #8f6570; border-bottom:0; border-radius:20px 20px 0 0; }
-    .accessory.glasses { display: var(--glasses-display, none); top: 103px; left: 83px; width: 76px; height: 22px; }
-    .accessory.glasses::before, .accessory.glasses::after { content:""; position:absolute; width:25px; height:18px; border:3px solid #4a4446; border-radius:50%; }
-    .accessory.glasses::before { left:0; } .accessory.glasses::after { right:0; } .accessory.glasses span { position:absolute; left:28px; top:8px; width:20px; border-top:3px solid #4a4446; }
-    .accessory.clip { display: var(--clip-display, none); top: 69px; right: 63px; width: 32px; height: 9px; border-radius: 999px; background: #d7c4f0; transform: rotate(-18deg); }
+    /* Layer 6: outerwear frames the outfit without hiding garment identity. */
+    .outer { display: var(--outer-display, none); position: absolute; top: 170px; left: 44px; width: 170px; height: 178px; border: 18px solid var(--outer-color); border-top-width: 30px; border-bottom-width: 0; border-radius: 36px 36px 20px 20px; z-index: 8; pointer-events: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08); }
+    .outer::before { left:45px; top:-25px; width:44px; height:70px; border-left:3px solid rgba(255,255,255,.20); border-right:3px solid rgba(0,0,0,.12); }
+    .outer-oversized-cardigan .outer { height:188px; border-width: 24px 24px 0; border-radius: 42px 42px 28px 28px; }
+    .outer-oversized-cardigan .outer::after { left:-17px; right:-17px; bottom:12px; border-top:2px dashed rgba(255,255,255,.25); }
+    .outer-leather-jacket .outer { height:126px; border-width: 20px 20px 0; border-radius: 24px 24px 14px 14px; box-shadow: inset 13px 0 20px rgba(255,255,255,.10), inset -10px 0 14px rgba(0,0,0,.22); }
+    .outer-leather-jacket .outer::before { left:38px; top:-20px; width:55px; height:46px; background: linear-gradient(135deg, rgba(255,255,255,.12) 0 48%, transparent 49%), linear-gradient(225deg, rgba(255,255,255,.09) 0 48%, transparent 49%); border:0; }
+    .outer-trench-coat .outer { height:230px; border-width: 20px 28px 0; border-radius: 28px 28px 18px 18px; }
+    .outer-trench-coat .outer::after { left:10px; right:10px; top:86px; border-top:7px solid rgba(83,62,41,.22); }
+    .outer-studio-hoodie .outer { height:154px; border-width: 25px 23px 0; border-radius: 45px 45px 23px 23px; }
+    .outer-studio-hoodie .outer::before { left:44px; top:-36px; width:46px; height:39px; border:5px solid rgba(255,255,255,.22); border-bottom:0; border-radius: 28px 28px 0 0; }
+    .outer-studio-hoodie .outer::after { left:55px; top:10px; width:22px; height:38px; border-left:2px solid rgba(255,255,255,.54); border-right:2px solid rgba(255,255,255,.54); }
+    .outer-wool-coat .outer { height:224px; border-width: 22px 24px 0; border-radius: 32px 32px 18px 18px; }
+
+    /* Layer 7: shoes with item-specific straps, soles, and boot height. */
+    .shoe { position: absolute; top: 431px; width: 44px; height: 19px; background: var(--shoe-color); border-radius: 18px 18px 8px 8px; z-index: 9; box-shadow: inset 0 -4px 0 rgba(0,0,0,.12); }
+    .shoe.left { left: 80px; } .shoe.right { right: 80px; }
+    .shoes-mary-janes .shoe::before { left:9px; right:8px; top:5px; border-top:3px solid rgba(255,250,242,.58); }
+    .shoes-ballet-flats .shoe { height:16px; top:435px; background:#d6a0a5; border-radius: 50% 50% 14px 14px; }
+    .shoes-black-boots .shoe { top:396px; height:54px; border-radius: 12px 12px 8px 8px; }
+    .shoes-black-boots .shoe::before { left:3px; right:3px; bottom:8px; border-top:2px solid rgba(255,255,255,.16); }
+    .shoes-sneakers .shoe { background:#f7f0e7; border:1px solid rgba(60,48,46,.22); }
+    .shoes-sneakers .shoe::before { left:4px; right:4px; bottom:2px; border-top:3px solid #d3bdb5; }
+    .shoes-sneakers .shoe::after { left:14px; top:5px; width:14px; border-top:2px dashed rgba(70,60,58,.32); }
+
+    /* Layer 8: accessories sit on the appropriate face, neck, hair, or hand area. */
+    .accessory { position: absolute; z-index: 13; color: var(--champagne); font-weight: 900; text-shadow: 0 1px 0 rgba(255,255,255,.5); pointer-events: none; }
+    .accessory.ribbon { display: var(--ribbon-display, none); top: 61px; left: 74px; width: 36px; height: 24px; color: #9d4d57; }
+    .accessory.ribbon::before { content:""; position:absolute; inset:0; background:#9d4d57; clip-path: polygon(50% 48%,0 6%,0 94%,50% 58%,100% 94%,100% 6%); }
+    .accessory.necklace { display: var(--necklace-display, none); top: 171px; left: 98px; width: 62px; height: 23px; border-bottom: var(--necklace-border, 5px dotted #fff4df); border-radius: 50%; }
+    .accessory.bag { display: var(--bag-display, none); top: 258px; right: 22px; width: 45px; height: 56px; border-radius: 14px 14px 17px 17px; background: #8f6570; box-shadow: inset 0 12px 0 rgba(255,255,255,.12), 0 8px 16px rgba(75,54,50,.10); }
+    .accessory.bag::before { content:""; position:absolute; top:-18px; left:9px; width:27px; height:27px; border:4px solid #8f6570; border-bottom:0; border-radius:20px 20px 0 0; }
+    .accessory.bag::after { content:""; position:absolute; top:18px; left:18px; width:10px; height:10px; border-radius:50%; background:rgba(255,250,242,.55); }
+    .accessory.glasses { display: var(--glasses-display, none); top: 106px; left: 88px; width: 82px; height: 25px; }
+    .accessory.glasses::before, .accessory.glasses::after { content:""; position:absolute; width:28px; height:19px; border:3px solid #4a4446; border-radius:50%; background:rgba(255,255,255,.12); }
+    .accessory.glasses::before { left:0; } .accessory.glasses::after { right:0; } .accessory.glasses span { position:absolute; left:30px; top:8px; width:22px; border-top:3px solid #4a4446; }
+    .accessory.clip { display: var(--clip-display, none); top: 70px; right: 61px; width: 35px; height: 10px; border-radius: 999px; background: linear-gradient(90deg, #efe3ff, #bda4ea); transform: rotate(-18deg); box-shadow:0 1px 0 rgba(255,255,255,.6); }
+
+    /* Layer 9: front hair/bangs sit last to remove bald-looking hairlines and polish silhouettes. */
+    .hair-front { position: absolute; top: 40px; left: 63px; width: 132px; height: 82px; background: var(--hair-color); border-radius: 62px 62px 26px 26px; z-index: 14; box-shadow: inset 13px 8px 0 var(--hair-shine); pointer-events: none; }
+    .hair-front::before, .hair-front::after { content:""; position:absolute; background: inherit; }
+    .hair-front::before { left:13px; top:43px; width:47px; height:43px; border-radius: 0 0 36px 34px; transform: rotate(9deg); }
+    .hair-front::after { right:12px; top:43px; width:44px; height:39px; border-radius: 0 0 36px 34px; transform: rotate(-8deg); }
+    .hair-short-bob .hair-front { top:39px; left:58px; width:142px; height:86px; border-radius: 64px 64px 32px 32px; }
+    .hair-short-bob .hair-front::before { left:22px; top:49px; width:98px; height:30px; border-radius:0 0 46px 46px; transform:rotate(0deg); }
+    .hair-short-bob .hair-front::after { right:7px; top:62px; width:31px; height:58px; border-radius: 0 0 28px 24px; }
+    .hair-long-waves .hair-front::before { left:3px; top:49px; width:42px; height:98px; border-radius: 22px 0 36px 28px; transform: rotate(7deg); }
+    .hair-long-waves .hair-front::after { right:3px; top:49px; width:42px; height:104px; border-radius: 0 22px 28px 36px; transform: rotate(-7deg); }
+    .hair-curly-hair .hair-front { top:32px; left:47px; width:164px; height:96px; border-radius:50%; background: radial-gradient(circle at 23px 47px, var(--hair-color) 0 21px, transparent 22px), radial-gradient(circle at 55px 22px, var(--hair-color) 0 27px, transparent 28px), radial-gradient(circle at 100px 21px, var(--hair-color) 0 29px, transparent 30px), radial-gradient(circle at 137px 47px, var(--hair-color) 0 25px, transparent 26px), var(--hair-color); }
+    .hair-curly-hair .hair-front::before { left:34px; top:60px; width:36px; height:42px; border-radius:50%; transform:rotate(0); }
+    .hair-curly-hair .hair-front::after { right:34px; top:59px; width:37px; height:43px; border-radius:50%; transform:rotate(0); }
+    .hair-twin-braids .hair-front { top:40px; left:59px; width:140px; height:78px; border-radius: 62px 62px 24px 24px; }
+    .hair-twin-braids .hair-front::before { left:18px; top:47px; width:48px; height:33px; border-radius:0 0 36px 24px; transform:rotate(10deg); }
+    .hair-twin-braids .hair-front::after { right:18px; top:47px; width:48px; height:33px; border-radius:0 0 24px 36px; transform:rotate(-10deg); }
+    .hair-messy-bun .hair-front { top:45px; left:62px; width:134px; height:76px; border-radius: 62px 62px 22px 22px; }
+    .hair-messy-bun .hair-front::before { left:5px; top:50px; width:36px; height:70px; border-radius: 20px 0 30px 24px; transform: rotate(12deg); }
+    .hair-messy-bun .hair-front::after { right:9px; top:48px; width:30px; height:58px; border-radius: 0 22px 26px 20px; transform: rotate(-12deg); }
+    .hair-sleek-ponytail .hair-front { top:43px; left:62px; width:135px; height:76px; border-radius: 68px 68px 24px 24px; background: linear-gradient(135deg, var(--hair-shine) 0 18%, transparent 19%), var(--hair-color); }
+    .hair-sleek-ponytail .hair-front::before { left:20px; top:44px; width:76px; height:28px; border-radius: 0 0 46px 34px; transform: rotate(-6deg); }
+    .hair-sleek-ponytail .hair-front::after { right:15px; top:38px; width:28px; height:44px; border-radius: 0 0 24px 22px; transform: rotate(-10deg); }
 
     .scene-rainy .scene-detail::before { content:""; position:absolute; inset:56px 35px auto; height:180px; border:6px solid rgba(255,250,242,.55); border-radius:26px; background: repeating-linear-gradient(105deg, rgba(99,107,126,.18) 0 2px, transparent 2px 18px); }
     .scene-cafe .scene-detail::before { content:"café"; position:absolute; top:78px; left:44px; font: italic 3.2rem Georgia, serif; color:rgba(99,70,64,.2); }
@@ -195,6 +336,7 @@
     .scene-moon .scene-detail::before { content:"☾"; position:absolute; right:48px; top:70px; font-size:5rem; color:rgba(54,50,82,.26); }
     .scene-museum .scene-detail::before { content:""; position:absolute; left:40px; right:40px; top:90px; height:132px; border:10px double rgba(195,164,109,.28); border-radius:4px; }
 
+    .view-toggle { width: 100%; margin: 0 0 14px; background: rgba(255,255,255,.74); }
     .stage-tools { display:grid; gap:12px; margin-top:16px; }
     .summary { margin: 0; padding: 16px; border-radius: 22px; background: rgba(255,255,255,.52); color: var(--muted-ink); line-height: 1.55; }
     .challenge { color: var(--champagne); font-weight: 900; }
@@ -230,7 +372,8 @@
       body { padding-left: 10px; padding-right: 10px; }
       .hero { flex-direction: column; border-radius: 26px; }
       .hub-link { width: 100%; }
-      .doll { transform: translateY(12px) scale(.9) rotate(var(--pose-tilt, 0deg)); }
+      .doll { transform: translateY(12px) scale(.98) rotate(var(--pose-tilt, 0deg)); }
+      .mirror.face-view .doll { transform: translateY(138px) scale(1.52) rotate(var(--pose-tilt, 0deg)); }
       .mirror { min-height: 500px; padding-left: 4px; padding-right: 4px; }
       .chip { flex: 1 1 auto; }
     }
@@ -250,17 +393,37 @@
     <main class="workspace">
       <section class="stage-card" aria-labelledby="stage-title">
         <h2 id="stage-title" class="eyebrow">Character stage</h2>
+        <button class="secondary view-toggle" id="viewToggle" type="button" aria-pressed="false">Face close-up view</button>
         <div id="mirror" class="mirror scene-atelier" aria-label="Current Puff Atelier character look">
           <div class="scene-detail" aria-hidden="true"></div>
           <div class="caption"><span id="sceneName">Atelier Mirror</span><span id="moodText">Sweet</span></div>
           <div id="doll" class="doll" aria-hidden="true">
+            <!-- Layer 1: background / stage lives on the mirror and scene-detail elements. -->
             <div class="asset-layer future-background-props"></div>
+
+            <!-- Layer 2: back hair pieces, including ponytail and braids behind the head. -->
             <div class="ponytail"></div><div class="hair-back"></div><div class="braid left"></div><div class="braid right"></div>
-            <div class="neck"></div><div class="ear left"></div><div class="ear right"></div><div class="head"></div><div class="bun"></div><div class="hair-front"></div>
-            <div class="eyeshadow left"></div><div class="eyeshadow right"></div><div class="liner left"></div><div class="liner right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="mouth"></div><div class="sparkles"></div><div class="marks"></div>
-            <div class="arm left"></div><div class="arm right"></div><div class="body"></div><div class="leg left"></div><div class="leg right"></div>
-            <div class="top"></div><div class="bottom"></div><div class="dress"></div><div class="outer"></div><div class="shoe left"></div><div class="shoe right"></div>
-            <div class="accessory ribbon">⌁</div><div class="accessory necklace"></div><div class="accessory bag"></div><div class="accessory glasses"><span></span></div><div class="accessory clip"></div>
+
+            <!-- Layer 3: body base: elegant head, neck, shoulders, arms, and legs. -->
+            <div class="neck"></div><div class="ear left"></div><div class="ear right"></div><div class="head"></div><div class="arm left"></div><div class="arm right"></div><div class="body"></div><div class="leg left"></div><div class="leg right"></div>
+
+            <!-- Layer 4: face features and makeup, separated so Remove Makeup stays clean. -->
+            <div class="eyeshadow left"></div><div class="eyeshadow right"></div><div class="liner left"></div><div class="liner right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="nose"></div><div class="mouth"></div><div class="sparkles"></div><div class="marks"></div>
+
+            <!-- Layer 5: clothing base. -->
+            <div class="top"></div><div class="bottom"></div><div class="dress"></div>
+
+            <!-- Layer 6: outerwear. -->
+            <div class="outer"></div>
+
+            <!-- Layer 7: shoes. -->
+            <div class="shoe left"></div><div class="shoe right"></div>
+
+            <!-- Layer 8: accessories. -->
+            <div class="accessory ribbon"></div><div class="accessory necklace"></div><div class="accessory bag"></div><div class="accessory glasses"><span></span></div><div class="accessory clip"></div>
+
+            <!-- Layer 9: front hair and bangs render last to keep hairlines full. -->
+            <div class="bun"></div><div class="hair-front"></div>
             <div class="asset-layer future-png-clothes"></div>
           </div>
         </div>
@@ -345,6 +508,7 @@
     ];
 
     function pretty(text) { return text.toLowerCase(); }
+    function slug(text) { return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
     function escapeHTML(text) { return String(text).replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "\'":"&#39;" }[char])); }
     function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function root() { return document.documentElement.style; }
@@ -389,6 +553,7 @@
       root().setProperty("--ribbon-display", state.accessory === "Ribbon" ? "block" : "none");
       root().setProperty("--necklace-display", state.accessory.includes("Necklace") ? "block" : "none");
       root().setProperty("--necklace-color", state.accessory === "Silver Necklace" ? "#d9dce0" : "#fff4df");
+      root().setProperty("--necklace-border", state.accessory === "Silver Necklace" ? "2px solid #d9dce0" : "5px dotted #fff4df");
       root().setProperty("--bag-display", state.accessory === "Tiny Bag" ? "block" : "none");
       root().setProperty("--glasses-display", state.accessory === "Glasses" ? "block" : "none");
       root().setProperty("--clip-display", state.accessory === "Hair Clip" ? "block" : "none");
@@ -401,7 +566,10 @@
     }
 
     function applySceneMood() {
-      const mirror = document.getElementById("mirror"); mirror.className = "mirror " + styleMaps.scene[state.scene][0]; mirror.style.setProperty("--scene-bg", styleMaps.scene[state.scene][1]);
+      const mirror = document.getElementById("mirror");
+      const faceView = mirror.classList.contains("face-view");
+      mirror.className = `mirror ${styleMaps.scene[state.scene][0]}${faceView ? " face-view" : ""}`;
+      mirror.style.setProperty("--scene-bg", styleMaps.scene[state.scene][1]);
       root().setProperty("--pose-tilt", styleMaps.mood[state.mood][0]); root().setProperty("--mouth-width", styleMaps.mood[state.mood][1]);
       document.getElementById("sceneName").textContent = state.scene; document.getElementById("moodText").textContent = styleMaps.mood[state.mood][2];
     }
@@ -416,8 +584,21 @@
       return pick(notes);
     }
 
+    function updateDollClasses() {
+      const doll = document.getElementById("doll");
+      doll.className = [
+        "doll",
+        `hair-${slug(state.hair)}`,
+        `top-${slug(state.top)}`,
+        `bottom-${slug(state.bottom)}`,
+        `dress-${slug(state.dress)}`,
+        `outer-${slug(state.outer)}`,
+        `shoes-${slug(state.shoes)}`
+      ].join(" ");
+    }
+
     function render() {
-      applyFace(); applyHair(); applyClothes(); applySceneMood();
+      updateDollClasses(); applyFace(); applyHair(); applyClothes(); applySceneMood();
       document.querySelectorAll(".chip").forEach(btn => btn.setAttribute("aria-pressed", String(state[btn.dataset.key] === btn.dataset.value)));
       const text = summaryText(); document.getElementById("summary").textContent = text; document.getElementById("lookSummary").textContent = text; document.getElementById("pupNote").textContent = pupComment();
     }
@@ -449,6 +630,12 @@
       document.getElementById("surprise").addEventListener("click", () => { randomOutfit(); randomMakeup(); });
       document.getElementById("reset").addEventListener("click", () => { state = { ...defaultState }; render(); });
       document.getElementById("challenge").addEventListener("click", () => { document.getElementById("challengeLine").innerHTML = `Current challenge: <span class="challenge">${pick(challenges)}</span>`; });
+      document.getElementById("viewToggle").addEventListener("click", event => {
+        const mirror = document.getElementById("mirror");
+        const close = mirror.classList.toggle("face-view");
+        event.currentTarget.setAttribute("aria-pressed", String(close));
+        event.currentTarget.textContent = close ? "Full body view" : "Face close-up view";
+      });
       document.getElementById("saveLook").addEventListener("click", () => {
         const name = document.getElementById("lookName").value.trim() || `${state.mood} Puff Look`;
         const look = { id: Date.now().toString(36), name, date: new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }), state: { ...state }, summary: summaryText() };
