@@ -275,6 +275,7 @@
       <section class="panel">
         <h2>Error notebook</h2>
         <p class="small">Wrong answers are useful evidence. Resolve an item when it feels clear.</p>
+        <div class="answer-row"><button class="ghost-btn" id="cleanUpgradeErrorsBtn" type="button">Clean corrupted upgrade errors</button></div>
         <div class="list" id="errorList"></div>
       </section>
     </section>
@@ -353,6 +354,16 @@
         var cleaned = normalize(input);
         return answers.some(function (answer) { return cleaned === normalize(answer) || cleaned.indexOf(normalize(answer)) !== -1; });
       };
+      function isValidUserDate(value) {
+        var d = new Date(value);
+        return !Number.isNaN(d.getTime()) && d.getFullYear() > 2000;
+      }
+      function formatDateForUser(value, fallback) {
+        var d = new Date(value);
+        if (!isValidUserDate(value)) return fallback || 'After your next review';
+        if (todayKey(d) === todayKey()) return 'Today';
+        return d.toLocaleString();
+      }
 
       var vocabSeeds = [
         ['analyse','B2','Academic thinking / argument','分析','to examine something carefully to understand it','The essay analyses the causes of youth unemployment.','analyse data; analyse causes','analyse|analysis|analytical|analytically','examine, study','Do not write “analyse about”; write “analyse the issue”.'],
@@ -626,7 +637,12 @@
         };
       }
       function makeCollocation(item, index) {
-        return { id:'c-' + index, word:item[0], type:'collocation', level:index < 10 ? 'B2' : 'B1', category:'Collocations', meaningZh:item[1], definitionEn:'A natural IELTS-ready word partnership.', example:item[2], collocations:[item[0]], wordFamily:'', synonyms:[], commonMistake:item[5], prompt:item[4], answer:item[3], explanation:item[5], tags:['collocation','writing-ready phrase'] };
+        var answer = item[3];
+        var rest = item[0].replace(new RegExp('^' + answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'i'), '');
+        var choices = item[4].split('/').map(function (choice) {
+          return choice.trim().replace(new RegExp('\\s+' + rest.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i'), '').trim();
+        });
+        return { id:'c-' + index, word:item[0], type:'collocation', level:index < 10 ? 'B2' : 'B1', category:'Collocations', meaningZh:item[1], definitionEn:'A natural IELTS-ready word partnership.', example:item[2], collocations:[item[0]], wordFamily:'', synonyms:[], commonMistake:item[5], prompt:'___ ' + rest, answer:answer, choices:choices, explanation:item[5], tags:['collocation','writing-ready phrase'] };
       }
       function grammarCardsFromNotes() {
         var cards = [];
@@ -662,6 +678,7 @@
       var sessionStats = { reviewed:0, correct:0, wrong:[] };
       var correctStreak = 0;
       var currentSelfRating = 'okay';
+      var currentSessionTitle = 'Daily Review';
 
       var $ = function (id) { return document.getElementById(id); };
       var allItems = function () { return seedItems.concat(state.customCards || []); };
@@ -696,8 +713,37 @@
         state.errors.unshift({ id:'err-' + Date.now(), itemId:item.id, word:item.word, type:item.type, category:item.category, wrongAnswer:given || '(blank)', correctAnswer:correct || item.answer, explanation:item.explanation, nextReviewDate:progressFor(item.id).dueDate, resolved:false, createdAt:new Date().toISOString() });
         state.errors = state.errors.slice(0, 80);
       }
+      function isCorruptedUpgradeError(error) {
+        if (!error || error.category !== 'IELTS Writing Upgrade') return false;
+        return error.word === '升级表达' || error.wrongAnswer === '升级表达' || error.correctAnswer === '升级表达' || (error.type !== 'upgrade' && /^upgrade-/.test(error.itemId || ''));
+      }
+      function cleanCorruptedUpgradeErrors() {
+        if (!confirm('Remove only clearly corrupted IELTS Writing Upgrade error entries?')) return;
+        var before = (state.errors || []).length;
+        state.errors = (state.errors || []).filter(function (error) { return !isCorruptedUpgradeError(error); });
+        var cleaned = before - state.errors.length;
+        saveState();
+        renderErrors();
+        alert('Cleaned ' + cleaned + ' corrupted upgrade errors.');
+      }
+      function sessionPracticeLabel(title) {
+        if (title === 'IELTS Writing Upgrade') return 'phrase upgrade practice';
+        if (title === 'Collocation Builder') return 'collocation practice';
+        if (title === 'Grammar Clinic') return 'grammar practice';
+        return 'mixed active recall';
+      }
+      function nextDueSummary() {
+        var now = new Date();
+        var validDates = allItems().map(function (item) { return progressFor(item.id).dueDate; }).filter(isValidUserDate).map(function (value) { return new Date(value); });
+        if (validDates.some(function (date) { return date <= now; }) || allItems().some(isDue)) return 'Now — more cards are ready';
+        var futureDates = validDates.filter(function (date) { return date > now; }).sort(function (a, b) { return a - b; });
+        if (!futureDates.length) return 'After your next review';
+        if (todayKey(futureDates[0]) === todayKey()) return 'Today';
+        return futureDates[0].toLocaleString();
+      }
 
       function makeQuestion(item, forcedType) {
+        if (item.type === 'upgrade') return { type:'upgrade', prompt:item.simplePhrase, instruction:'Upgrade this simple phrase into a more precise IELTS-style expression.', answers:item.acceptableAnswers || [item.upgradedPhrase], input:'text' };
         var type = forcedType;
         if (!type) {
           var options = item.category === 'Word Family Lab' ? ['word-family'] : item.type === 'grammar' ? ['grammar-correction','cloze'] : item.type === 'collocation' ? ['collocation','cloze','sentence'] : ['meaning','reverse','cloze','sentence'];
@@ -706,8 +752,7 @@
         if (type === 'meaning') return { type:type, prompt:item.word, instruction:'Type the Chinese meaning or a simple English definition.', answers:[item.meaningZh, item.definitionEn], input:'text' };
         if (type === 'reverse') return { type:type, prompt:item.meaningZh, instruction:'Type the English word or phrase.', answers:[item.word], input:'text' };
         if (type === 'collocation') {
-          var parts = item.prompt.split('/').map(function (s) { return s.trim(); });
-          return { type:type, prompt:item.prompt, instruction:'Choose the word that completes the natural collocation.', answers:[item.answer], choices:parts, input:'choice' };
+          return { type:type, prompt:item.prompt, instruction:'Choose the word that completes the natural collocation.', answers:[item.answer], choices:item.choices || [item.answer], input:'choice' };
         }
         if (type === 'word-family') {
           var forms = item.wordFamily.split(' / ').filter(Boolean);
@@ -773,11 +818,12 @@
         }
         sessionStats.reviewed += 1;
         if (correct) { sessionStats.correct += 1; correctStreak += 1; if (correctStreak >= 3) setPup('streak'); }
+        else if (revealed) { correctStreak = 0; setPup('wrong'); }
         else { correctStreak = 0; sessionStats.wrong.push(item); addError(item, raw, currentQuestion.answers[0]); setPup(isSentence && !raw.trim() ? 'writing' : 'wrong'); }
         var fb = $('feedbackBox');
         fb.className = 'feedback show ' + (correct ? 'ok' : 'work');
-        fb.innerHTML = '<h3>' + (correct ? 'Correct' : 'Needs work') + '</h3><dl><dt>Your answer</dt><dd>' + (raw || '(blank / revealed)') + '</dd><dt>Correct answer</dt><dd>' + currentQuestion.answers.join(' / ') + '</dd><dt>Explanation</dt><dd>' + item.explanation + '</dd><dt>Example</dt><dd>' + item.example + '</dd><dt>Common mistake</dt><dd>' + (item.commonMistake || 'Keep the collocation and grammar pattern controlled.') + '</dd></dl><div class="rating-row"><button class="danger-btn" data-rate="again">Again</button><button class="ghost-btn" data-rate="hard">Hard</button><button class="ghost-btn" data-rate="good">Good</button><button class="primary-btn" data-rate="easy">Easy</button></div>';
-        Array.prototype.forEach.call(document.querySelectorAll('[data-rate]'), function (btn) { btn.addEventListener('click', function () { schedule(item, btn.getAttribute('data-rate')); nextCard(); }); });
+        fb.innerHTML = '<h3>' + (correct ? 'Correct' : (revealed ? 'Revealed' : 'Needs work')) + '</h3><dl><dt>Your answer</dt><dd>' + (raw || '(blank / revealed)') + '</dd><dt>Correct answer</dt><dd>' + currentQuestion.answers.join(' / ') + '</dd><dt>Explanation</dt><dd>' + item.explanation + '</dd><dt>Example</dt><dd>' + item.example + '</dd><dt>Common mistake</dt><dd>' + (item.commonMistake || 'Keep the collocation and grammar pattern controlled.') + '</dd></dl><div class="rating-row"><button class="danger-btn" data-rate="again">Again</button><button class="ghost-btn" data-rate="hard">Hard</button><button class="ghost-btn" data-rate="good">Good</button><button class="primary-btn" data-rate="easy">Easy</button></div>';
+        Array.prototype.forEach.call(document.querySelectorAll('[data-rate]'), function (btn) { btn.addEventListener('click', function () { var rating = btn.getAttribute('data-rate'); if (revealed && rating === 'again') { sessionStats.wrong.push(item); addError(item, raw || '(revealed)', currentQuestion.answers[0]); } schedule(item, rating); nextCard(); }); });
         saveState(); renderAll();
       }
 
@@ -785,6 +831,7 @@
         currentSession = items.slice(0, 20);
         currentIndex = -1;
         sessionStats = { reviewed:0, correct:0, wrong:[] };
+        currentSessionTitle = title;
         $('modeTitle').textContent = title;
         setPup('before');
         nextCard();
@@ -792,16 +839,15 @@
       function nextCard() {
         currentIndex += 1;
         if (currentIndex >= currentSession.length || !currentSession[currentIndex]) return endSession();
-        $('sessionInfo').textContent = 'Card ' + (currentIndex + 1) + ' of ' + currentSession.length + ' · mixed active recall';
+        $('sessionInfo').textContent = 'Card ' + (currentIndex + 1) + ' of ' + currentSession.length + ' · ' + sessionPracticeLabel(currentSessionTitle);
         renderQuestion(currentSession[currentIndex], makeQuestion(currentSession[currentIndex]));
       }
       function endSession() {
         currentIndex = -1;
-        var nextDue = allItems().map(function (item) { return progressFor(item.id).dueDate; }).sort()[0];
         $('cardMeta').innerHTML = '<span class="tag sage">Session complete</span>';
         $('modeTitle').textContent = 'Review summary';
         $('sessionInfo').textContent = 'Reviewed ' + sessionStats.reviewed + ' cards · Correct ' + sessionStats.correct + ' · Weak items ' + sessionStats.wrong.length;
-        $('promptText').textContent = 'Next due: ' + (nextDue ? new Date(nextDue).toLocaleString() : 'soon');
+        $('promptText').textContent = 'Next due: ' + nextDueSummary();
         $('questionText').textContent = sessionStats.wrong.length ? 'Weak categories: ' + Array.from(new Set(sessionStats.wrong.map(function (i) { return i.category; }))).join(', ') : 'Clean session. Keep the daily chain alive.';
         $('answerArea').innerHTML = '';
         $('mainActions').innerHTML = '<button class="primary-btn" type="button" id="startReviewBtn2">Start another review</button><button class="ghost-btn" type="button" id="newBatchBtn2">Learn 5 New</button>';
@@ -834,8 +880,19 @@
         $('feedbackBox').className = 'feedback';
         $('testNewBtn').addEventListener('click', function () { startSession(newItems, 'New Word Learning Test'); });
       }
+      function upgradeAcceptableAnswers(simplePhrase, upgradedPhrase) {
+        var flexible = {
+          'many people think':['it is widely argued that','it is commonly believed that','some people argue that','many people believe that'],
+          'big problem':['a significant issue','a serious problem','a major issue'],
+          'bad effect':['negative consequence','negative effect','adverse effect'],
+          'good for children':['beneficial for children','helpful for children'],
+          'use money on schools':['invest in education','invest more in education','invest in schools'],
+          'make pollution less':['reduce pollution','decrease pollution','cut pollution']
+        };
+        return flexible[simplePhrase] || [upgradedPhrase];
+      }
       function startUpgrade() {
-        var items = upgradeSeeds.map(function (u, idx) { return { id:'upgrade-' + idx, word:u[0], type:'vocabulary', level:'B2', category:'IELTS Writing Upgrade', meaningZh:'升级表达', definitionEn:u[1], example:u[0] + ' → ' + u[1], collocations:[u[1]], wordFamily:'', synonyms:[u[1]], commonMistake:'Do not overuse fancy words; use precise words naturally.', prompt:u[0], answer:u[1], explanation:u[2], tags:['writing-ready phrase'] }; });
+        var items = upgradeSeeds.map(function (u, idx) { return { id:'upgrade-' + idx, word:u[0], type:'upgrade', level:'B2', category:'IELTS Writing Upgrade', simplePhrase:u[0], upgradedPhrase:u[1], usageNote:u[2], acceptableAnswers:upgradeAcceptableAnswers(u[0], u[1]), definitionEn:u[1], example:u[0] + ' → ' + u[1], collocations:[u[1]], wordFamily:'', synonyms:[u[1]], commonMistake:'Do not overuse fancy words; use precise words naturally.', prompt:u[0], answer:u[1], explanation:u[2], tags:['writing-ready phrase','upgrade'] }; });
         startSession(items, 'IELTS Writing Upgrade');
       }
       function startCollocation() { startSession(seedItems.filter(function (i) { return i.type === 'collocation'; }), 'Collocation Builder'); }
@@ -880,7 +937,7 @@
       }
       function renderErrors() {
         var errors = (state.errors || []).filter(function (e) { return !e.resolved; });
-        $('errorList').innerHTML = errors.length ? errors.map(function (e) { return '<div class="list-item"><strong>' + e.word + ' · ' + e.type + '</strong><p>Wrong: ' + e.wrongAnswer + '</p><p>Correct: ' + e.correctAnswer + '</p><p>' + e.explanation + '</p><p>Next review: ' + new Date(e.nextReviewDate).toLocaleString() + '</p><button class="ghost-btn" data-resolve="' + e.id + '" type="button">Mark resolved</button></div>'; }).join('') : '<p class="small">No unresolved errors yet.</p>';
+        $('errorList').innerHTML = errors.length ? errors.map(function (e) { return '<div class="list-item"><strong>' + e.word + ' · ' + e.type + '</strong><p>Wrong: ' + e.wrongAnswer + '</p><p>Correct: ' + e.correctAnswer + '</p><p>' + e.explanation + '</p><p>Next review: ' + formatDateForUser(e.nextReviewDate) + '</p><button class="ghost-btn" data-resolve="' + e.id + '" type="button">Mark resolved</button></div>'; }).join('') : '<p class="small">No unresolved errors yet.</p>';
         Array.prototype.forEach.call(document.querySelectorAll('[data-resolve]'), function (btn) { btn.addEventListener('click', function () { var err = state.errors.filter(function (e) { return e.id === btn.getAttribute('data-resolve'); })[0]; if (err) err.resolved = true; saveState(); renderErrors(); }); });
       }
       function renderLibrary() {
@@ -891,7 +948,7 @@
           var f = filter === 'all' || item.level === filter || (filter === 'due' && isDue(item)) || (filter === 'weak' && isWeak(item)) || (filter === 'mastered' && isMastered(item)) || (filter === 'custom' && item.custom) || item.type === filter;
           return matches && f;
         }).slice(0, 80);
-        $('libraryList').innerHTML = items.map(function (item) { var p = progressFor(item.id); return '<button type="button" class="list-item" data-inspect="' + item.id + '"><strong>' + item.word + ' <span class="tag">' + item.level + '</span></strong><p>' + item.meaningZh + ' — ' + item.definitionEn + '</p><p>Category: ' + item.category + ' · Box ' + p.box + ' · Due ' + new Date(p.dueDate).toLocaleDateString() + '</p></button>'; }).join('') || '<p class="small">No cards match this filter.</p>';
+        $('libraryList').innerHTML = items.map(function (item) { var p = progressFor(item.id); return '<button type="button" class="list-item" data-inspect="' + item.id + '"><strong>' + item.word + ' <span class="tag">' + item.level + '</span></strong><p>' + (item.meaningZh || item.usageNote || '') + ' — ' + item.definitionEn + '</p><p>Category: ' + item.category + ' · Box ' + p.box + ' · Due ' + formatDateForUser(p.dueDate, 'Now') + '</p></button>'; }).join('') || '<p class="small">No cards match this filter.</p>';
         Array.prototype.forEach.call(document.querySelectorAll('[data-inspect]'), function (btn) { btn.addEventListener('click', function () { var item = byId(btn.getAttribute('data-inspect')); if (item) startSession([item], 'Library inspection'); }); });
       }
       function renderSaved() {
@@ -922,7 +979,7 @@
       Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function (btn) { btn.addEventListener('click', function () { var mode = btn.getAttribute('data-mode'); if (mode === 'daily') startDailyReview(); if (mode === 'new') startNewBatch(); if (mode === 'upgrade') startUpgrade(); if (mode === 'collocation') startCollocation(); if (mode === 'family') startFamily(); if (mode === 'grammar') startGrammar(); if (mode === 'speaking') startSpeaking(); if (mode === 'test') startMiniTest(); }); });
       $('saveGoalBtn').addEventListener('click', function () { state.dailyGoal = Math.max(5, Math.min(100, Number($('dailyGoalInput').value) || 20)); saveState(); renderStats(); });
       $('searchInput').addEventListener('input', renderLibrary); $('filterSelect').addEventListener('change', renderLibrary);
-      $('addCustomBtn').addEventListener('click', addCustomCard); $('exportBtn').addEventListener('click', exportBackup); $('importBtn').addEventListener('click', importBackup);
+      $('addCustomBtn').addEventListener('click', addCustomCard); $('exportBtn').addEventListener('click', exportBackup); $('importBtn').addEventListener('click', importBackup); $('cleanUpgradeErrorsBtn').addEventListener('click', cleanCorruptedUpgradeErrors);
       $('themeToggle').addEventListener('click', function () { state.theme = state.theme === 'dark' ? 'light' : 'dark'; saveState(); applyTheme(); });
 
       applyTheme(); renderAll();
