@@ -161,7 +161,10 @@
     .feedback dl { display: grid; grid-template-columns: 140px minmax(0,1fr); gap: 8px 12px; margin: 12px 0 0; }
     .feedback dt { color: var(--muted); font-weight: 800; }
     .feedback dd { margin: 0; }
-    .rating-row button { flex: 1; min-width: 112px; }
+    .rating-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .rating-row button { width: 100%; min-width: 0; }
+    .chip-bank, .ordered-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .chip-btn { border-radius: 999px; border: 1px solid var(--line); background: var(--card-strong); padding: 10px 12px; font-weight: 800; }
 
     .pup-note { border-left: 5px solid var(--gold); background: linear-gradient(135deg, var(--gold-soft), transparent); }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -187,6 +190,7 @@
       .top-actions { justify-content: flex-start; }
       .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .mode-grid, .two-col, .three-col, .choice-grid { grid-template-columns: 1fr; }
+      .rating-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .feedback dl { grid-template-columns: 1fr; }
     }
   </style>
@@ -261,6 +265,7 @@
           <button class="mode-btn" data-mode="collocation"><strong>Collocation Builder</strong><span>Choose the natural verb or phrase in IELTS-ready chunks.</span></button>
           <button class="mode-btn" data-mode="family"><strong>Word Family Lab</strong><span>Noun, verb, adjective, and adverb form control.</span></button>
           <button class="mode-btn" data-mode="grammar"><strong>Grammar Clinic</strong><span>Notes, correction, transformation, and cloze drills.</span></button>
+          <button class="mode-btn" data-mode="linker"><strong>Sentence &amp; Linker Gym</strong><span>Choose linkers, combine ideas, tap sentence chips, and improve weak sentences.</span></button>
           <button class="mode-btn" data-mode="speaking"><strong>Speaking Quick Cards</strong><span>Answer aloud or type bullet points; save favorite phrases.</span></button>
           <button class="mode-btn" data-mode="test"><strong>Mini Test</strong><span>Ten mixed questions with weak category summary.</span></button>
         </div>
@@ -275,7 +280,7 @@
       <section class="panel">
         <h2>Error notebook</h2>
         <p class="small">Wrong answers are useful evidence. Resolve an item when it feels clear.</p>
-        <div class="answer-row"><button class="ghost-btn" id="cleanUpgradeErrorsBtn" type="button">Clean corrupted upgrade errors</button></div>
+        <div class="answer-row"><button class="ghost-btn" id="cleanUpgradeErrorsBtn" type="button">Clean corrupted grammar errors</button></div>
         <div class="list" id="errorList"></div>
       </section>
     </section>
@@ -508,6 +513,29 @@
         ['gradually','B1','Useful adjective/adverb','逐渐地','slowly over time','The proportion gradually declined.','gradually increase; gradually change','gradation|gradation|gradual|gradually','slowly, steadily','Use for slow changes, not sudden ones.']
       ];
 
+      vocabSeeds = vocabSeeds.concat([
+        ['access to education','B1','Education','受教育机会','the opportunity to receive schooling or training','Rural children need better access to education.','improve access to education; equal access to education','access|access|accessible|accessibly','educational opportunity','Use access to, not access for.'],
+        ['quality of life','B1','Society','生活质量','the general standard of health, comfort, and happiness','Green spaces can improve quality of life.','improve quality of life; high quality of life','qualify|quality|qualitative','living standard','Do not write life quality.'],
+        ['social mobility','B2','Society','社会流动性','the ability to move to a higher social or economic position','Education can increase social mobility.','increase social mobility; upward social mobility','move|mobility|mobile','opportunity','Mobility here is social, not transport.'],
+        ['public services','B1','Government','公共服务','services provided by government such as health and transport','Tax revenue supports public services.','fund public services; improve public services','serve|service|public','government services','Usually plural in this meaning.'],
+        ['environmental protection','B1','Environment','环境保护','actions that keep nature safe from damage','Environmental protection should be a long-term priority.','strengthen environmental protection; environmental protection policy','protect|protection|protective|protectively','conservation','Do not confuse protection with prevention.'],
+        ['economic development','B1','Work / economy','经济发展','growth and improvement in an economy','Transport links can support economic development.','promote economic development; sustainable economic development','develop|development|developed','growth','Economic is adjective; economy is noun.'],
+        ['digital technology','B1','Technology','数字技术','electronic tools and systems that process information','Digital technology has changed how students learn.','use digital technology; digital technology skills','digitise|digitisation|digital|digitally','IT','Technology is usually uncountable as a field.'],
+        ['mental well-being','B2','Health','心理健康与幸福感','emotional and psychological health','Regular exercise can improve mental well-being.','support mental well-being; protect mental well-being','well-being|well-being|well','mental health','Hyphenation varies, but well-being is common.'],
+        ['long-term consequences','B2','Cause / effect / problem','长期后果','results that appear or continue far into the future','Poor planning can have long-term consequences.','serious long-term consequences; face consequences','consequence|consequence|consequent|consequently','outcomes','Consequence often suggests seriousness.'],
+        ['practical skills','B1','Education','实用技能','abilities useful in real life or work','Internships help students develop practical skills.','develop practical skills; learn practical skills','practise|practice|practical|practically','life skills','Practical means useful, not possible.'],
+        ['critical thinking','B2','Education','批判性思维','the ability to analyse ideas carefully and independently','Universities should encourage critical thinking.','develop critical thinking; critical thinking skills','think|thinking|critical|critically','analysis','Critical does not mean negative here.'],
+        ['public transport','B1','Urban life','公共交通','buses, trains, and other shared transport systems','Public transport can reduce urban congestion.','use public transport; invest in public transport','transport|transport|transportable','transit','British English often says transport, not transportation.'],
+        ['urban congestion','B2','Urban life','城市拥堵','overcrowding and traffic pressure in cities','Urban congestion wastes time and fuel.','reduce urban congestion; severe congestion','congest|congestion|congested','traffic jams','Congestion is uncountable.'],
+        ['renewable energy','B1','Environment','可再生能源','energy from sources that naturally replace themselves','Renewable energy can reduce dependence on fossil fuels.','invest in renewable energy; renewable energy sources','renew|renewal|renewable','clean energy','Energy is usually uncountable.'],
+        ['government funding','B1','Government','政府资金','money provided by the government','Government funding is essential for many schools.','increase government funding; receive government funding','fund|funding|funded','public money','Funding is uncountable.'],
+        ['personal responsibility','B2','Society','个人责任','the duty individuals have for their own actions','Health campaigns often stress personal responsibility.','take personal responsibility; individual responsibility','respond|responsibility|responsible|responsibly','individual duty','Use responsibility for.']
+      ]);
+      var extraVocabTopics = ['curriculum','tuition fees','vocational training','lifelong learning','school attendance','academic performance','biodiversity','carbon emissions','waste management','climate change','air quality','online privacy','artificial intelligence','remote work','screen time','data security','preventive healthcare','balanced diet','public health','healthcare system','job security','flexible working','work-life balance','income inequality','ageing population','community spirit','civic engagement','public policy','tax revenue','law enforcement','consumer behaviour','statistical evidence','upward trend','sharp decline','average income','cultural heritage','creative industries','public art','local identity','housing affordability','city centre','green space','traffic pressure','population density','social media','digital divide','teacher training','student motivation','environmental awareness','energy efficiency','medical treatment','employment opportunities','economic inequality','public safety','data analysis','cultural diversity','urban planning','community facilities','sustainable lifestyle','natural resources','recycling scheme','technological innovation','mental health','career prospects','social support','government regulation','survey results','museum attendance','rural communities','public amenities','transport network','affordable housing','online education','renewable resources','elderly care','youth unemployment','consumer rights','local businesses','international trade'];
+      extraVocabTopics.forEach(function (word, idx) {
+        vocabSeeds.push([word, idx % 3 === 0 ? 'B1' : idx % 3 === 1 ? 'B2' : 'C1', idx % 10 === 0 ? 'Education' : idx % 10 === 1 ? 'Environment' : idx % 10 === 2 ? 'Technology' : idx % 10 === 3 ? 'Health' : idx % 10 === 4 ? 'Work' : idx % 10 === 5 ? 'Society' : idx % 10 === 6 ? 'Government' : idx % 10 === 7 ? 'Data/trends' : idx % 10 === 8 ? 'Art/culture' : 'Urban life', '雅思常用词：' + word, 'a useful IELTS topic word or phrase for clear essays and speaking answers', 'Clear policy can improve ' + word + ' in many communities.', 'improve ' + word + '; support ' + word, word + '|' + word + '|' + word, 'related issue', 'Use the phrase naturally; do not add decorative words.']);
+      });
+
       var collocationSeeds = [
         ['play a crucial role in','发挥关键作用','Schools play a crucial role in developing social skills.','play','play / make / do a crucial role in','Use play a role, not make a role.'],
         ['have a significant impact on','对……有显著影响','Transport has a significant impact on employment opportunities.','have','have / make / do a significant impact on','Impact commonly takes have + on.'],
@@ -554,6 +582,16 @@
         ['depend','dependence','dependent','dependently','Many families are ____ on public transport.', 'dependent'],
         ['respond','response','responsive','responsively','The government gave a quick ____.', 'response']
       ];
+
+      familySeeds = familySeeds.concat([
+        ['assess','assessment','assessable','', 'A fair ____ should measure real ability.', 'assessment'],['create','creation','creative','creatively','The arts can support ____ thinking.', 'creative'],['educate','education','educational','educationally','Early childhood ____ can reduce inequality.', 'education'],['environment','environment','environmental','environmentally','Cities need ____ sustainable transport.', 'environmentally'],['efficient','efficiency','efficient','efficiently','The system works more ____ after the upgrade.', 'efficiently'],['effective','effectiveness','effective','effectively','The ____ of the policy remains uncertain.', 'effectiveness'],['influence','influence','influential','influentially','Parents are highly ____ in early learning.', 'influential'],['restrict','restriction','restrictive','restrictively','The new rules place a ____ on car use.', 'restriction'],['consume','consumption','consumable','', 'Energy ____ fell after prices increased.', 'consumption'],['produce','production','productive','productively','The factory increased ____ by 20 percent.', 'production'],['reduce','reduction','reduced','', 'There was a sharp ____ in waste.', 'reduction'],['improve','improvement','improved','', 'The data show a clear ____ in attendance.', 'improvement'],['protect','protection','protective','protectively','Stronger ____ is needed for wildlife.', 'protection'],['respond','response','responsive','responsively','A ____ government listens to citizens.', 'responsive'],['depend','dependence','dependent','dependently','The city is heavily ____ on tourism.', 'dependent'],['independent','independence','independent','independently','Students should learn to work ____.', 'independently'],['signify','significance','significant','significantly','Costs rose ____ in 2024.', 'significantly'],['vary','variation','variable','variably','The results ____ across age groups.', 'vary'],['participate','participation','participatory','', 'Public ____ can improve local decisions.', 'participation'],['regulate','regulation','regulatory','', 'Strict ____ may reduce harmful emissions.', 'regulation'],['innovate','innovation','innovative','innovatively','Many firms invest in technological ____.', 'innovation'],['secure','security','secure','securely','Data must be stored ____ online.', 'securely'],['urbanise','urbanisation','urban','', 'Rapid ____ can increase housing demand.', 'urbanisation'],['globalise','globalisation','global','globally','Companies now compete ____.', 'globally'],['sustain','sustainability','sustainable','sustainably','Cities should grow ____.', 'sustainably'],['afford','affordability','affordable','affordably','Housing ____ is a major urban issue.', 'affordability'],['employ','employment','employable','', 'Training can improve ____ prospects.', 'employment'],['equal','equality','equal','equally','Resources should be distributed ____.', 'equally'],['diverse','diversity','diverse','diversely','Cultural ____ can enrich city life.', 'diversity'],['healthy','health','healthy','healthily','Children need a ____ diet.', 'healthy'],['invest','investment','investable','', 'Public ____ in transport can reduce congestion.', 'investment'],['govern','government','governmental','', '____ policy affects public services.', 'governmental'],['analyse','analysis','analytical','analytically','The essay presents a detailed ____.', 'analysis'],['compare','comparison','comparative','comparatively','The chart makes a ____ between two countries.', 'comparison'],['clarify','clarification','clear','clearly','The final paragraph states the answer ____.', 'clearly'],['contribute','contribution','contributory','', 'Education makes a major ____ to growth.', 'contribution'],['distribute','distribution','distributed','', 'The ____ of income is uneven.', 'distribution'],['interpret','interpretation','interpretive','', 'The writer offers a cautious ____ of the data.', 'interpretation'],['maintain','maintenance','maintainable','', 'Road ____ is expensive but necessary.', 'maintenance'],['prevent','prevention','preventive','', '____ healthcare can save money.', 'Preventive'],['prioritise','priority','prioritised','', 'Safety should be the main ____.', 'priority'],['recover','recovery','recoverable','', 'Economic ____ may take several years.', 'recovery'],['require','requirement','required','', 'Attendance is a basic ____ of the course.', 'requirement'],['sign','signal','significant','significantly','The change was statistically ____.', 'significant'],['stable','stability','stable','stably','Political ____ encourages investment.', 'stability'],['tend','tendency','tendentious','', 'There is a ____ to delay difficult reforms.', 'tendency'],['transform','transformation','transformative','', 'Digital tools can support educational ____.', 'transformation'],['valuable','value','valuable','valuably','Libraries provide ____ public services.', 'valuable'],['visible','visibility','visible','visibly','Air pollution is often ____ in large cities.', 'visible'],['willing','willingness','willing','willingly','Public ____ to recycle has increased.', 'willingness']
+      ]);
+      familySeeds = familySeeds.map(function (f) {
+        var forms = f.slice(0, 4).filter(Boolean);
+        f[6] = forms;
+        f[7] = 'The answer “' + f[5] + '” fits the grammar position in the sentence; the other family members have different parts of speech.';
+        return f;
+      });
 
       var grammarNotes = [
         ['g-articles','Articles in academic writing','B1','Use a/an for one non-specific singular countable noun, the for a specific noun, and zero article for general plural or uncountable nouns.','Government should protect environment.','The government should protect the environment.','Singular countable nouns usually need a determiner.',[
@@ -619,6 +657,21 @@
         ]]
       ].map(function (g) { return { id:g[0], title:g[1], level:g[2], explanation:g[3], badExample:g[4], goodExample:g[5], miniRule:g[6], practiceItems:g[7] }; });
 
+
+      var linkerGymSeeds = [
+        { id:'linker-choice-1', type:'linker-gym', gymType:'linker-choice', level:'B2', category:'Sentence & Linker Gym', word:'Although', prompt:'___ public transport is expensive to build, it can reduce traffic pressure in the long term.', instruction:'Choose the best linker for the logical relationship.', choices:['Although','Because','Therefore','For example'], answer:'Although', explanation:'Although introduces a concession: the first idea is a limitation, but the second idea remains true.', modelSentence:'Although public transport is expensive to build, it can reduce traffic pressure in the long term.', commonMistake:'Do not use therefore for contrast or concession.', whatTests:'Concession linkers'},
+        { id:'linker-combine-1', type:'linker-gym', gymType:'linker-combine', level:'B2', category:'Sentence & Linker Gym', word:'although', prompt:'Public transport is expensive to build.\nIt can reduce traffic pressure in the long term.', instruction:'Combine the two sentences using “although”.', answer:'Although public transport is expensive to build, it can reduce traffic pressure in the long term.', explanation:'Put although before the concession clause and add the main clause after a comma.', modelSentence:'Although public transport is expensive to build, it can reduce traffic pressure in the long term.', commonMistake:'Avoid writing two separate sentences when asked to combine.', whatTests:'Combining clauses with concession'},
+        { id:'linker-order-1', type:'linker-gym', gymType:'linker-order', level:'B2', category:'Sentence & Linker Gym', word:'sentence order', prompt:'Tap the chips in the correct order.', instruction:'Order the sentence parts. Tap chips; do not drag.', chips:['Although public transport is expensive to build,','it can reduce traffic pressure','in the long term.'], answer:'Although public transport is expensive to build, it can reduce traffic pressure in the long term.', explanation:'The concession clause comes first, followed by the main result and time phrase.', modelSentence:'Although public transport is expensive to build, it can reduce traffic pressure in the long term.', commonMistake:'Keep the comma after the opening although-clause.', whatTests:'Sentence organization'},
+        { id:'linker-improve-1', type:'linker-gym', gymType:'linker-improve', level:'B2', category:'Sentence & Linker Gym', word:'contrast', prompt:'Cars are bad. Buses are good.', instruction:'Rewrite this as one IELTS-style sentence using contrast.', answer:'While cars can increase congestion and emissions, buses can move large numbers of people more efficiently.', explanation:'Clear contrast is better than decorative complexity. Choose the linker based on the logical relationship.', modelSentence:'While cars can increase congestion and emissions, buses can move large numbers of people more efficiently.', commonMistake:'Do not overuse fancy linkers; IELTS rewards clear control.', whatTests:'Improving weak contrast sentences'},
+        { id:'linker-choice-2', type:'linker-gym', gymType:'linker-choice', level:'B1', category:'Sentence & Linker Gym', word:'because', prompt:'Many people cycle to work ___ it is cheaper and healthier.', instruction:'Choose the best linker for cause.', choices:['because','however','for example','in contrast'], answer:'because', explanation:'Because introduces a reason.', modelSentence:'Many people cycle to work because it is cheaper and healthier.', commonMistake:'However cannot connect a reason inside one sentence.', whatTests:'Cause linkers'},
+        { id:'linker-choice-3', type:'linker-gym', gymType:'linker-choice', level:'B2', category:'Sentence & Linker Gym', word:'therefore', prompt:'The city improved its bus network. ___, fewer commuters drove to work.', instruction:'Choose the result linker.', choices:['Therefore','Although','For instance','Whereas'], answer:'Therefore', explanation:'Therefore introduces a result.', modelSentence:'The city improved its bus network. Therefore, fewer commuters drove to work.', commonMistake:'Use punctuation when therefore starts a new sentence.', whatTests:'Result linkers'},
+        { id:'linker-choice-4', type:'linker-gym', gymType:'linker-choice', level:'B2', category:'Sentence & Linker Gym', word:'for example', prompt:'Cities can discourage car use in several ways; ___, they can charge drivers to enter busy areas.', instruction:'Choose the example linker.', choices:['for example','therefore','although','whereas'], answer:'for example', explanation:'For example introduces a specific illustration.', modelSentence:'Cities can discourage car use in several ways; for example, they can charge drivers to enter busy areas.', commonMistake:'Do not use for example to show cause or contrast.', whatTests:'Example linkers'},
+        { id:'linker-combine-2', type:'linker-gym', gymType:'linker-combine', level:'B2', category:'Sentence & Linker Gym', word:'whereas', prompt:'Online courses are flexible. Traditional classes offer more direct support.', instruction:'Combine the ideas using “whereas”.', answer:'Online courses are flexible, whereas traditional classes offer more direct support.', explanation:'Whereas compares two contrasting facts.', modelSentence:'Online courses are flexible, whereas traditional classes offer more direct support.', commonMistake:'Do not use whereas for a simple reason.', whatTests:'Contrast linkers'},
+        { id:'linker-order-2', type:'linker-gym', gymType:'linker-order', level:'B2', category:'Sentence & Linker Gym', word:'sentence order', prompt:'Tap the chips in the correct order.', instruction:'Order the sentence parts. Tap chips; do not drag.', chips:['In addition,','public libraries provide internet access','for residents who cannot afford it.'], answer:'In addition, public libraries provide internet access for residents who cannot afford it.', explanation:'Addition linkers introduce another supporting point.', modelSentence:'In addition, public libraries provide internet access for residents who cannot afford it.', commonMistake:'Do not add in addition when the second idea is actually a contrast.', whatTests:'Addition linkers'},
+        { id:'linker-improve-2', type:'linker-gym', gymType:'linker-improve', level:'B2', category:'Sentence & Linker Gym', word:'clarification', prompt:'It is good. This helps people.', instruction:'Rewrite this as one clearer IELTS-style sentence using clarification.', answer:'In other words, the policy is useful because it gives residents easier access to essential services.', explanation:'Clarification linkers explain what the previous idea means.', modelSentence:'In other words, the policy is useful because it gives residents easier access to essential services.', commonMistake:'Avoid vague words like good and things.', whatTests:'Clarification and precision'}
+      ];
+      var linkerCategories = 'Contrast: however, whereas, while, in contrast. Concession: although, even though, despite the fact that. Cause: because, since, as. Result: therefore, as a result, consequently. Addition: in addition, moreover, furthermore. Example: for example, for instance. Comparison: similarly, compared with. Clarification: in other words, this means that. Do not overuse fancy linkers; choose based on logic.';
+
       var speakingPrompts = [
         ['Describe a useful skill you learned.', 'I used to…, but now…'],
         ['Talk about a place in your city that helps people relax.', 'One thing I’ve noticed is…'],
@@ -644,12 +697,27 @@
         });
         return { id:'c-' + index, word:item[0], type:'collocation', level:index < 10 ? 'B2' : 'B1', category:'Collocations', meaningZh:item[1], definitionEn:'A natural IELTS-ready word partnership.', example:item[2], collocations:[item[0]], wordFamily:'', synonyms:[], commonMistake:item[5], prompt:'___ ' + rest, answer:answer, choices:choices, explanation:item[5], tags:['collocation','writing-ready phrase'] };
       }
+      function grammarChoiceSet(noteId, answer) {
+        var sets = {
+          'g-articles':['zero article','a','an','the','more'], 'g-relative':['who','which','where','that'], 'g-nounclauses':['that','which','what','who'],
+          'g-concession':['Although','Because','Therefore','In addition','However','Despite'], 'g-complex':['Although','Because','If','While'],
+          'g-agreement':['is','are','was','were'], 'g-count':['evidence','evidences','an evidence','many evidence'], 'g-passive':['is','are','was','were'],
+          'g-hedging':['likely','certain','always','definitely'], 'g-comparison':['as','than','with','to'], 'g-prepositions':['to','on','in','for'],
+          'g-tense':['increased','increases','increase','increasing'], 'g-conditionals':['would','will','can','did'], 'g-parallel':['effective','effectively','effect','effectiveness'], 'g-runons':['so','because of','despite','however']
+        };
+        var choices = (sets[noteId] || [answer, 'the', 'that', 'because']).slice();
+        if (choices.indexOf(answer) === -1) choices.unshift(answer);
+        return choices.slice(0, 4);
+      }
       function grammarCardsFromNotes() {
         var cards = [];
         grammarNotes.forEach(function (note) {
           note.practiceItems.forEach(function (p, i) {
-            cards.push({ id: note.id + '-p' + i, word: note.title, type:'grammar', level:note.level, category:'Grammar Clinic', meaningZh:'语法练习', definitionEn:note.explanation, example:note.goodExample, collocations:[], wordFamily:'', synonyms:[], commonMistake:note.badExample, prompt:p[1], answer:p[2], explanation:p[3], tags:['grammar', p[0], note.title] });
+            var kind = p[0] === 'cloze' ? 'grammar-blank-choice' : p[0] === 'correction' ? 'grammar-correction' : p[0] === 'transform' ? 'grammar-transform' : 'grammar-choice';
+            var prompt = p[1], answer = p[2];
+            cards.push({ id: note.id + '-p' + i, word: note.title, type:'grammar', grammarType:kind, level:note.level, category:'Grammar Clinic', meaningZh:'语法练习', definitionEn:note.explanation, example:note.goodExample, modelSentence:note.goodExample, collocations:[], wordFamily:'', synonyms:[], commonMistake:p[0] === 'correction' ? prompt : note.badExample, prompt:prompt, answer:answer, choices:kind === 'grammar-blank-choice' || kind === 'grammar-choice' ? grammarChoiceSet(note.id, answer) : [], explanation:p[3], whatTests:note.title, tags:['grammar', kind, note.title] });
           });
+          cards.push({ id:note.id + '-concept', word:note.title, type:'grammar', grammarType:'grammar-choice', level:note.level, category:'Grammar Clinic', meaningZh:'语法概念', definitionEn:note.explanation, example:note.goodExample, modelSentence:note.goodExample, collocations:[], wordFamily:'', synonyms:[], commonMistake:note.badExample, prompt:'Which rule best matches this example? ' + note.goodExample, answer:note.miniRule, choices:[note.miniRule,'Use a decorative advanced word.','Choose by vocabulary topic only.','Ignore the sentence structure.'], explanation:note.explanation, whatTests:note.title, tags:['grammar','grammar-choice',note.title] });
         });
         return cards;
       }
@@ -681,6 +749,7 @@
       var currentSessionTitle = 'Daily Review';
 
       var $ = function (id) { return document.getElementById(id); };
+      var escapeHtml = function (value) { return String(value == null ? '' : value).replace(/[&<>"]/g, function (ch) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]; }); };
       var allItems = function () { return seedItems.concat(state.customCards || []); };
       var byId = function (id) { return allItems().filter(function (item) { return item.id === id; })[0]; };
       function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -713,18 +782,22 @@
         state.errors.unshift({ id:'err-' + Date.now(), itemId:item.id, word:item.word, type:item.type, category:item.category, wrongAnswer:given || '(blank)', correctAnswer:correct || item.answer, explanation:item.explanation, nextReviewDate:progressFor(item.id).dueDate, resolved:false, createdAt:new Date().toISOString() });
         state.errors = state.errors.slice(0, 80);
       }
-      function isCorruptedUpgradeError(error) {
-        if (!error || error.category !== 'IELTS Writing Upgrade') return false;
-        return error.word === '升级表达' || error.wrongAnswer === '升级表达' || error.correctAnswer === '升级表达' || (error.type !== 'upgrade' && /^upgrade-/.test(error.itemId || ''));
+      function isCorruptedGrammarError(error) {
+        if (!error || error.type !== 'grammar') return false;
+        var answer = normalize(error.correctAnswer || '');
+        var topicOnly = ['relative','relative clauses','articles','noun','noun clauses','complex sentence structure','countable uncountable nouns','grammar clinic'].indexOf(answer) !== -1;
+        var brokenCloze = /fill the blank/i.test(error.instruction || error.explanation || '') && String(error.prompt || '').indexOf('___') === -1;
+        var mixedTopic = /relative clauses for description|noun clauses after verbs|articles in academic writing/i.test(error.correctAnswer || '') && String(error.correctAnswer || '').indexOf('/') !== -1;
+        return topicOnly || brokenCloze || mixedTopic;
       }
       function cleanCorruptedUpgradeErrors() {
-        if (!confirm('Remove only clearly corrupted IELTS Writing Upgrade error entries?')) return;
+        if (!confirm('Remove only clearly corrupted grammar error entries? Vocabulary and collocation errors will stay.')) return;
         var before = (state.errors || []).length;
-        state.errors = (state.errors || []).filter(function (error) { return !isCorruptedUpgradeError(error); });
+        state.errors = (state.errors || []).filter(function (error) { return !isCorruptedGrammarError(error); });
         var cleaned = before - state.errors.length;
         saveState();
         renderErrors();
-        alert('Cleaned ' + cleaned + ' corrupted upgrade errors.');
+        alert('Cleaned ' + cleaned + ' corrupted grammar errors.');
       }
       function sessionPracticeLabel(title) {
         if (title === 'IELTS Writing Upgrade') return 'phrase upgrade practice';
@@ -743,28 +816,32 @@
       }
 
       function makeQuestion(item, forcedType) {
-        if (item.type === 'upgrade') return { type:'upgrade', prompt:item.simplePhrase, instruction:'Upgrade this simple phrase into a more precise IELTS-style expression.', answers:item.acceptableAnswers || [item.upgradedPhrase], input:'text' };
+        if (item.type === 'upgrade') return { type:'upgrade', prompt:item.simplePhrase, instruction:'Upgrade this simple phrase into a more precise IELTS-style expression.', answers:item.acceptableAnswers || [item.upgradedPhrase], input:'text', whatTests:'Precise IELTS phrase control', modelSentence:item.example, commonMistake:item.commonMistake };
+        if (item.type === 'linker-gym') return { type:item.gymType, prompt:item.prompt, instruction:item.instruction + ' ' + linkerCategories, answers:[item.answer], choices:item.choices || [], chips:item.chips || [], input:item.gymType === 'linker-choice' ? 'choice' : item.gymType === 'linker-order' ? 'order' : 'textarea', whatTests:item.whatTests, modelSentence:item.modelSentence, commonMistake:item.commonMistake, explanation:item.explanation };
+        if (item.type === 'grammar') {
+          var gType = item.grammarType || (String(item.prompt || '').indexOf('___') !== -1 ? 'grammar-blank-choice' : 'grammar-correction');
+          if (gType === 'grammar-blank-choice' || gType === 'grammar-choice') return { type:gType, prompt:item.prompt, instruction:'Choose the best answer. This is a grammar question, not a vocabulary cloze.', answers:[item.answer], choices:item.choices && item.choices.length ? item.choices : grammarChoiceSet(item.id.split('-p')[0], item.answer), input:'choice', whatTests:item.whatTests || item.word, modelSentence:item.modelSentence || item.example, commonMistake:item.commonMistake, explanation:item.explanation };
+          if (gType === 'grammar-transform') return { type:gType, prompt:item.prompt, instruction:'Transform the sentence as requested. Focus on grammar control.', answers:[item.answer], input:'textarea', whatTests:item.whatTests || item.word, modelSentence:item.answer, commonMistake:item.commonMistake, explanation:item.explanation };
+          return { type:'grammar-correction', prompt:item.prompt || item.commonMistake, instruction:'Correct the sentence. Focus on grammar control, not decoration.', answers:[item.answer], input:'textarea', whatTests:item.whatTests || item.word, modelSentence:item.modelSentence || item.example, commonMistake:item.commonMistake, explanation:item.explanation };
+        }
         var type = forcedType;
         if (!type) {
-          var options = item.category === 'Word Family Lab' ? ['word-family'] : item.type === 'grammar' ? ['grammar-correction','cloze'] : item.type === 'collocation' ? ['collocation','cloze','sentence'] : ['meaning','reverse','cloze','sentence'];
+          var options = item.category === 'Word Family Lab' ? ['word-family'] : item.type === 'collocation' ? ['collocation','cloze','sentence'] : ['meaning','reverse','cloze','sentence'];
           type = options[Math.floor(Math.random() * options.length)];
         }
-        if (type === 'meaning') return { type:type, prompt:item.word, instruction:'Type the Chinese meaning or a simple English definition.', answers:[item.meaningZh, item.definitionEn], input:'text' };
-        if (type === 'reverse') return { type:type, prompt:item.meaningZh, instruction:'Type the English word or phrase.', answers:[item.word], input:'text' };
-        if (type === 'collocation') {
-          return { type:type, prompt:item.prompt, instruction:'Choose the word that completes the natural collocation.', answers:[item.answer], choices:item.choices || [item.answer], input:'choice' };
-        }
+        if (type === 'meaning') return { type:type, prompt:item.word, instruction:'Type the Chinese meaning or a simple English definition.', answers:[item.meaningZh, item.definitionEn], input:'text', whatTests:item.category, modelSentence:item.example, commonMistake:item.commonMistake };
+        if (type === 'reverse') return { type:type, prompt:item.meaningZh, instruction:'Type the English word or phrase.', answers:[item.word], input:'text', whatTests:item.category, modelSentence:item.example, commonMistake:item.commonMistake };
+        if (type === 'collocation') return { type:type, prompt:item.prompt, instruction:'Choose the word that completes the natural collocation.', answers:[item.answer], choices:item.choices || [item.answer], input:'choice', whatTests:'Natural collocation', modelSentence:item.example, commonMistake:item.commonMistake };
         if (type === 'word-family') {
-          var forms = item.wordFamily.split(' / ').filter(Boolean);
-          return { type:type, prompt:item.example, instruction:'Choose the form that fits the sentence.', answers:[item.answer], choices:forms, input:'choice' };
+          var forms = item.choices || item.wordFamily.split(' / ').filter(Boolean);
+          return { type:type, prompt:item.example, instruction:'Choose the word form that fits the grammar position.', answers:[item.answer], choices:forms, input:'choice', whatTests:'Word family and part of speech', modelSentence:item.example, commonMistake:item.commonMistake, explanation:item.explanation };
         }
-        if (type === 'grammar-correction') return { type:type, prompt:item.prompt || item.commonMistake, instruction:'Correct the sentence. Focus on grammar control, not decoration.', answers:[item.answer, item.example], input:'textarea' };
-        if (type === 'sentence') return { type:type, prompt:'Write one IELTS-style sentence using: ' + item.word, instruction:'Save your own sentence, then self-rate weak / okay / strong.', answers:[item.word], input:'sentence' };
+        if (type === 'sentence') return { type:type, prompt:'Write one IELTS-style sentence using: ' + item.word, instruction:'Productive practice: write a complete sentence, save it, then self-rate Weak / Okay / Strong.', answers:[item.word], input:'sentence', whatTests:'Productive sentence use', modelSentence:item.example, commonMistake:item.commonMistake, explanation:item.explanation };
         var sentence = item.example || item.prompt || ('Use ' + item.word + ' in a sentence.');
         var answer = item.type === 'collocation' ? item.answer : item.word.split(' ')[0];
         var blanked = sentence.replace(new RegExp(answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '___');
         if (blanked === sentence && item.word.indexOf(' ') === -1) blanked = sentence.replace(new RegExp(item.word, 'i'), '___');
-        return { type:'cloze', prompt:blanked, instruction:'Fill the blank with the best word or phrase.', answers:[answer, item.word], input:'text' };
+        return { type:'cloze', prompt:blanked, instruction:'Fill the blank with the best word or phrase.', answers:[answer, item.word], input:'text', whatTests:item.category, modelSentence:item.example, commonMistake:item.commonMistake };
       }
 
       function setPup(kind) {
@@ -788,8 +865,12 @@
         $('feedbackBox').className = 'feedback';
         $('feedbackBox').innerHTML = '';
         if (question.input === 'choice') {
-          $('answerArea').innerHTML = '<div class="choice-grid">' + question.choices.map(function (choice) { return '<button type="button" class="choice-btn" data-choice="' + choice.replace(/"/g, '&quot;') + '">' + choice + '</button>'; }).join('') + '</div>';
+          $('answerArea').innerHTML = '<div class="choice-grid">' + question.choices.map(function (choice) { return '<button type="button" class="choice-btn" data-choice="' + escapeHtml(choice) + '">' + escapeHtml(choice) + '</button>'; }).join('') + '</div>';
           Array.prototype.forEach.call(document.querySelectorAll('[data-choice]'), function (btn) { btn.addEventListener('click', function () { selectedChoice = btn.getAttribute('data-choice'); Array.prototype.forEach.call(document.querySelectorAll('[data-choice]'), function (b) { b.style.borderColor = 'var(--line)'; }); btn.style.borderColor = 'var(--gold)'; }); });
+        } else if (question.input === 'order') {
+          $('answerArea').innerHTML = '<div class="chip-bank">' + question.chips.map(function (chip, idx) { return '<button type="button" class="chip-btn" data-chip="' + idx + '">' + escapeHtml(chip) + '</button>'; }).join('') + '</div><p class="small">Your order:</p><div class="ordered-chips" id="orderedChips"></div><input id="userAnswer" type="hidden" />';
+          var ordered = [];
+          Array.prototype.forEach.call(document.querySelectorAll('[data-chip]'), function (btn) { btn.addEventListener('click', function () { ordered.push(btn.textContent); btn.disabled = true; $('orderedChips').innerHTML = ordered.map(function (chip) { return '<span class="pill">' + escapeHtml(chip) + '</span>'; }).join(''); $('userAnswer').value = ordered.join(' '); }); });
         } else if (question.input === 'textarea' || question.input === 'sentence') {
           currentSelfRating = 'okay';
           $('answerArea').innerHTML = '<textarea id="userAnswer" placeholder="Type your answer here..."></textarea>' + (question.input === 'sentence' ? '<div class="choice-grid" style="margin-top:10px"><button type="button" class="choice-btn" data-self="weak">Weak</button><button type="button" class="choice-btn" data-self="okay">Okay</button><button type="button" class="choice-btn" data-self="strong">Strong</button></div>' : '');
@@ -807,23 +888,45 @@
         var input = $('userAnswer'); if (input) input.focus();
       }
 
+      function sentenceUsesTarget(raw, target) {
+        var nRaw = normalize(raw), nTarget = normalize(target);
+        return nTarget && (nRaw.indexOf(nTarget) !== -1 || nTarget.split(' ').every(function (part) { return part.length < 3 || nRaw.indexOf(part) !== -1; }));
+      }
+      function ratingControls(revealed) {
+        return (revealed ? '<p class="small">Since you revealed the answer, choose Again or Hard if you did not know it.</p>' : '') + '<div class="rating-row"><button class="danger-btn" data-rate="again">Again</button><button class="ghost-btn" data-rate="hard">Hard</button><button class="ghost-btn" data-rate="good">Good</button><button class="primary-btn" data-rate="easy">Easy</button></div>';
+      }
+      function attachRatingHandlers(item, raw, revealed, shouldLogReveal) {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-rate]'), function (btn) { btn.addEventListener('click', function () { var rating = btn.getAttribute('data-rate'); if (revealed && shouldLogReveal && (rating === 'again' || rating === 'hard')) { sessionStats.wrong.push(item); addError(item, raw || '(revealed)', currentQuestion.answers[0]); } schedule(item, rating); nextCard(); }); });
+      }
       function checkAnswer(revealed) {
         if (!currentQuestion || currentIndex < 0) return;
         var item = currentSession[currentIndex];
         var raw = currentQuestion.input === 'choice' ? selectedChoice : (($('userAnswer') && $('userAnswer').value) || '');
         var isSentence = currentQuestion.input === 'sentence';
-        var correct = !revealed && (isSentence ? normalize(raw).split(' ').length >= 7 && normalize(raw).indexOf(normalize(item.word).split(' ')[0]) !== -1 : containsAnswer(raw, currentQuestion.answers));
-        if (isSentence && raw.trim()) {
-          state.savedSentences.unshift({ id:'sent-' + Date.now(), itemId:item.id, word:item.word, sentence:raw.trim(), rating:currentSelfRating || 'okay', createdAt:new Date().toISOString() });
-        }
+        var target = currentQuestion.answers[0] || item.word;
+        var missingTarget = isSentence && !sentenceUsesTarget(raw, target);
+        var tooShortSentence = isSentence && normalize(raw).split(' ').length < 7;
+        var tooWeakSentence = isSentence && (!raw.trim() || tooShortSentence || missingTarget);
+        var shouldLogSentenceError = isSentence && (!raw.trim() || missingTarget);
+        var correct = !revealed && !isSentence && containsAnswer(raw, currentQuestion.answers);
+        if (isSentence && raw.trim()) state.savedSentences.unshift({ id:'sent-' + Date.now(), itemId:item.id, word:item.word, sentence:raw.trim(), rating:currentSelfRating || 'okay', createdAt:new Date().toISOString() });
         sessionStats.reviewed += 1;
+        if (isSentence) {
+          if (tooWeakSentence) { correctStreak = 0; if (shouldLogSentenceError) { sessionStats.wrong.push(item); addError(item, raw, 'Write a complete sentence using “' + target + '”.'); } setPup('writing'); }
+          else { sessionStats.correct += 1; correctStreak += 1; setPup('writing'); }
+          var suggestion = tooWeakSentence ? 'Try writing a complete sentence using the target phrase.' : 'Check whether your sentence has a clear IELTS relationship, precise nouns, and controlled grammar.';
+          var fbSentence = $('feedbackBox');
+          fbSentence.className = 'feedback show ' + (tooWeakSentence ? 'work' : 'ok');
+          fbSentence.innerHTML = '<h3>' + (tooWeakSentence ? 'Sentence saved with a note' : 'Sentence saved') + '</h3><dl><dt>Your answer</dt><dd>' + escapeHtml(raw || '(blank)') + '</dd><dt>Correct answer</dt><dd>Self-assessment, not an objective quiz</dd><dt>What this tests</dt><dd>' + escapeHtml(currentQuestion.whatTests || 'Productive sentence use') + '</dd><dt>Explanation</dt><dd>' + escapeHtml(currentQuestion.explanation || item.explanation || 'Use the phrase naturally in a complete IELTS-style sentence.') + '</dd><dt>Model sentence / example</dt><dd>' + escapeHtml(currentQuestion.modelSentence || item.example || '') + '</dd><dt>Common mistake</dt><dd>' + escapeHtml(currentQuestion.commonMistake || item.commonMistake || 'Do not only insert the phrase; make the whole sentence clear and grammatical.') + '</dd><dt>Next action</dt><dd>' + escapeHtml(suggestion) + '</dd></dl><div class="choice-grid" style="margin-top:10px"><button type="button" class="choice-btn">Weak</button><button type="button" class="choice-btn">Okay</button><button type="button" class="choice-btn">Strong</button></div>' + ratingControls(revealed);
+          attachRatingHandlers(item, raw, revealed, false); saveState(); renderAll(); return;
+        }
         if (correct) { sessionStats.correct += 1; correctStreak += 1; if (correctStreak >= 3) setPup('streak'); }
         else if (revealed) { correctStreak = 0; setPup('wrong'); }
-        else { correctStreak = 0; sessionStats.wrong.push(item); addError(item, raw, currentQuestion.answers[0]); setPup(isSentence && !raw.trim() ? 'writing' : 'wrong'); }
+        else { correctStreak = 0; sessionStats.wrong.push(item); addError(item, raw, currentQuestion.answers[0]); setPup('wrong'); }
         var fb = $('feedbackBox');
         fb.className = 'feedback show ' + (correct ? 'ok' : 'work');
-        fb.innerHTML = '<h3>' + (correct ? 'Correct' : (revealed ? 'Revealed' : 'Needs work')) + '</h3><dl><dt>Your answer</dt><dd>' + (raw || '(blank / revealed)') + '</dd><dt>Correct answer</dt><dd>' + currentQuestion.answers.join(' / ') + '</dd><dt>Explanation</dt><dd>' + item.explanation + '</dd><dt>Example</dt><dd>' + item.example + '</dd><dt>Common mistake</dt><dd>' + (item.commonMistake || 'Keep the collocation and grammar pattern controlled.') + '</dd></dl><div class="rating-row"><button class="danger-btn" data-rate="again">Again</button><button class="ghost-btn" data-rate="hard">Hard</button><button class="ghost-btn" data-rate="good">Good</button><button class="primary-btn" data-rate="easy">Easy</button></div>';
-        Array.prototype.forEach.call(document.querySelectorAll('[data-rate]'), function (btn) { btn.addEventListener('click', function () { var rating = btn.getAttribute('data-rate'); if (revealed && rating === 'again') { sessionStats.wrong.push(item); addError(item, raw || '(revealed)', currentQuestion.answers[0]); } schedule(item, rating); nextCard(); }); });
+        fb.innerHTML = '<h3>' + (correct ? 'Correct' : (revealed ? 'Revealed' : 'Needs work')) + '</h3><dl><dt>Your answer</dt><dd>' + escapeHtml(raw || '(blank / revealed)') + '</dd><dt>Correct answer</dt><dd>' + escapeHtml(currentQuestion.answers.join(' / ')) + '</dd><dt>What this tests</dt><dd>' + escapeHtml(currentQuestion.whatTests || item.category || item.type) + '</dd><dt>Explanation</dt><dd>' + escapeHtml(currentQuestion.explanation || item.explanation || '') + '</dd><dt>Model sentence / example</dt><dd>' + escapeHtml(currentQuestion.modelSentence || item.example || '') + '</dd><dt>Common mistake</dt><dd>' + escapeHtml(currentQuestion.commonMistake || item.commonMistake || 'Keep the collocation and grammar pattern controlled.') + '</dd><dt>Next action</dt><dd>' + escapeHtml(correct ? 'Rate honestly, then move on.' : 'Review the explanation, then choose an SRS rating.') + '</dd></dl>' + ratingControls(revealed);
+        attachRatingHandlers(item, raw, revealed, true);
         saveState(); renderAll();
       }
 
@@ -862,9 +965,14 @@
           return (pa.box - pb.box) || (new Date(pa.dueDate) - new Date(pb.dueDate)) || a.type.localeCompare(b.type);
         });
       }
+      function isWellFormedReviewItem(item) {
+        if (item.type !== 'grammar') return true;
+        var q = makeQuestion(item);
+        return q && q.prompt && q.answers && q.answers[0] && (!/Fill the blank/i.test(q.instruction) || q.prompt.indexOf('___') !== -1);
+      }
       function startDailyReview() {
-        var due = interleave(allItems().filter(isDue));
-        if (!due.length) due = interleave(allItems()).slice(0, 10);
+        var due = interleave(allItems().filter(function (item) { return isDue(item) && isWellFormedReviewItem(item); }));
+        if (!due.length) due = interleave(allItems().filter(isWellFormedReviewItem)).slice(0, 10);
         startSession(due, 'Daily Review');
       }
       function startNewBatch() {
@@ -897,10 +1005,11 @@
       }
       function startCollocation() { startSession(seedItems.filter(function (i) { return i.type === 'collocation'; }), 'Collocation Builder'); }
       function startFamily() {
-        var items = familySeeds.map(function (f, idx) { return { id:'family-' + idx, word:f[0], type:'vocabulary', level:'B2', category:'Word Family Lab', meaningZh:'词族', definitionEn:f[0] + ' / ' + f[1] + ' / ' + f[2] + ' / ' + f[3], example:f[4], collocations:[], wordFamily:f.slice(0,4).join(' / '), synonyms:[], commonMistake:'Choose the form that fits the grammar position.', prompt:f[4], answer:f[5], explanation:'Word family: ' + f.slice(0,4).join(' / '), tags:['word family'] }; });
+        var items = familySeeds.map(function (f, idx) { return { id:'family-' + idx, word:f[0], type:'vocabulary', level:'B2', category:'Word Family Lab', meaningZh:'词族', definitionEn:f[0] + ' / ' + f[1] + ' / ' + f[2] + ' / ' + f[3], example:f[4], collocations:[], wordFamily:f.slice(0,4).join(' / '), choices:f[6] || f.slice(0,4).filter(Boolean), synonyms:[], commonMistake:'Choose the form that fits the grammar position.', prompt:f[4], answer:f[5], explanation:f[7] || ('Word family: ' + f.slice(0,4).join(' / ')), tags:['word family'] }; });
         startSession(items, 'Word Family Lab');
       }
-      function startGrammar() { startSession(seedItems.filter(function (i) { return i.type === 'grammar'; }), 'Grammar Clinic'); }
+      function startGrammar() { startSession(seedItems.filter(function (i) { return i.type === 'grammar' && isWellFormedReviewItem(i); }), 'Grammar Clinic'); }
+      function startLinkerGym() { startSession(linkerGymSeeds, 'Sentence & Linker Gym'); }
       function startSpeaking() {
         var prompt = speakingPrompts[Math.floor(Math.random() * speakingPrompts.length)];
         $('modeTitle').textContent = 'IELTS Speaking Quick Cards';
@@ -976,7 +1085,7 @@
       $('startReviewBtn').addEventListener('click', startDailyReview);
       $('newBatchBtn').addEventListener('click', startNewBatch);
       $('miniTestBtn').addEventListener('click', startMiniTest);
-      Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function (btn) { btn.addEventListener('click', function () { var mode = btn.getAttribute('data-mode'); if (mode === 'daily') startDailyReview(); if (mode === 'new') startNewBatch(); if (mode === 'upgrade') startUpgrade(); if (mode === 'collocation') startCollocation(); if (mode === 'family') startFamily(); if (mode === 'grammar') startGrammar(); if (mode === 'speaking') startSpeaking(); if (mode === 'test') startMiniTest(); }); });
+      Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function (btn) { btn.addEventListener('click', function () { var mode = btn.getAttribute('data-mode'); if (mode === 'daily') startDailyReview(); if (mode === 'new') startNewBatch(); if (mode === 'upgrade') startUpgrade(); if (mode === 'collocation') startCollocation(); if (mode === 'family') startFamily(); if (mode === 'grammar') startGrammar(); if (mode === 'linker') startLinkerGym(); if (mode === 'speaking') startSpeaking(); if (mode === 'test') startMiniTest(); }); });
       $('saveGoalBtn').addEventListener('click', function () { state.dailyGoal = Math.max(5, Math.min(100, Number($('dailyGoalInput').value) || 20)); saveState(); renderStats(); });
       $('searchInput').addEventListener('input', renderLibrary); $('filterSelect').addEventListener('change', renderLibrary);
       $('addCustomBtn').addEventListener('click', addCustomCard); $('exportBtn').addEventListener('click', exportBackup); $('importBtn').addEventListener('click', importBackup); $('cleanUpgradeErrorsBtn').addEventListener('click', cleanCorruptedUpgradeErrors);
