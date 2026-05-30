@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Room That Breathes</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --black: #050607;
+      --ink: #0b0d10;
+      --paper: #e6d2a9;
+      --paper-dim: #bda982;
+      --moon: #9bb9cf;
+      --moon-bright: #c4e4f2;
+      --burgundy: #5b1f2e;
+      --brass: #a98750;
+      --panel: rgba(13, 15, 18, 0.82);
+      --panel-strong: rgba(21, 19, 20, 0.92);
+      --line: rgba(230, 210, 169, 0.24);
+      --danger: #a14a5e;
+      --good: #b8d6bf;
+      --shadow: rgba(0, 0, 0, 0.58);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--paper);
+      background:
+        radial-gradient(circle at 72% 8%, rgba(142, 179, 201, .23), transparent 29%),
+        radial-gradient(circle at 16% 88%, rgba(91, 31, 46, .2), transparent 34%),
+        linear-gradient(135deg, #08090d, #121010 62%, #050607);
+      padding: max(14px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(230, 210, 169, .08);
+      color: var(--paper);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    button:hover, button:focus-visible {
+      border-color: rgba(196, 228, 242, .72);
+      background: rgba(155, 185, 207, .16);
+      box-shadow: 0 0 0 3px rgba(155, 185, 207, .14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .32);
+      color: var(--paper);
+      padding: 10px 12px;
+    }
+
+    input:focus-visible {
+      border-color: var(--moon-bright);
+      box-shadow: 0 0 0 3px rgba(155, 185, 207, .16);
+      outline: none;
+    }
+
+    .shell {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: clamp(16px, 3vw, 28px);
+      background: linear-gradient(135deg, rgba(15, 17, 21, .9), rgba(25, 19, 21, .82));
+      box-shadow: 0 24px 70px var(--shadow), inset 0 1px rgba(255, 255, 255, .06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: -40% -10% auto auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(196, 228, 242, .18), transparent 62%);
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 7vw, 5.2rem);
+      letter-spacing: -.055em;
+      line-height: .92;
+      color: #f0dfbc;
+      text-shadow: 0 10px 24px #000;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--moon);
+      font-size: clamp(1rem, 2.2vw, 1.24rem);
+      letter-spacing: .02em;
+    }
+
+    .hub-link, .end-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--paper);
+      background: rgba(230, 210, 169, .08);
+      text-decoration: none;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(310px, .75fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .scene-card, .side-card, .panel {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .36), inset 0 1px rgba(255, 255, 255, .045);
+    }
+
+    .scene-card { padding: clamp(12px, 2vw, 20px); }
+
+    .goal {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, .22);
+      border: 1px solid rgba(230, 210, 169, .14);
+      color: var(--moon-bright);
+    }
+
+    .room {
+      position: relative;
+      min-height: clamp(470px, 62vw, 650px);
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(155, 185, 207, .24);
+      background:
+        radial-gradient(ellipse at 74% 12%, rgba(196, 228, 242, .24), transparent 24%),
+        radial-gradient(ellipse at 52% 82%, rgba(91, 31, 46, .24), transparent 32%),
+        repeating-linear-gradient(90deg, rgba(230, 210, 169, .025) 0 12px, rgba(0, 0, 0, .05) 12px 15px),
+        linear-gradient(#151719 0 62%, #11100f 62% 100%);
+      box-shadow: inset 0 -70px 90px rgba(0,0,0,.52), inset 0 0 90px rgba(0,0,0,.6);
+    }
+
+    .room.awake { filter: saturate(.88) brightness(.88); }
+    .room.watching { box-shadow: inset 0 -70px 90px rgba(0,0,0,.62), inset 0 0 120px rgba(0,0,0,.74), 0 0 32px rgba(91, 31, 46, .18); }
+    .room.ended { filter: brightness(1.1) saturate(.8); }
+
+    body:not(.reduce-motion) .room.awake { animation: breathe 5.8s ease-in-out infinite; }
+    body:not(.reduce-motion) .lamp-lit { animation: lampFlicker 4.8s ease-in-out infinite; }
+    body:not(.reduce-motion) .pulse-fill { animation: pulseBar 3.4s ease-in-out infinite; }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.006); }
+    }
+
+    @keyframes lampFlicker {
+      0%, 100% { opacity: .58; }
+      46% { opacity: .42; }
+      48% { opacity: .75; }
+      51% { opacity: .48; }
+      70% { opacity: .62; }
+    }
+
+    @keyframes pulseBar {
+      0%, 100% { filter: brightness(.92); }
+      50% { filter: brightness(1.28); }
+    }
+
+    .floor-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 62%;
+      height: 1px;
+      background: rgba(230, 210, 169, .12);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    }
+
+    .moonbeam {
+      position: absolute;
+      right: 10%;
+      top: 10%;
+      width: 24%;
+      height: 74%;
+      transform: skewX(-18deg);
+      background: linear-gradient(rgba(196, 228, 242, .18), rgba(196, 228, 242, .02));
+      opacity: .42;
+      pointer-events: none;
+    }
+
+    .lamp-lit {
+      position: absolute;
+      left: 53%;
+      top: 43%;
+      width: 220px;
+      height: 220px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(230,210,169,.18), transparent 66%);
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .hotspot {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      padding: 7px;
+      border-radius: 16px;
+      background: rgba(6, 7, 8, .18);
+      border: 1px solid rgba(230, 210, 169, .16);
+      color: var(--paper);
+      min-width: 52px;
+      min-height: 52px;
+      font-size: .78rem;
+      line-height: 1.05;
+      text-align: center;
+      text-shadow: 0 2px 8px #000;
+      backdrop-filter: blur(1px);
+    }
+
+    .hotspot:hover, .hotspot:focus-visible, .hotspot.selected-target {
+      background: rgba(155, 185, 207, .13);
+      border-color: rgba(196, 228, 242, .72);
+      box-shadow: 0 0 24px rgba(196, 228, 242, .14), inset 0 0 20px rgba(0,0,0,.2);
+    }
+
+    .hotspot::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,.05);
+      pointer-events: none;
+    }
+
+    .door { left: 6%; top: 22%; width: 17%; height: 52%; background: linear-gradient(90deg, #18100f, #26191a); }
+    .mirror { left: 31%; top: 13%; width: 13%; height: 28%; border-radius: 46% 46% 18px 18px; background: linear-gradient(135deg, rgba(155,185,207,.22), rgba(0,0,0,.42)); }
+    .lamp { left: 52%; top: 33%; width: 9%; height: 20%; background: linear-gradient(#29211b, #120f0f); }
+    .bookshelf { left: 73%; top: 23%; width: 20%; height: 42%; background: repeating-linear-gradient(90deg, #211713 0 9px, #3b251d 9px 17px); }
+    .drawer { left: 42%; top: 58%; width: 20%; height: 18%; background: linear-gradient(#2a2019, #14100e); }
+    .portrait { left: 53%; top: 12%; width: 13%; height: 21%; background: linear-gradient(#2c201c, #120e0d); }
+    .musicbox { left: 65%; top: 67%; width: 13%; height: 12%; background: linear-gradient(#3b1d25, #1a1013); }
+    .catbed { left: 11%; top: 74%; width: 17%; height: 12%; border-radius: 999px; background: radial-gradient(ellipse, #34252b, #120d10); }
+    .rug { left: 35%; top: 80%; width: 34%; height: 13%; border-radius: 50%; background: radial-gradient(ellipse, rgba(91,31,46,.76), rgba(18,12,13,.86)); }
+    .clock { left: 20%; top: 17%; width: 10%; height: 15%; border-radius: 999px; background: radial-gradient(circle, #302820, #0d0e10); }
+    .box { left: 79%; top: 70%; width: 12%; height: 11%; background: linear-gradient(135deg, #2d2418, #12100d); }
+    .window { left: 74%; top: 8%; width: 17%; height: 15%; background: linear-gradient(135deg, rgba(196,228,242,.28), rgba(11,13,16,.66)); }
+    .canvas { left: 27%; top: 51%; width: 11%; height: 18%; background: linear-gradient(135deg, #d9c79f22, #5b1f2e55); }
+    .vent { left: 5%; top: 12%; width: 12%; height: 8%; background: repeating-linear-gradient(0deg, rgba(230,210,169,.22) 0 3px, rgba(0,0,0,.28) 3px 8px); }
+
+    .side {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel { padding: 16px; }
+    .panel h2, .panel h3 { margin: 0 0 10px; color: #f0dfbc; }
+    .panel p { color: var(--paper-dim); line-height: 1.45; }
+
+    .dread-line {
+      display: grid;
+      gap: 8px;
+    }
+
+    .meter {
+      height: 15px;
+      border: 1px solid rgba(230, 210, 169, .2);
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(0,0,0,.34);
+    }
+
+    .pulse-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #3f6a73, #a98750, #8f344a);
+      border-radius: inherit;
+      transition: width .3s ease;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+      gap: 8px;
+    }
+
+    .item-card {
+      padding: 10px 8px;
+      min-height: 56px;
+      border-radius: 14px;
+      background: rgba(230, 210, 169, .07);
+      border-color: rgba(230, 210, 169, .18);
+    }
+
+    .item-card.selected {
+      color: var(--moon-bright);
+      border-color: var(--moon-bright);
+      box-shadow: 0 0 0 3px rgba(155, 185, 207, .14);
+    }
+
+    .empty-inventory { margin: 0; color: var(--paper-dim); }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 245px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log-entry {
+      margin: 0;
+      padding: 9px 10px;
+      border-left: 3px solid rgba(155, 185, 207, .42);
+      background: rgba(0,0,0,.2);
+      border-radius: 8px 12px 12px 8px;
+      color: var(--paper-dim);
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .code-row, .symbol-row, .end-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .code-field { flex: 1 1 130px; }
+    .code-row button { flex: 0 0 auto; padding-inline: 14px; }
+
+    .symbol-row button {
+      min-width: 70px;
+      padding: 8px 10px;
+    }
+
+    .sequence-readout {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px dashed rgba(230, 210, 169, .24);
+      border-radius: 12px;
+      color: var(--moon-bright);
+    }
+
+    .switch {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--paper-dim);
+    }
+
+    .switch input { width: auto; min-height: auto; }
+
+    .privacy { font-size: .9rem; margin-bottom: 0; }
+
+    .end-screen {
+      display: none;
+      border: 1px solid rgba(196, 228, 242, .38);
+      border-radius: 24px;
+      padding: clamp(18px, 3vw, 32px);
+      background: linear-gradient(135deg, rgba(9,12,14,.95), rgba(29,20,23,.92));
+      box-shadow: 0 24px 70px rgba(0,0,0,.46);
+    }
+
+    .end-screen.visible { display: block; }
+    .end-screen h2 { margin-top: 0; font-size: clamp(2rem, 5vw, 3.6rem); }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .stat { padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(230,210,169,.06); }
+    .stat strong { display: block; color: var(--moon-bright); font-size: 1.25rem; margin-top: 4px; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .game-grid { grid-template-columns: 1fr; }
+      header { grid-template-columns: 1fr; }
+      .hub-link { justify-self: start; }
+      .room { min-height: 620px; }
+      .hotspot { font-size: .72rem; }
+    }
+
+    @media (max-width: 560px) {
+      .room { min-height: 560px; }
+      .hotspot { min-width: 48px; min-height: 48px; }
+      .door { width: 20%; }
+      .bookshelf { left: 70%; width: 24%; }
+      .drawer { width: 24%; }
+      .rug { width: 40%; left: 31%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>The Room That Breathes</h1>
+        <p class="subtitle">The door is locked. The room is not empty.</p>
+      </div>
+      <a class="hub-link" href="index.html">← Back to hub</a>
+    </header>
+
+    <section id="endScreen" class="end-screen" aria-live="polite"></section>
+
+    <section id="gameArea" class="game-grid" aria-label="Escape room game">
+      <div class="scene-card">
+        <div class="goal">
+          <strong>Current goal:</strong>
+          <span id="goalText">Find what the clock is missing.</span>
+        </div>
+        <div id="room" class="room" aria-label="Dark abandoned study room">
+          <div class="floor-line" aria-hidden="true"></div>
+          <div class="moonbeam" aria-hidden="true"></div>
+          <div id="lampGlow" class="lamp-lit" aria-hidden="true"></div>
+          <div id="roomObjects"></div>
+        </div>
+      </div>
+
+      <aside class="side" aria-label="Game panels">
+        <section class="panel dread-line">
+          <h2>Room pulse</h2>
+          <div class="meter" aria-label="Dread meter"><div id="dreadFill" class="pulse-fill"></div></div>
+          <p id="dreadText">The walls wait between breaths.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Inventory</h2>
+          <div id="inventory" class="inventory-grid"></div>
+        </section>
+
+        <section class="panel controls">
+          <h2>Locks</h2>
+          <div class="code-row">
+            <label class="code-field">Desk drawer code
+              <input id="drawerCode" inputmode="numeric" pattern="[0-9]*" maxlength="3" aria-label="Desk drawer three digit code" placeholder="3 digits" />
+            </label>
+            <button type="button" onclick="checkDrawerCode()">Try drawer</button>
+          </div>
+          <div class="code-row">
+            <label class="code-field">Sealed box code
+              <input id="boxCode" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="Sealed box four digit code" placeholder="4 digits" />
+            </label>
+            <button type="button" onclick="checkBoxCode()">Try box</button>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;">Door sequence</p>
+            <div id="sequenceReadout" class="sequence-readout">No symbols pressed.</div>
+            <div class="symbol-row" aria-label="Door symbol buttons">
+              <button type="button" onclick="enterDoorSymbol('clock')">Clock</button>
+              <button type="button" onclick="enterDoorSymbol('eye')">Eye</button>
+              <button type="button" onclick="enterDoorSymbol('door')">Door</button>
+              <button type="button" onclick="enterDoorSymbol('moon')">Moon</button>
+              <button type="button" onclick="enterDoorSymbol('clear')">Clear</button>
+            </div>
+          </div>
+          <button type="button" onclick="tryDoor()">Try the door</button>
+          <button type="button" onclick="showHint()">Hint</button>
+          <button type="button" onclick="resetGame()">Reset game</button>
+          <label class="switch"><input id="motionToggle" type="checkbox" /> Reduce eerie motion</label>
+          <p class="privacy">Your escape progress is saved only in this browser on this device.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Pup’s corner</h2>
+          <p id="pupText">Do not panic. Rooms like this feed on messy thinking.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Clue log</h2>
+          <div id="messageLog" class="log" aria-live="polite"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const storageKey = "roomThatBreathes.v1";
+
+    const roomObjects = {
+      door: { label: "Locked door", className: "door" },
+      mirror: { label: "Cracked mirror", className: "mirror" },
+      lamp: { label: "Dead lamp", className: "lamp" },
+      bookshelf: { label: "Bookshelf", className: "bookshelf" },
+      drawer: { label: "Desk drawer", className: "drawer" },
+      portrait: { label: "Old portrait", className: "portrait" },
+      musicbox: { label: "Music box", className: "musicbox" },
+      catbed: { label: "Cat bed", className: "catbed" },
+      rug: { label: "Rug", className: "rug" },
+      clock: { label: "Wall clock", className: "clock" },
+      box: { label: "Sealed box", className: "box" },
+      window: { label: "Window", className: "window" },
+      canvas: { label: "Paint-stained canvas", className: "canvas" },
+      vent: { label: "Wall grate", className: "vent" }
+    };
+
+    const itemDefinitions = {
+      rustedKey: { name: "rusted key", note: "It fits nothing here. It still feels accused." },
+      silverKey: { name: "silver key", note: "Cold enough to numb your thumb." },
+      diaryPage: { name: "torn diary page", note: "It stopped purring when the clock lost its hand." },
+      blackRibbon: { name: "black ribbon", note: "Soft, funereal, faintly warm." },
+      matchbox: { name: "matchbox", note: "Three matches. All smell of rain." },
+      candle: { name: "candle", note: "Old wax, new shadow." },
+      crackedLens: { name: "cracked lens", note: "It changes what broken things admit." },
+      porcelainEye: { name: "porcelain eye", note: "Painted to look awake." },
+      musicBoxHandle: { name: "music box handle", note: "A brass crank for a backward song." },
+      clockHand: { name: "clock hand", note: "Recovered from under the rug." },
+      moonToken: { name: "moon token", note: "A small metal moon, wet with melted frost." },
+      redThread: { name: "red thread", note: "It was wrapped around the clock hand like a warning." }
+    };
+
+    const puzzleDefinitions = {
+      catbed: "Find the diary page and ribbon in the warm empty bed.",
+      clock: "Return the missing hand to reveal 3:17.",
+      drawer: "Use the time clue to open the desk drawer.",
+      hiddenWriting: "Light the candle and read what the wall kept hidden.",
+      mirror: "Use the cracked lens to make the mirror confess its numbers.",
+      box: "Combine bookshelf order with mirror numbers to open the sealed box.",
+      portrait: "Give the portrait its missing eye.",
+      musicbox: "Play the brass handle and reverse the tune.",
+      door: "Bring key, moon token, and the backward sequence to the door."
+    };
+
+    const hints = [
+      "The clock is not broken. It is incomplete.",
+      "Soft places keep hard evidence. Search where something absent still left warmth.",
+      "The drawer listens for a time, not a name.",
+      "A candle cannot wake the dead lamp, but it can shame the wall into speaking.",
+      "The mirror will not help until you change how you look at it.",
+      "Do not guess the box. Assemble what the room has numbered.",
+      "The portrait is missing more than dignity.",
+      "Music remembers order. Fear remembers it backwards.",
+      "The door needs a key, a token, and a sequence: clock, eye, door, moon."
+    ];
+
+    const symbolSequence = ["clock", "eye", "door", "moon"];
+    const initialMessages = ["You wake in a locked study. Dust drifts like it is listening."];
+
+    let state;
+
+    function defaultState() {
+      return {
+        collectedItems: ["candle", "rustedKey"],
+        solvedPuzzles: [],
+        selectedInventoryItem: null,
+        drawerOpened: false,
+        sealedBoxOpened: false,
+        portraitSolved: false,
+        musicBoxSolved: false,
+        moonTokenCollected: false,
+        finalDoorUnlocked: false,
+        hiddenWritingRevealed: false,
+        mirrorRevealed: false,
+        clockTimeRevealed: false,
+        secretFound: false,
+        dreadLevel: 0,
+        hintCount: 0,
+        clickCount: 0,
+        mirrorClicks: 0,
+        doorSequence: [],
+        messages: initialMessages.slice(),
+        startTime: Date.now(),
+        completionTime: null,
+        reduceMotion: false,
+        pupMood: "Do not panic. Rooms like this feed on messy thinking."
+      };
+    }
+
+    function initGame() {
+      state = loadGame() || defaultState();
+      const motionToggle = document.getElementById("motionToggle");
+      motionToggle.checked = Boolean(state.reduceMotion);
+      document.body.classList.toggle("reduce-motion", state.reduceMotion);
+      motionToggle.addEventListener("change", function () {
+        state.reduceMotion = motionToggle.checked;
+        document.body.classList.toggle("reduce-motion", state.reduceMotion);
+        addMessage(state.reduceMotion ? "The room stills. It resents the courtesy." : "The room resumes its shallow breathing.");
+        saveGame();
+        renderAll();
+      });
+      renderAll();
+    }
+
+    function renderAll() {
+      renderRoom();
+      renderInventory();
+      renderMessage();
+      renderGoal();
+      renderDread();
+      renderDoorSequence();
+      document.getElementById("pupText").textContent = state.pupMood;
+      document.getElementById("lampGlow").style.opacity = state.hiddenWritingRevealed ? ".62" : "0";
+      if (state.completionTime) {
+        showEndScreen();
+      }
+    }
+
+    function renderRoom() {
+      const room = document.getElementById("room");
+      room.classList.toggle("awake", state.clockTimeRevealed || state.dreadLevel > 10);
+      room.classList.toggle("watching", state.portraitSolved || state.dreadLevel > 45);
+      room.classList.toggle("ended", state.finalDoorUnlocked);
+      const target = document.getElementById("roomObjects");
+      target.innerHTML = "";
+      Object.keys(roomObjects).forEach(function (id) {
+        const object = roomObjects[id];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "hotspot " + object.className;
+        button.textContent = object.label;
+        button.setAttribute("aria-label", "Inspect " + object.label);
+        button.onclick = function () { inspectObject(id); };
+        if (state.selectedInventoryItem) {
+          button.classList.add("selected-target");
+          button.title = "Use " + itemDefinitions[state.selectedInventoryItem].name + " here";
+        }
+        target.appendChild(button);
+      });
+    }
+
+    function renderInventory() {
+      const inventory = document.getElementById("inventory");
+      inventory.innerHTML = "";
+      if (!state.collectedItems.length) {
+        inventory.innerHTML = '<p class="empty-inventory">Your pockets remember nothing.</p>';
+        return;
+      }
+      state.collectedItems.forEach(function (id) {
+        const item = itemDefinitions[id];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "item-card" + (state.selectedInventoryItem === id ? " selected" : "");
+        button.textContent = item.name;
+        button.title = item.note;
+        button.onclick = function () {
+          state.selectedInventoryItem = state.selectedInventoryItem === id ? null : id;
+          addMessage(state.selectedInventoryItem ? "Selected " + item.name + ". The room leans closer." : "You lower the " + item.name + ".");
+          saveGame();
+          renderAll();
+        };
+        inventory.appendChild(button);
+      });
+    }
+
+    function renderMessage() {
+      const log = document.getElementById("messageLog");
+      log.innerHTML = "";
+      state.messages.slice(-8).reverse().forEach(function (message) {
+        const entry = document.createElement("p");
+        entry.className = "log-entry";
+        entry.textContent = message;
+        log.appendChild(entry);
+      });
+    }
+
+    function renderGoal() {
+      let goal = "Find what the clock is missing.";
+      if (!state.solvedPuzzles.includes("clock")) goal = state.collectedItems.includes("clockHand") ? "Use the clock hand on the wall clock." : "Find what the clock is missing.";
+      else if (!state.drawerOpened) goal = "Open the desk drawer.";
+      else if (!state.hiddenWritingRevealed) goal = "Make light where the dead lamp cannot.";
+      else if (!state.mirrorRevealed) goal = "Change how you look at the cracked mirror.";
+      else if (!state.sealedBoxOpened) goal = "Assemble the sealed box code.";
+      else if (!state.portraitSolved) goal = "Give the portrait what it lacks.";
+      else if (!state.musicBoxSolved) goal = "Play the tune backwards.";
+      else if (!state.moonTokenCollected) goal = "Take what the window releases.";
+      else goal = "The door needs a key, a token, and a sequence.";
+      document.getElementById("goalText").textContent = goal;
+    }
+
+    function renderDread() {
+      const dread = Math.min(100, state.dreadLevel);
+      document.getElementById("dreadFill").style.width = dread + "%";
+      const text = dread < 25 ? "The walls wait between breaths." : dread < 55 ? "The wallpaper tightens when you turn away." : dread < 80 ? "Every object seems to know your hand." : "The room breathes through the locks.";
+      document.getElementById("dreadText").textContent = text;
+    }
+
+    function renderDoorSequence() {
+      const readout = document.getElementById("sequenceReadout");
+      readout.textContent = state.doorSequence.length ? state.doorSequence.join(" → ") : "No symbols pressed.";
+    }
+
+    function inspectObject(id) {
+      state.clickCount += 1;
+      if (state.selectedInventoryItem) {
+        useItemOnObject(state.selectedInventoryItem, id);
+        return;
+      }
+
+      if (id === "catbed") {
+        addMessage("The cat bed is warm, but there is no cat.");
+        collectItem("diaryPage");
+        collectItem("blackRibbon");
+        solvePuzzle("catbed");
+        state.pupMood = "Good. Paper remembers what people do not.";
+      } else if (id === "rug") {
+        addMessage("Under the rug: a clock hand wrapped in red thread.");
+        collectItem("clockHand");
+        collectItem("redThread");
+      } else if (id === "clock") {
+        addMessage(state.clockTimeRevealed ? "The clock shows 3:17. It refuses to tick twice." : "The wall clock is missing a hand. Its face looks embarrassed.");
+      } else if (id === "drawer") {
+        addMessage(state.drawerOpened ? "The drawer hangs open, smelling of old smoke." : "A three-digit lock waits on the desk drawer.");
+      } else if (id === "lamp") {
+        addMessage(state.hiddenWritingRevealed ? "In candlelight: THE MIRROR LIES LEFT TO RIGHT. EYE BEFORE MOON." : "The lamp is dead. The wall around it is cleaner than the rest.");
+      } else if (id === "mirror") {
+        inspectMirror();
+      } else if (id === "bookshelf") {
+        addMessage("A marked shelf reads: Read what the room noticed first: book, portrait, lamp, window.");
+      } else if (id === "box") {
+        addMessage(state.sealedBoxOpened ? "The sealed box is open. Its velvet lining has an eye-shaped hollow." : "The sealed box asks for four numbers. It prefers assembled truths to guesses.");
+      } else if (id === "portrait") {
+        addMessage(state.portraitSolved ? "The portrait watches properly now. Its mouth whispers: Play the tune backwards." : "The portrait is missing one porcelain eye. The empty socket is too patient.");
+      } else if (id === "musicbox") {
+        if (state.musicBoxSolved) addMessage("The music box shows: moon, door, eye, clock. Backwards, it becomes a way out.");
+        else addMessage("The music box has no handle. Its silence is wound too tight.");
+      } else if (id === "window") {
+        if (state.musicBoxSolved && !state.moonTokenCollected) {
+          addMessage("The window frost melts in a perfect crescent. A moon token drops to the sill.");
+          collectItem("moonToken");
+          state.moonTokenCollected = true;
+          state.pupMood = "You have almost made the room obey.";
+        } else if (state.moonTokenCollected) addMessage("The window is only moonlight now. The frost has fled.");
+        else addMessage("Frost covers the window from the inside. Something round waits beneath it.");
+      } else if (id === "door") {
+        addMessage(state.finalDoorUnlocked ? "The door stands open into a silence that is finally yours." : "Something taps back from the other side.");
+      } else if (id === "canvas") {
+        addMessage("The paint-stained canvas is nearly black. In the corner, a tiny moon has been painted over and over.");
+      } else if (id === "vent") {
+        addMessage("Behind the wall grate, air moves in careful counts: three, one, seven.");
+      }
+      saveGame();
+      renderAll();
+    }
+
+    function inspectMirror() {
+      state.mirrorClicks += 1;
+      if (state.mirrorRevealed) {
+        addMessage("Through the cracked lens memory: BOOK 4, PORTRAIT 2, LAMP 6, WINDOW 9.");
+      } else if (state.mirrorClicks === 1) {
+        addMessage("Your reflection is late.");
+      } else if (state.mirrorClicks === 2) {
+        addMessage("It blinks after you.");
+      } else {
+        addMessage("Stop checking if it is still you.");
+        increaseDread(5);
+      }
+    }
+
+    function useItemOnObject(item, object) {
+      const itemName = itemDefinitions[item].name;
+      let used = false;
+
+      if (item === "clockHand" && object === "clock" && !state.solvedPuzzles.includes("clock")) {
+        addMessage("The clock accepts its hand. It ticks once: 3:17. The room exhales.");
+        state.clockTimeRevealed = true;
+        solvePuzzle("clock");
+        increaseDread(8);
+        used = true;
+      } else if (item === "matchbox" && object === "candle" && !state.hiddenWritingRevealed) {
+        addMessage("A match wakes the candle. The flame bends toward the wall.");
+        used = true;
+      } else if ((item === "candle" || item === "matchbox") && (object === "lamp" || object === "canvas") && state.drawerOpened && !state.hiddenWritingRevealed) {
+        addMessage("Candlelight stains the wall: THE MIRROR LIES LEFT TO RIGHT. Beneath it: EYE BEFORE MOON.");
+        state.hiddenWritingRevealed = true;
+        solvePuzzle("hiddenWriting");
+        increaseDread(6);
+        used = true;
+      } else if (item === "crackedLens" && object === "mirror" && !state.mirrorRevealed) {
+        addMessage("The lens splits the mirror's lie: B O O K 4 / P O R T R A I T 2 / L A M P 6 / W I N D O W 9.");
+        state.mirrorRevealed = true;
+        solvePuzzle("mirror");
+        used = true;
+      } else if (item === "porcelainEye" && object === "portrait" && !state.portraitSolved) {
+        addMessage("It sees you properly now. The portrait mouth opens and drops a music box handle. It whispers: Play the tune backwards.");
+        state.portraitSolved = true;
+        collectItem("musicBoxHandle");
+        solvePuzzle("portrait");
+        increaseDread(10);
+        used = true;
+      } else if (item === "musicBoxHandle" && object === "musicbox" && state.portraitSolved && !state.musicBoxSolved) {
+        addMessage("The music box turns: moon, door, eye, clock. Backwards, the tune becomes clock, eye, door, moon.");
+        state.musicBoxSolved = true;
+        solvePuzzle("musicbox");
+        used = true;
+      } else if (item === "blackRibbon" && object === "mirror" && state.portraitSolved && !state.secretFound) {
+        addMessage("The ribbon drinks the mirror's edge. A hidden note appears: You were not the first to solve it. You were the first it allowed to leave.");
+        state.secretFound = true;
+        state.pupMood = "There. You looked where it hoped you would not.";
+        used = true;
+      } else if (item === "silverKey" && object === "door") {
+        addMessage("The silver key turns once. The door still wants the moon and the backward symbols.");
+        used = true;
+      } else {
+        addMessage("The " + itemName + " does not belong there. The room gives you nothing for forcing it.");
+        if (object === "box" || object === "drawer" || object === "door") addMessage("Locks prefer clues to pressure.");
+      }
+
+      if (used) state.selectedInventoryItem = null;
+      saveGame();
+      renderAll();
+    }
+
+    function collectItem(id) {
+      if (!state.collectedItems.includes(id)) {
+        state.collectedItems.push(id);
+        addMessage("Collected: " + itemDefinitions[id].name + ".");
+      }
+    }
+
+    function solvePuzzle(id) {
+      if (!state.solvedPuzzles.includes(id)) {
+        state.solvedPuzzles.push(id);
+      }
+    }
+
+    function checkDrawerCode() {
+      const input = document.getElementById("drawerCode");
+      const code = input.value.trim();
+      state.clickCount += 1;
+      if (state.drawerOpened) {
+        addMessage("The drawer is already open.");
+      } else if (code === "317") {
+        addMessage("The drawer unlocks at 3:17. Inside: a matchbox and a cracked lens.");
+        state.drawerOpened = true;
+        collectItem("matchbox");
+        collectItem("crackedLens");
+        solvePuzzle("drawer");
+        input.value = "";
+      } else {
+        addMessage("The lock stays shut. Somewhere behind the wall, something shifts. The wall grate counts three, one, seven when you listen.");
+        state.pupMood = "No guessing. The room punishes noise with more noise.";
+        increaseDread(5);
+      }
+      saveGame();
+      renderAll();
+    }
+
+    function checkBoxCode() {
+      const input = document.getElementById("boxCode");
+      const code = input.value.trim();
+      state.clickCount += 1;
+      if (state.sealedBoxOpened) {
+        addMessage("The sealed box has already surrendered.");
+      } else if (code === "4269") {
+        addMessage("The sealed box opens on 4269: book, portrait, lamp, window. Inside lie a porcelain eye and a silver key.");
+        state.sealedBoxOpened = true;
+        collectItem("porcelainEye");
+        collectItem("silverKey");
+        solvePuzzle("box");
+        input.value = "";
+      } else {
+        addMessage("The lock stays shut. Somewhere behind the wall, something shifts. Bookshelf order first; mirror numbers second.");
+        state.pupMood = "No guessing. The room punishes noise with more noise.";
+        increaseDread(6);
+      }
+      saveGame();
+      renderAll();
+    }
+
+    function enterDoorSymbol(symbol) {
+      state.clickCount += 1;
+      if (symbol === "clear") {
+        state.doorSequence = [];
+        addMessage("The door forgets the symbols, reluctantly.");
+      } else {
+        if (state.doorSequence.length >= 4) state.doorSequence = [];
+        state.doorSequence.push(symbol);
+        addMessage("Pressed " + symbol + ". The door listens for the backward tune.");
+      }
+      saveGame();
+      renderAll();
+    }
+
+    function tryDoor() {
+      state.clickCount += 1;
+      const hasKey = state.collectedItems.includes("silverKey");
+      const hasMoon = state.collectedItems.includes("moonToken");
+      const sequenceCorrect = symbolSequence.every(function (symbol, index) { return state.doorSequence[index] === symbol; });
+      if (hasKey && hasMoon && sequenceCorrect) {
+        addMessage("The room stops breathing. For the first time, the silence belongs to you.");
+        state.finalDoorUnlocked = true;
+        solvePuzzle("door");
+        finishGame();
+      } else {
+        const missing = [];
+        if (!hasKey) missing.push("silver key");
+        if (!hasMoon) missing.push("moon token");
+        if (!sequenceCorrect) missing.push("correct sequence");
+        addMessage("The door refuses you. It still needs: " + missing.join(", ") + ".");
+        increaseDread(4);
+      }
+      saveGame();
+      renderAll();
+    }
+
+    function showHint() {
+      state.clickCount += 1;
+      const index = Math.min(state.hintCount, hints.length - 1);
+      const hint = hints[index];
+      state.hintCount += 1;
+      addMessage("Hint: " + hint);
+      if (state.hintCount > 3) increaseDread(2);
+      saveGame();
+      renderAll();
+    }
+
+    function increaseDread(amount) {
+      state.dreadLevel = Math.min(100, state.dreadLevel + amount);
+    }
+
+    function addMessage(message) {
+      state.messages.push(message);
+      if (state.messages.length > 24) state.messages = state.messages.slice(-24);
+    }
+
+    function saveGame() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch (error) {
+        console.warn("Could not save escape room progress", error);
+      }
+    }
+
+    function loadGame() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (!saved) return null;
+        const parsed = JSON.parse(saved);
+        return Object.assign(defaultState(), parsed);
+      } catch (error) {
+        console.warn("Could not load escape room progress", error);
+        return null;
+      }
+    }
+
+    function resetGame() {
+      if (!confirm("Let the room forget this attempt?")) return;
+      try { localStorage.removeItem(storageKey); } catch (error) { console.warn("Could not clear progress", error); }
+      state = defaultState();
+      document.getElementById("drawerCode").value = "";
+      document.getElementById("boxCode").value = "";
+      document.getElementById("endScreen").classList.remove("visible");
+      document.getElementById("gameArea").classList.remove("hidden");
+      renderAll();
+      saveGame();
+    }
+
+    function finishGame() {
+      state.completionTime = Date.now();
+      if (state.secretFound) state.pupMood = "The room remembered you. I noticed it flinch.";
+      saveGame();
+    }
+
+    function showEndScreen() {
+      const end = document.getElementById("endScreen");
+      const elapsedMs = Math.max(0, state.completionTime - state.startTime);
+      const minutes = Math.floor(elapsedMs / 60000);
+      const seconds = Math.floor((elapsedMs % 60000) / 1000).toString().padStart(2, "0");
+      const rank = getRank();
+      end.innerHTML = '<h2>Escaped</h2>' +
+        '<p>The room stops breathing. For the first time, the silence belongs to you.</p>' +
+        '<div class="stats">' +
+        '<div class="stat">Time taken<strong>' + minutes + ':' + seconds + '</strong></div>' +
+        '<div class="stat">Clicks used<strong>' + state.clickCount + '</strong></div>' +
+        '<div class="stat">Hints used<strong>' + state.hintCount + '</strong></div>' +
+        '<div class="stat">Dread level<strong>' + state.dreadLevel + '</strong></div>' +
+        '<div class="stat">Secret<strong>' + (state.secretFound ? 'The room remembered you' : 'Not found') + '</strong></div>' +
+        '<div class="stat">Rank<strong>' + rank + '</strong></div>' +
+        '</div><div class="end-actions" style="margin-top:16px;"><button type="button" onclick="resetGame()">Play again</button><a href="index.html">Back to hub</a></div>';
+      end.classList.add("visible");
+      document.getElementById("gameArea").classList.add("hidden");
+    }
+
+    function getRank() {
+      if (state.secretFound) return "The Room Remembered You";
+      if (state.hintCount >= 5) return "Hint Haunted";
+      if (state.dreadLevel >= 45) return "Mirror-Touched";
+      if (state.clickCount <= 55 && state.hintCount <= 2) return "Quiet Detective";
+      return "Moonlit Survivor";
+    }
+
+    document.addEventListener("DOMContentLoaded", initGame);
+  </script>
+</body>
+</html>
