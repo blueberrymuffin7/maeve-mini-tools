@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Whispering Hotel: English Quest</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --navy: #08111f;
+      --ink: #0d1728;
+      --panel: rgba(20, 29, 45, .86);
+      --panel-strong: rgba(29, 39, 59, .94);
+      --gold: #d8ad54;
+      --gold-soft: #f0d28a;
+      --cream: #fff3d7;
+      --burgundy: #6d2637;
+      --burgundy-soft: #a95462;
+      --gray: #9fa7b5;
+      --green: #95d7b1;
+      --red: #f09a9a;
+      --blue: #9fc3ff;
+      --border: rgba(240, 210, 138, .28);
+      --shadow: rgba(0, 0, 0, .45);
+      --focus: #ffe39a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 16% 10%, rgba(216, 173, 84, .18), transparent 28%),
+        radial-gradient(circle at 84% 8%, rgba(159, 195, 255, .15), transparent 27%),
+        radial-gradient(circle at 50% 80%, rgba(109, 38, 55, .35), transparent 34%),
+        linear-gradient(145deg, #060b14, var(--navy) 58%, #120d18);
+      padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: .001ms !important;
+    }
+
+    .hotel-shell {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: clamp(20px, 4vw, 38px);
+      background:
+        linear-gradient(90deg, rgba(8, 17, 31, .95), rgba(29, 39, 59, .84)),
+        radial-gradient(circle at 84% 26%, rgba(240, 210, 138, .22), transparent 28%);
+      box-shadow: 0 24px 64px var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: auto 6% 0 auto;
+      width: 190px;
+      height: 150px;
+      border: 2px solid rgba(240, 210, 138, .2);
+      border-bottom: 0;
+      border-radius: 95px 95px 0 0;
+      background: linear-gradient(rgba(159, 195, 255, .16), transparent 70%);
+      box-shadow: inset 0 0 28px rgba(159, 195, 255, .12);
+    }
+
+    .topline {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 7vw, 5rem);
+      line-height: .92;
+      letter-spacing: -.055em;
+      text-shadow: 0 12px 34px rgba(0,0,0,.46);
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--gold-soft);
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      letter-spacing: .03em;
+    }
+
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+    button, .button-link {
+      appearance: none;
+      border: 1px solid rgba(240, 210, 138, .34);
+      border-radius: 999px;
+      min-height: 48px;
+      padding: 12px 17px;
+      background: rgba(255, 243, 215, .1);
+      color: var(--cream);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      touch-action: manipulation;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    button:hover, .button-link:hover { transform: translateY(-1px); border-color: rgba(255, 227, 154, .72); background: rgba(255, 243, 215, .16); }
+    button:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .primary { background: linear-gradient(135deg, rgba(216, 173, 84, .95), rgba(169, 84, 98, .86)); color: #180d12; border-color: rgba(255, 227, 154, .76); }
+    .danger { border-color: rgba(240, 154, 154, .5); color: #ffd5d5; }
+    .ghost { color: var(--gold-soft); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(240px, .8fr) minmax(0, 1.55fr) minmax(250px, .85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      background: linear-gradient(150deg, var(--panel-strong), rgba(13, 23, 40, .88));
+      box-shadow: 0 18px 46px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.06);
+      padding: clamp(16px, 2.4vw, 24px);
+    }
+
+    .panel h2, .panel h3 { margin: 0 0 12px; }
+    .panel h2 { color: var(--gold-soft); font-size: 1.25rem; }
+    .panel h3 { color: var(--cream); font-size: 1.05rem; }
+    .small { color: var(--gray); font-size: .95rem; line-height: 1.45; }
+
+    .map { display: grid; gap: 10px; }
+    .room-card {
+      width: 100%;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: left;
+      background: rgba(255,255,255,.055);
+      display: grid;
+      gap: 4px;
+      border-color: rgba(240, 210, 138, .2);
+    }
+    .room-card.active { border-color: rgba(255, 227, 154, .85); box-shadow: 0 0 0 2px rgba(216, 173, 84, .15); }
+    .room-card.cleared { background: linear-gradient(135deg, rgba(149, 215, 177, .15), rgba(255,255,255,.055)); }
+    .room-card.locked { filter: grayscale(.3); }
+    .room-name { font-weight: 900; }
+    .room-skill { color: var(--gray); font-size: .9rem; }
+
+    .story {
+      position: relative;
+      min-height: 166px;
+      background:
+        linear-gradient(135deg, rgba(109, 38, 55, .28), transparent 42%),
+        linear-gradient(150deg, var(--panel-strong), rgba(13, 23, 40, .91));
+    }
+
+    .clock {
+      display: inline-grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      margin-right: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(240, 210, 138, .42);
+      background: rgba(255,255,255,.08);
+      font-size: 1.45rem;
+      vertical-align: middle;
+    }
+
+    .ghost-line {
+      margin: 12px 0 0;
+      padding: 13px 15px;
+      border-left: 4px solid var(--gold);
+      border-radius: 14px;
+      background: rgba(255, 243, 215, .075);
+      color: #f8e7c2;
+      line-height: 1.55;
+    }
+
+    .challenge-title { color: var(--gold-soft); }
+    .prompt { font-size: clamp(1.1rem, 2.6vw, 1.45rem); line-height: 1.42; margin: 12px 0 16px; }
+    .choices, .chip-bank, .answer-bank { display: grid; gap: 10px; }
+    .choice { border-radius: 18px; width: 100%; text-align: left; justify-content: flex-start; background: rgba(255,255,255,.065); }
+    .choice.selected { border-color: rgba(255, 227, 154, .9); background: rgba(216, 173, 84, .17); }
+    .choice.correct { border-color: rgba(149, 215, 177, .9); }
+    .choice.wrong { border-color: rgba(240, 154, 154, .86); }
+
+    .chip-area {
+      min-height: 76px;
+      padding: 12px;
+      border: 1px dashed rgba(240, 210, 138, .34);
+      border-radius: 18px;
+      background: rgba(0,0,0,.16);
+      margin-bottom: 12px;
+    }
+    .chip-bank, .answer-bank { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .chip { border-radius: 16px; background: rgba(159, 195, 255, .11); }
+    .chip.used { opacity: .35; }
+
+    textarea {
+      width: 100%;
+      min-height: 86px;
+      border-radius: 18px;
+      border: 1px solid rgba(240, 210, 138, .28);
+      background: rgba(0,0,0,.22);
+      color: var(--cream);
+      padding: 14px;
+      font: inherit;
+      resize: vertical;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.11);
+      line-height: 1.5;
+    }
+    .feedback.good { border-color: rgba(149, 215, 177, .65); }
+    .feedback.bad { border-color: rgba(240, 154, 154, .65); }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat, .item, .achievement {
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.055);
+    }
+    .stat strong { display: block; color: var(--gold-soft); font-size: 1.2rem; }
+    .inventory, .achievements { display: grid; gap: 8px; margin-top: 10px; }
+    .item.have, .achievement.have { border-color: rgba(149, 215, 177, .58); color: #d9ffe7; }
+    .item.missing, .achievement.missing { color: rgba(255,243,215,.55); }
+
+    .pup-note { background: linear-gradient(135deg, rgba(216, 173, 84, .15), rgba(109, 38, 55, .18)); }
+    .notebook-list { display: grid; gap: 10px; max-height: 360px; overflow: auto; padding-right: 4px; }
+    .mistake-card { border-radius: 16px; border: 1px solid rgba(240, 210, 138, .18); padding: 12px; background: rgba(0,0,0,.15); }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .privacy { margin-top: 12px; color: var(--gray); font-size: .88rem; }
+    .secret { color: var(--gold-soft); font-weight: 900; }
+
+    @keyframes glow { 50% { box-shadow: 0 0 32px rgba(216, 173, 84, .22); } }
+    .panel:not(.static-glow) { animation: glow 5s ease-in-out infinite; }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      body { padding-left: 10px; padding-right: 10px; }
+      .map { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .header-actions { justify-content: flex-start; }
+      button, .button-link { width: 100%; justify-content: center; }
+      .room-card, .choice, .chip { min-height: 54px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="hotel-shell">
+    <header>
+      <div class="topline">
+        <div>
+          <h1>The Whispering Hotel</h1>
+          <p class="subtitle">Speak carefully. The hotel listens.</p>
+        </div>
+        <div class="header-actions">
+          <a class="button-link" href="index.html">← Back to hub</a>
+          <button id="dailyReplayBtn" type="button">Daily Replay</button>
+          <button id="practiceBtn" type="button">Practice mistakes</button>
+          <button id="motionBtn" type="button" aria-pressed="false">Reduce motion</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid" aria-label="The Whispering Hotel game">
+      <aside class="panel static-glow" aria-labelledby="mapTitle">
+        <h2 id="mapTitle">Hotel Map</h2>
+        <div id="map" class="map"></div>
+      </aside>
+
+      <section aria-live="polite">
+        <article id="storyPanel" class="panel story"></article>
+        <article id="challengePanel" class="panel" style="margin-top:18px;"></article>
+      </section>
+
+      <aside>
+        <section class="panel static-glow" aria-labelledby="progressTitle">
+          <h2 id="progressTitle">Inventory & Progress</h2>
+          <div id="stats" class="stats"></div>
+          <h3>Items</h3>
+          <div id="inventory" class="inventory"></div>
+          <h3>Achievements</h3>
+          <div id="achievements" class="achievements"></div>
+        </section>
+        <section class="panel pup-note static-glow" style="margin-top:18px;" aria-labelledby="pupTitle">
+          <h2 id="pupTitle">Pup’s note</h2>
+          <p id="pupNote" class="small"></p>
+        </section>
+        <section class="panel static-glow" style="margin-top:18px;" aria-labelledby="notebookTitle">
+          <h2 id="notebookTitle">Mistake Notebook</h2>
+          <div id="notebook" class="notebook-list"></div>
+          <div class="controls"><button id="clearMistakesBtn" class="danger" type="button">Clear notebook</button></div>
+          <p class="privacy">Your progress is saved only in this browser on this device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    'use strict';
+
+    var STORAGE_KEY = 'whisperingHotelEnglishQuest.v1';
+    var roomOrder = ['lobby', 'library', 'kitchen', 'mirror', 'gallery', 'elevator', 'attic', 'final'];
+    var inventoryItems = [
+      { id: 'brassKey', name: 'brass key', room: 'lobby' },
+      { id: 'libraryCard', name: 'library card', room: 'library' },
+      { id: 'silverSpoon', name: 'silver spoon', room: 'kitchen' },
+      { id: 'mirrorShard', name: 'mirror shard', room: 'mirror' },
+      { id: 'galleryTicket', name: 'gallery ticket', room: 'gallery' },
+      { id: 'elevatorButton', name: 'elevator button', room: 'elevator' },
+      { id: 'atticCandle', name: 'attic candle', room: 'attic' },
+      { id: 'finalKey', name: 'final key', room: 'final' }
+    ];
+    var achievementList = [
+      { id: 'firstKey', name: 'First Key' },
+      { id: 'cleanSentence', name: 'No-Mistake Room: Clean Sentence' },
+      { id: 'fixedMirror', name: 'Fixed the Mirror' },
+      { id: 'linkerTamer', name: 'Linker Tamer' },
+      { id: 'wordFamilyWitch', name: 'Word Family Witch' },
+      { id: 'fluentEscape', name: 'Fluent Escape' },
+      { id: 'mistakeHunter', name: 'Mistake Hunter' },
+      { id: 'hotelLetYouLeave', name: 'The Hotel Let You Leave' }
+    ];
+    var rooms = {
+      lobby: { name: 'Lobby', skill: 'Natural Dialogue', item: 'brassKey', goal: 'Get the brass key from the receptionist ghost.', description: 'Velvet curtains breathe beside a moonlit desk. A brass clock ticks like a polite warning.', ghost: 'The receptionist ghost folds a transparent newspaper. “Ask naturally, guest. The stairs dislike rude grammar.”', bank: 'dialogue', count: 6 },
+      library: { name: 'Library', skill: 'Sentence Order', item: 'libraryCard', goal: 'Arrange torn sentence strips to reveal the bookshelf code.', description: 'Shelves lean together and whisper clauses through dusty pages.', ghost: 'A librarian with candle-flame eyes says, “Put the sentence in order, and the books will stop rearranging you.”', bank: 'order', count: 6 },
+      kitchen: { name: 'Kitchen', skill: 'Prepositions & Collocations', item: 'silverSpoon', goal: 'Collect the silver spoon.', description: 'Copper pots swing without hands. Something delicious is responsible for the smell of thunder.', ghost: 'The chef ghost points a spoon at you. “Collocations are recipes. One wrong preposition, and the soup sulks.”', bank: 'collocation', count: 6 },
+      mirror: { name: 'Mirror Hall', skill: 'Error Correction', item: 'mirrorShard', goal: 'Repair broken mirror sentences.', description: 'Every mirror shows a sentence with one button done up wrong.', ghost: 'Your reflection sighs, “Fix me before I start conjugating in reverse.”', bank: 'correction', count: 6 },
+      gallery: { name: 'Gallery', skill: 'IELTS-style Description', item: 'galleryTicket', goal: 'Earn the gallery ticket.', description: 'Portraits watch your adjectives. The frames prefer precise descriptions.', ghost: 'The curator ghost smiles. “Big, good, bad? Darling, the paintings have standards.”', bank: 'upgrade', count: 5, speaking: true },
+      elevator: { name: 'Elevator', skill: 'Linkers and Logic', item: 'elevatorButton', goal: 'Restore the elevator button.', description: 'The elevator doors open onto impossible floors: Therefore, Basement, However, and Moon.', ghost: 'A bellhop ghost bows. “Choose the logic, and the lift may choose a destination.”', bank: 'linker', count: 6 },
+      attic: { name: 'Attic', skill: 'Word Family Lab', item: 'atticCandle', goal: 'Get the attic candle.', description: 'Trunks, old letters, and academic vocabulary sleep under linen sheets.', ghost: 'A small attic witch taps a dictionary. “Noun, verb, adjective, adverb. Pick the correct mask.”', bank: 'wordFamily', count: 6 },
+      final: { name: 'Final Door', skill: 'Mixed Challenge', item: 'finalKey', goal: 'Answer at least 6 of 8 mixed questions to escape.', description: 'Eight locks glow on the final door. Every room behind you clears its throat.', ghost: 'The hotel whispers, “Bring every item. Then prove you learned what you survived.”', bank: 'mixed', count: 8 }
+    };
+
+    var pupNotes = [
+      'Do not translate word by word. Listen for the sentence’s shape.',
+      'This ghost is not asking for fancy English. It wants natural English.',
+      'Good. The sentence clicked because the logic clicked.',
+      'Wrong answers are clues. The hotel just showed us the weak hinge.',
+      'If the phrase sounds like something a polite person would actually say, trust it.'
+    ];
+
+    var playerState;
+    var currentRoomId = 'lobby';
+    var currentSet = [];
+    var currentIndex = 0;
+    var currentMode = 'room';
+    var sessionCorrect = 0;
+    var sessionMistakes = 0;
+    var selectedAnswer = '';
+    var orderedChips = [];
+    var answered = false;
+
+    function makeChoice(id, room, prompt, choices, answer, explanation, common, example) {
+      return { id: id, type: 'choice', room: room, prompt: prompt, choices: choices, answer: answer, explanation: explanation, common: common, example: example };
+    }
+    function makeOrder(id, room, chips, answer, explanation) {
+      return { id: id, type: 'order', room: room, prompt: 'Tap the sentence strips in the best order.', chips: chips, answer: answer, explanation: explanation, common: 'Do not move the dependent clause marker away from its clause.', example: answer };
+    }
+    function makeSpeaking(id, prompt, phrases) {
+      return { id: id, type: 'speaking', room: 'gallery', prompt: prompt, phrases: phrases, answer: 'Self-rated speaking practice', explanation: 'Self-rating builds fluency awareness. Save a phrase you want to reuse.', common: 'Do not memorize a full speech; reuse flexible sentence frames.', example: phrases[0] + ' the room feels carefully staged.' };
+    }
+
+    function buildQuestionBank() {
+      var dialoguePrompts = [
+        ['You look lost. Are you looking for the stairs?', 'Yes, could you tell me where they are?', 'Yes, tell me where is stairs.', 'Yes, I search stair.', 'Give me stair.'],
+        ['The dining room is closed. Do you need anything else?', 'Would it be possible to get some water?', 'Give water because I need.', 'It is possible water?', 'I want that you bring water.'],
+        ['May I ask why you are carrying that candle?', 'I’m looking for the room at the end of the hall.', 'I look room end hall.', 'Where is it room?', 'Because candle is carried by me.'],
+        ['Do you know which room you booked?', 'I’m not sure. Could you check my name?', 'I no sure. Check name me?', 'Can you to check my name?', 'Which room I booked know you?'],
+        ['The lift is sleeping. What do you want?', 'Could you tell me when it will wake up?', 'Tell me when will it wake up?', 'When it wake?', 'Wake lift for me now.'],
+        ['This key belongs to someone careful.', 'I’ll be careful with it, thank you.', 'I careful it, thanks.', 'Thank you, I will carefully it.', 'Belongs me careful.'],
+        ['Would you like a quieter room?', 'Yes, that would be wonderful.', 'Yes, it will wonderful.', 'Yes, give quiet.', 'I like quieter, do it.'],
+        ['Are you here for the midnight tour?', 'Actually, I’m trying to find the exit.', 'Actually I try find exit.', 'I am try to finding the exit.', 'Exit is tried by me.'],
+        ['The corridor is not safe after twelve.', 'Thanks for warning me.', 'Thanks to warn me.', 'Thank you for warn.', 'Thanks because warning me.'],
+        ['Can I help you with your luggage?', 'No, thank you. I can manage.', 'No thanks. I can to manage.', 'No, I manage myself it.', 'No help luggage.'],
+        ['Did you ring the bell?', 'Yes, I was wondering if anyone was here.', 'Yes, I wonder is anyone here?', 'Yes, anyone was here wondering.', 'Yes, I wondered if here anyone.'],
+        ['The room has no windows. Is that a problem?', 'I’d prefer a room with a window, if possible.', 'I prefer room with window if can.', 'I would prefer to room window.', 'Window room is preferred.'],
+        ['Do you need directions to the library?', 'Yes, could you show me the way?', 'Yes, show to me way.', 'Yes, could you show where is way?', 'Way show, please.'],
+        ['The guest book just wrote your name.', 'That’s unsettling, but thank you for telling me.', 'That unsettle but thanks tell.', 'It is unsettle thank.', 'Thanks for tell me that is unsettling.'],
+        ['Are you waiting for someone?', 'I’m waiting for the person who has the key.', 'I wait person has key.', 'I am waiting the person which has key.', 'I wait for person who key has.'],
+        ['The manager is unavailable.', 'Could I leave a message for her?', 'Could I leave her a message?', 'Can I to leave message?', 'Message for her leave?'],
+        ['Would you mind signing here?', 'Not at all. Where should I sign?', 'No mind. Where sign should I?', 'Not at all. Where I should sign?', 'I would not mind to signing.'],
+        ['The stairs only answer polite questions.', 'Could you please take me to the second floor?', 'Please can take me second floor?', 'Could you take me where is second floor?', 'Take me second floor now please.'],
+        ['Have you stayed with us before?', 'No, this is my first time here.', 'No, this my first time here.', 'No, I first time stay.', 'No, first time of me.'],
+        ['The bell sounds nervous tonight.', 'Is there anything I should know?', 'Is anything I should to know?', 'What I should know is there?', 'Anything should know me?'],
+        ['Do you prefer tea or coffee?', 'Tea would be lovely, thank you.', 'Tea would lovely thanks.', 'I prefer that tea is lovely.', 'Give tea lovely.'],
+        ['Why are you whispering?', 'I don’t want to wake the portraits.', 'I no want wake portraits.', 'I do not want waking portraits.', 'I don’t want wake up the portraits.'],
+        ['Do you have a reservation?', 'I believe it was made under my name.', 'I believe it made under my name.', 'I believe was made it under name.', 'It under name made.'],
+        ['The door wants a password.', 'Could you give me a hint?', 'Could you give to me hint?', 'Can you hint me?', 'Give a hint to I.'],
+        ['Are you sure you want to enter?', 'I’m sure, but I’d like to know what is inside.', 'I sure but want know what inside is.', 'I am sure but I like know inside what is.', 'Sure, tell inside.'],
+        ['The carpet remembers every footprint.', 'That sounds mysterious.', 'That sounds mysteriously.', 'That sound mysterious.', 'It sounds a mystery way.'],
+        ['Do you hear music?', 'Yes, it seems to be coming from upstairs.', 'Yes, it seems coming from upstairs.', 'Yes, it seems to coming from upstairs.', 'Yes, seems it comes upstairs.'],
+        ['The key is missing again.', 'When did you last see it?', 'When you last saw it?', 'When did you last saw it?', 'When last you see it?'],
+        ['Should I call the night porter?', 'Yes, please. That would help.', 'Yes please that help would.', 'Yes, that would to help.', 'Please call because help.'],
+        ['The hotel dislikes shouting.', 'I’ll keep my voice down.', 'I keep down my voice will.', 'I will keep down voice.', 'I keep my voice to down.'],
+        ['Did someone knock on your door?', 'I thought I heard a knock.', 'I thought I heard knock.', 'I think I heard a knocking door.', 'I thought heard I a knock.'],
+        ['The hallway changes when people rush.', 'Then I’ll walk slowly.', 'Then I slowly will walk.', 'Then I walk slowful.', 'So I will walking slowly.'],
+        ['What brings you to this old hotel?', 'I’m here to practise English and escape.', 'I here practice English and escape.', 'I am here for practise English.', 'I here to practising English.'],
+        ['Do you need the Wi-Fi password?', 'Yes, could you write it down for me?', 'Yes, write down it for me.', 'Yes, could write it down me?', 'Yes, write to me it down.'],
+        ['The fireplace is telling jokes again.', 'I wish I could understand them.', 'I wish I can understand them.', 'I wish to can understand.', 'I wish I could to understand them.'],
+        ['Are you afraid of ghosts?', 'A little, but I’m more afraid of bad grammar.', 'A little, but more afraid bad grammar.', 'Little, afraid of grammar bad more.', 'I afraid more of bad grammar.'],
+        ['The guest in 204 complains about silence.', 'That is an unusual complaint.', 'That is unusual complaint.', 'That complaint is a unusual.', 'That is an unusually complaint.'],
+        ['Do you want me to open the curtains?', 'Yes, please. The room feels too dark.', 'Yes please room feels too much dark.', 'Yes, the room feels too dark.', 'Open because room dark too.'],
+        ['The phone rings only for questions.', 'May I answer it?', 'May I to answer it?', 'May answer it I?', 'I may answering it?'],
+        ['Can you describe the problem?', 'The door opens, but it does not lead outside.', 'Door opens but not lead outside.', 'The door open but it does not leads outside.', 'Door is open, but outside not lead.']
+      ];
+      var orderData = [
+        ['Although the hotel looks empty,', 'someone has been moving', 'the keys at night.'],
+        ['Because the corridor was flooded,', 'we had to use', 'the narrow back stairs.'],
+        ['The guest who lost her ticket', 'waited beside the clock', 'until midnight.'],
+        ['I do not know', 'why the portraits', 'keep changing places.'],
+        ['After the candle went out,', 'the room became', 'completely silent.'],
+        ['The door that leads to the attic', 'is hidden behind', 'a red curtain.'],
+        ['If you listen carefully,', 'you can hear', 'the elevator breathing.'],
+        ['The receptionist asked', 'whether I needed', 'a quieter room.'],
+        ['Although the answer was simple,', 'the ghost refused', 'to say it twice.'],
+        ['Because the map was upside down,', 'we walked into', 'the laundry room.'],
+        ['The key that you found', 'belongs to the room', 'with no number.'],
+        ['I wonder', 'where the manager', 'has hidden the guest book.'],
+        ['Before you open the drawer,', 'read the note', 'under the lamp.'],
+        ['The painting which hangs near the stairs', 'shows the hotel', 'during a storm.'],
+        ['When the bell rings,', 'every locked door', 'listens for an answer.'],
+        ['She asked me', 'if I had seen', 'a silver spoon.'],
+        ['Although I was tired,', 'I kept practising', 'until the sentence sounded natural.'],
+        ['Because the phrase was polite,', 'the ghost finally', 'gave me directions.'],
+        ['The mirror that cracked yesterday', 'now reflects', 'only correct sentences.'],
+        ['I cannot explain', 'how the candle', 'returned to my pocket.'],
+        ['While the rain hit the windows,', 'we arranged', 'the torn sentence strips.'],
+        ['The woman who owned the hotel', 'left a message', 'inside the piano.'],
+        ['If the lift arrives,', 'press the button', 'marked Therefore.'],
+        ['The chef explained', 'that good collocations', 'make English smoother.'],
+        ['Although the vocabulary was new,', 'the context made', 'the meaning clear.'],
+        ['Because he spoke too quickly,', 'I asked him', 'to repeat the clue.'],
+        ['The room where we waited', 'smelled of dust', 'and warm candles.'],
+        ['I remember', 'what the librarian', 'told us about clauses.'],
+        ['After we solved the puzzle,', 'the bookshelf opened', 'without a sound.'],
+        ['The note that fell from the ceiling', 'contained', 'a useful example.'],
+        ['When learners notice patterns,', 'they make', 'fewer repeated mistakes.'],
+        ['She wanted to know', 'whether the attic', 'was safe after midnight.'],
+        ['Although the lobby was cold,', 'the welcome desk', 'felt strangely friendly.'],
+        ['Because the sentence had a subject,', 'the verb needed', 'to agree with it.'],
+        ['The clue which seemed useless', 'became important', 'near the final door.'],
+        ['I am not sure', 'what this old key', 'is supposed to open.'],
+        ['Before the ghost disappeared,', 'it pointed', 'toward the gallery.'],
+        ['The guest who spoke calmly', 'received', 'the best answer.'],
+        ['If you make a mistake,', 'write it down', 'and practise it later.'],
+        ['The sentence that sounded awkward', 'needed', 'a more natural word order.']
+      ];
+      var collocations = [
+        ['The guest was afraid ___ the noise behind the wall.', 'of', ['of','at','with','for'], 'Use “afraid of” for fear.'],
+        ['The old key gave her access ___ the attic.', 'to', ['to','for','with','on'], 'Use “access to” a place or resource.'],
+        ['The chef is responsible ___ the midnight menu.', 'for', ['for','of','to','in'], 'Use “responsible for” a duty.'],
+        ['The strange smell led ___ a locked pantry.', 'to', ['to','on','at','with'], 'Use “lead to” for a result or destination.'],
+        ['The ending depends ___ your final answer.', 'on', ['on','of','at','from'], 'Use “depend on”.'],
+        ['The clue contributed ___ our escape.', 'to', ['to','for','in','with'], 'Use “contribute to”.'],
+        ['Her mistake resulted ___ a louder scream from the lift.', 'in', ['in','to','on','with'], 'Use “result in” for the outcome.'],
+        ['The portrait is interested ___ your pronunciation.', 'in', ['in','on','of','for'], 'Use “interested in”.'],
+        ['The hotel apologized ___ the inconvenience.', 'for', ['for','about','to','of'], 'Use “apologize for” the problem.'],
+        ['I am worried ___ the locked window.', 'about', ['about','of','to','with'], 'Use “worried about”.'],
+        ['The note refers ___ a room on the top floor.', 'to', ['to','for','at','with'], 'Use “refer to”.'],
+        ['This phrase is suitable ___ formal emails.', 'for', ['for','to','at','with'], 'Use “suitable for”.'],
+        ['The bell is connected ___ the front desk.', 'to', ['to','with','for','on'], 'Use “connected to”.'],
+        ['The guest insisted ___ speaking to the manager.', 'on', ['on','in','to','for'], 'Use “insist on” + -ing.'],
+        ['The answer is different ___ what I expected.', 'from', ['from','than','to','with'], 'Use “different from” in standard English.'],
+        ['The room was full ___ old umbrellas.', 'of', ['of','with','in','for'], 'Use “full of”.'],
+        ['The ghost was pleased ___ my polite reply.', 'with', ['with','of','to','for'], 'Use “pleased with”.'],
+        ['The ticket is valid ___ one night only.', 'for', ['for','during','since','to'], 'Use “valid for” a period.'],
+        ['The mirror is similar ___ the one downstairs.', 'to', ['to','with','as','from'], 'Use “similar to”.'],
+        ['We arrived ___ the hotel just before midnight.', 'at', ['at','to','in','on'], 'Use “arrive at” a building.'],
+        ['She complained ___ the cold soup.', 'about', ['about','for','of','to'], 'Use “complain about”.'],
+        ['The candle protected us ___ the dark.', 'from', ['from','of','with','for'], 'Use “protect from”.'],
+        ['The code consists ___ three numbers.', 'of', ['of','in','with','for'], 'Use “consist of”.'],
+        ['The lesson focuses ___ natural questions.', 'on', ['on','in','to','at'], 'Use “focus on”.'],
+        ['He succeeded ___ opening the drawer.', 'in', ['in','to','on','for'], 'Use “succeed in” + -ing.'],
+        ['The clue belongs ___ the final door.', 'to', ['to','with','for','in'], 'Use “belong to”.'],
+        ['The portrait laughed ___ my pronunciation.', 'at', ['at','to','on','for'], 'Use “laugh at”.'],
+        ['The waiter filled the glass ___ water.', 'with', ['with','of','by','for'], 'Use “fill with”.'],
+        ['The attic candle is made ___ beeswax.', 'of', ['of','from','by','with'], 'Use “made of” when the material remains visible.'],
+        ['The ghost reminded me ___ the rule.', 'of', ['of','about','to','for'], 'Use “remind someone of” a thing.'],
+        ['The hotel prevented us ___ leaving early.', 'from', ['from','to','of','for'], 'Use “prevent from” + -ing.'],
+        ['The clue was hidden ___ the carpet.', 'under', ['under','below','down','beneathly'], 'Use “under” for a covered position.'],
+        ['The manager was absent ___ the meeting.', 'from', ['from','in','at','to'], 'Use “absent from”.'],
+        ['The answer is based ___ evidence.', 'on', ['on','in','from','with'], 'Use “based on”.'],
+        ['She is capable ___ solving the puzzle.', 'of', ['of','for','to','in'], 'Use “capable of” + -ing.'],
+        ['The bell reacted ___ the word “please.”', 'to', ['to','with','for','on'], 'Use “react to”.'],
+        ['The room is famous ___ its moving wallpaper.', 'for', ['for','of','with','as'], 'Use “famous for”.'],
+        ['The phrase is common ___ spoken English.', 'in', ['in','on','at','with'], 'Use “common in”.'],
+        ['The final score increased ___ ten points.', 'by', ['by','with','for','to'], 'Use “increase by” an amount.'],
+        ['The guest exchanged the ticket ___ a key.', 'for', ['for','with','to','by'], 'Use “exchange for”.']
+      ];
+      var corrections = [
+        ['She don’t know where is the room.', 'She doesn’t know where the room is.', ['She doesn’t know where the room is.','She don’t know where the room is.','She doesn’t knows where is the room.','She not know where the room is.'], 'Use “doesn’t” and statement word order after “where”.'],
+        ['The keys is on the desk.', 'The keys are on the desk.', ['The keys are on the desk.','The keys is on the desk.','The key are on the desk.','The keys be on the desk.'], 'Plural subject “keys” needs “are”.'],
+        ['I have a good news.', 'I have good news.', ['I have good news.','I have a good news.','I have a news good.','I have an good news.'], '“News” is uncountable, so no article.'],
+        ['Where you found the candle?', 'Where did you find the candle?', ['Where did you find the candle?','Where you found the candle?','Where did you found the candle?','Where found you the candle?'], 'Use auxiliary “did” + base verb for past questions.'],
+        ['The hotel was quiet because nobody were there.', 'The hotel was quiet because nobody was there.', ['The hotel was quiet because nobody was there.','The hotel were quiet because nobody was there.','The hotel was quiet because nobody were there.','The hotel quiet because nobody was there.'], '“Nobody” is singular.'],
+        ['She is interested to learn English.', 'She is interested in learning English.', ['She is interested in learning English.','She is interested to learn English.','She interested in learn English.','She is interesting in learning English.'], 'Use “interested in” + -ing.'],
+        ['I didn’t went to the attic.', 'I didn’t go to the attic.', ['I didn’t go to the attic.','I didn’t went to the attic.','I don’t went to the attic.','I didn’t gone to the attic.'], 'After “didn’t”, use the base verb.'],
+        ['There are too much chairs in the lobby.', 'There are too many chairs in the lobby.', ['There are too many chairs in the lobby.','There are too much chairs in the lobby.','There is too many chairs in the lobby.','There are too many chair in the lobby.'], 'Use “many” with countable plural nouns.'],
+        ['The clue was more clearer than before.', 'The clue was clearer than before.', ['The clue was clearer than before.','The clue was more clearer than before.','The clue was more clear than before.','The clue more clearer than before.'], 'Do not use “more” with an -er comparative.'],
+        ['Can you tell me where is the exit?', 'Can you tell me where the exit is?', ['Can you tell me where the exit is?','Can you tell me where is the exit?','Can you tell where the exit is me?','Can you tell me where does the exit?'], 'Indirect questions use statement word order.'],
+        ['He has visited the hotel yesterday.', 'He visited the hotel yesterday.', ['He visited the hotel yesterday.','He has visited the hotel yesterday.','He had visit the hotel yesterday.','He visits the hotel yesterday.'], 'Use past simple with a finished time like “yesterday”.'],
+        ['This is an useful clue.', 'This is a useful clue.', ['This is a useful clue.','This is an useful clue.','This is useful clue.','This is the useful clue for general.'], '“Useful” starts with a /juː/ sound, so use “a”.'],
+        ['The furnitures are old.', 'The furniture is old.', ['The furniture is old.','The furnitures are old.','The furniture are old.','The furnitures is old.'], '“Furniture” is uncountable.'],
+        ['She asked where did I hide the ticket.', 'She asked where I hid the ticket.', ['She asked where I hid the ticket.','She asked where did I hide the ticket.','She asked where I hide the ticket yesterday.','She asked where I did hide the ticket.'], 'Reported questions use statement word order.'],
+        ['The room smell strange.', 'The room smells strange.', ['The room smells strange.','The room smell strange.','The room is smell strange.','The room smells strangely for linking verb.'], 'Third-person singular needs -s.'],
+        ['I am agree with you.', 'I agree with you.', ['I agree with you.','I am agree with you.','I am agreeing with you always.','I do agree with you am.'], '“Agree” is a verb; do not add “am”.'],
+        ['She made less mistakes this time.', 'She made fewer mistakes this time.', ['She made fewer mistakes this time.','She made less mistakes this time.','She made few mistakes than time.','She made lesser mistakes this time.'], 'Use “fewer” with countable plural nouns.'],
+        ['The ghost gave me an advice.', 'The ghost gave me advice.', ['The ghost gave me advice.','The ghost gave me an advice.','The ghost gave me advices.','The ghost gave advice to me an.'], '“Advice” is uncountable.'],
+        ['If I will find the key, I will leave.', 'If I find the key, I will leave.', ['If I find the key, I will leave.','If I will find the key, I will leave.','If I found the key, I will leave.','If I finding the key, I leave.'], 'Use present simple in the if-clause for real future conditions.'],
+        ['The door opened slow.', 'The door opened slowly.', ['The door opened slowly.','The door opened slow.','The door slowly was opened slow.','The door opened slowerly.'], 'Use an adverb to describe the verb.'],
+        ['I look forward to meet the manager.', 'I look forward to meeting the manager.', ['I look forward to meeting the manager.','I look forward to meet the manager.','I look forward meeting the manager.','I look forward to met the manager.'], '“Look forward to” is followed by -ing.'],
+        ['Neither of the keys work.', 'Neither of the keys works.', ['Neither of the keys works.','Neither of the keys work.','Neither keys works.','Neither of keys are work.'], '“Neither” is treated as singular here.'],
+        ['She said me the password.', 'She told me the password.', ['She told me the password.','She said me the password.','She told to me the password.','She said the password me.'], 'Use “tell someone something”.'],
+        ['I have been here since three hours.', 'I have been here for three hours.', ['I have been here for three hours.','I have been here since three hours.','I am here since three hours.','I have been since three hours here.'], 'Use “for” with a duration.'],
+        ['The lobby is enough warm.', 'The lobby is warm enough.', ['The lobby is warm enough.','The lobby is enough warm.','The lobby enough is warm.','The lobby is warmly enough.'], '“Enough” usually follows adjectives.'],
+        ['Every rooms has a secret.', 'Every room has a secret.', ['Every room has a secret.','Every rooms has a secret.','Every room have a secret.','Every rooms have a secret.'], 'Use a singular noun after “every”.'],
+        ['She suggested to wait.', 'She suggested waiting.', ['She suggested waiting.','She suggested to wait.','She suggested wait.','She suggested that waiting.'], '“Suggest” is followed by -ing or a that-clause.'],
+        ['The information are useful.', 'The information is useful.', ['The information is useful.','The information are useful.','The informations are useful.','The information useful are.'], '“Information” is uncountable.'],
+        ['I used to stayed here.', 'I used to stay here.', ['I used to stay here.','I used to stayed here.','I use to stayed here.','I used stay here.'], 'Use “used to” + base verb.'],
+        ['The ghost was boring by my answer.', 'The ghost was bored by my answer.', ['The ghost was bored by my answer.','The ghost was boring by my answer.','The ghost was boredom by my answer.','The ghost bored was by my answer.'], 'Use -ed adjectives for feelings.'],
+        ['It depends of the context.', 'It depends on the context.', ['It depends on the context.','It depends of the context.','It depends in the context.','It depends the context.'], 'Use “depend on”.'],
+        ['She is good in explaining clues.', 'She is good at explaining clues.', ['She is good at explaining clues.','She is good in explaining clues.','She is good for explain clues.','She is well at explaining clues.'], 'Use “good at” + -ing.'],
+        ['The candle stopped to burn suddenly.', 'The candle stopped burning suddenly.', ['The candle stopped burning suddenly.','The candle stopped to burn suddenly.','The candle stop burning suddenly.','The candle stopped burn suddenly.'], '“Stopped burning” means the action ended.'],
+        ['I need to improve my speaking skill.', 'I need to improve my speaking skills.', ['I need to improve my speaking skills.','I need to improve my speaking skill.','I need improve speaking skills.','I need to improving my speaking skills.'], 'Use plural “skills” for language ability areas.'],
+        ['The manager explained me the rule.', 'The manager explained the rule to me.', ['The manager explained the rule to me.','The manager explained me the rule.','The manager explained to me the rule me.','The manager explained me about the rule.'], 'Use “explain something to someone”.'],
+        ['Despite it was dark, we continued.', 'Although it was dark, we continued.', ['Although it was dark, we continued.','Despite it was dark, we continued.','Despite of the dark, we continued.','Although the dark, we continued.'], 'Use “although” before a clause.'],
+        ['I prefer tea than coffee.', 'I prefer tea to coffee.', ['I prefer tea to coffee.','I prefer tea than coffee.','I prefer tea more coffee.','I prefer tea rather coffee.'], 'Use “prefer A to B”.'],
+        ['She has much friends in the hotel.', 'She has many friends in the hotel.', ['She has many friends in the hotel.','She has much friends in the hotel.','She has a many friends in the hotel.','She has many friend in the hotel.'], 'Use “many” with countable plural nouns.'],
+        ['The clue made me to laugh.', 'The clue made me laugh.', ['The clue made me laugh.','The clue made me to laugh.','The clue made I laugh.','The clue made me laughing.'], 'Use “make someone” + base verb.'],
+        ['I am used to sleep late.', 'I am used to sleeping late.', ['I am used to sleeping late.','I am used to sleep late.','I used to sleeping late.','I am use to sleeping late.'], '“Be used to” is followed by -ing.']
+      ];
+      var linkers = [
+        ['___ the corridor was dark, she kept walking.', 'Although', ['Although','Because','Therefore','For example'], 'The contrast is between darkness and continuing.'],
+        ['The key was missing. ___, we searched the desk.', 'Therefore', ['Therefore','Although','Whereas','For example'], 'The second sentence is a result.'],
+        ['The lobby was silent. ___, the kitchen was full of noise.', 'However', ['However','Because','In addition','For example'], 'Use “however” for contrast between sentences.'],
+        ['She whispered ___ she did not want to wake the portraits.', 'because', ['because','although','therefore','whereas'], 'The second clause gives the reason.'],
+        ['The room was cold. ___, the window was broken.', 'In addition', ['In addition','Although','Whereas','Despite'], 'The second sentence adds another point.'],
+        ['Some rooms are bright, ___ others are almost black.', 'whereas', ['whereas','therefore','for example','because'], 'Use “whereas” to compare contrasting facts.'],
+        ['The lift refused to move. ___, we took the stairs.', 'As a result', ['As a result','Although','For example','Whereas'], 'The stairs are the result of the lift problem.'],
+        ['Several objects moved overnight; ___, the clock was on the floor.', 'for example', ['for example','therefore','although','however'], 'The clock gives a specific example.'],
+        ['___ I was nervous, I answered politely.', 'Although', ['Although','Because','Therefore','In addition'], 'This shows contrast.'],
+        ['The sentence was incorrect; ___, the mirror cracked.', 'therefore', ['therefore','whereas','although','for example'], 'The crack is the result.'],
+        ['The gallery was open, ___ the attic was locked.', 'whereas', ['whereas','because','therefore','for example'], 'Use “whereas” for contrast.'],
+        ['We practised the phrase ___ it sounded natural.', 'until', ['until','although','therefore','whereas'], '“Until” shows the point when the action stopped.'],
+        ['The ghost smiled. ___, it gave us a clue.', 'Then', ['Then','Although','Whereas','For example'], '“Then” shows sequence.'],
+        ['The clue looked simple. ___, it was surprisingly useful.', 'However', ['However','Because','Therefore','In addition'], 'This is a contrast.'],
+        ['She chose the polite answer ___ it matched the situation.', 'because', ['because','although','therefore','whereas'], 'The clause gives a reason.'],
+        ['The clock struck twelve. ___, every door locked itself.', 'As a result', ['As a result','Although','For example','Whereas'], 'The locking is a result.'],
+        ['___ the chef was invisible, his soup was excellent.', 'Although', ['Although','Because','Therefore','In addition'], 'Contrast between invisible chef and excellent soup.'],
+        ['The note was hard to read; ___, we understood the main idea.', 'however', ['however','therefore','because','for example'], 'Use “however” for contrast.'],
+        ['The hotel teaches grammar. ___, it teaches courage.', 'In addition', ['In addition','Although','Therefore','Whereas'], 'Adds another idea.'],
+        ['The first answer was too direct. ___, the second sounded polite.', 'By contrast', ['By contrast','Because','As a result','For example'], 'Compares two different answers.'],
+        ['The room was locked ___ we had the wrong key.', 'because', ['because','although','therefore','whereas'], 'Gives the reason.'],
+        ['She corrected the verb. ___, the sentence became clear.', 'Consequently', ['Consequently','Although','Whereas','For example'], 'Shows result.'],
+        ['The phrase is formal; ___, it is useful in emails.', 'however', ['however','because','therefore','for example'], 'Contrast: formal but useful.'],
+        ['___ the question looked easy, many guests missed it.', 'Although', ['Although','Because','Therefore','In addition'], 'Contrast between easy appearance and missed answers.'],
+        ['The attic was dusty. ___, it contained the best clue.', 'Nevertheless', ['Nevertheless','Because','For example','As a result'], 'Means “despite that”.'],
+        ['Use an indirect question ___ you want to sound polite.', 'when', ['when','although','therefore','whereas'], 'Shows the situation for using it.'],
+        ['The sentence had no subject. ___, it felt incomplete.', 'Therefore', ['Therefore','Although','Whereas','For example'], 'Shows result.'],
+        ['The painting was tiny; ___, its frame was enormous.', 'whereas', ['whereas','because','therefore','in addition'], 'Contrasts painting and frame.'],
+        ['I saved my mistakes ___ I could review them later.', 'so that', ['so that','although','whereas','for example'], 'Shows purpose.'],
+        ['The final door opened ___ we answered six questions correctly.', 'after', ['after','although','whereas','therefore'], 'Shows time sequence.']
+      ];
+      var wordFamilies = [
+        ['The clue was highly ___.', 'significant', ['significant','significance','significantly','signify'], 'After “was highly”, use an adjective.'],
+        ['The detective completed a careful ___ of the note.', 'analysis', ['analysis','analyse','analytical','analytically'], 'After “a careful”, use a noun.'],
+        ['We need to ___ the pattern in the answers.', 'analyse', ['analyse','analysis','analytical','analytically'], 'After “need to”, use the base verb.'],
+        ['Her explanation was clear and ___.', 'analytical', ['analytical','analysis','analyse','analytically'], 'Use an adjective after “was”.'],
+        ['The candle worked very ___.', 'effectively', ['effectively','effective','effect','affect'], 'Use an adverb to describe “worked”.'],
+        ['The new clue had a strong ___ on our plan.', 'effect', ['effect','affect','effective','effectively'], 'Use the noun “effect”.'],
+        ['The noise did not ___ her concentration.', 'affect', ['affect','effect','effective','effectively'], 'Use the verb “affect”.'],
+        ['The evidence was ___.', 'evident', ['evident','evidence','evidently','evidencing'], 'Use an adjective after “was”.'],
+        ['___, the ghost wanted a polite answer.', 'Evidently', ['Evidently','Evidence','Evident','Evidencing'], 'Use an adverb to comment on the whole sentence.'],
+        ['The ___ of the key became clear later.', 'significance', ['significance','significant','significantly','signify'], 'Use a noun after “the”.'],
+        ['The score improved ___.', 'significantly', ['significantly','significant','significance','signify'], 'Use an adverb to describe “improved”.'],
+        ['The hotel’s ___ history interested the guests.', 'economic', ['economic','economy','economically','economical'], 'Use an adjective before a noun.'],
+        ['The city’s ___ changed after the hotel opened.', 'economy', ['economy','economic','economically','economical'], 'Use the noun for a financial system.'],
+        ['We solved the puzzle ___.', 'efficiently', ['efficiently','efficient','efficiency','effect'], 'Use an adverb to describe “solved”.'],
+        ['The plan was simple but ___.', 'effective', ['effective','effectively','effect','affect'], 'Use an adjective after “was”.'],
+        ['There is strong ___ for this answer.', 'evidence', ['evidence','evident','evidently','evidentially'], 'Use the noun after “strong”.'],
+        ['The sentence needs a ___ verb.', 'finite', ['finite','finally','final','finish'], 'Use an adjective before “verb”.'],
+        ['The hotel asked us to ___ our answer.', 'justify', ['justify','justification','justified','justifiably'], 'Use a verb after “to”.'],
+        ['Her ___ was convincing.', 'justification', ['justification','justify','justified','justifiably'], 'Use a noun as the subject.'],
+        ['The mirror was ___ by the correction.', 'affected', ['affected','effect','effective','affect'], 'Use a past participle in passive structure.'],
+        ['The clue was ___ important.', 'particularly', ['particularly','particular','part','particle'], 'Use an adverb before an adjective.'],
+        ['We made a ___ comparison.', 'direct', ['direct','directly','direction','directed'], 'Use an adjective before a noun.'],
+        ['The ghost spoke ___.', 'directly', ['directly','direct','direction','directed'], 'Use an adverb after the verb.'],
+        ['This ___ explains the locked door.', 'evidence', ['evidence','evident','evidently','evidential'], 'Use a noun as the subject.'],
+        ['The answer was ___ correct.', 'grammatically', ['grammatically','grammar','grammatical','grammatic'], 'Use an adverb before an adjective.'],
+        ['The ___ rule is useful.', 'grammatical', ['grammatical','grammar','grammatically','grammatic'], 'Use an adjective before “rule”.'],
+        ['The hotel values ___.', 'accuracy', ['accuracy','accurate','accurately','accurateful'], 'Use a noun after “values”.'],
+        ['Please answer ___.', 'accurately', ['accurately','accurate','accuracy','accuration'], 'Use an adverb after “answer”.'],
+        ['The ___ of the answer surprised me.', 'accuracy', ['accuracy','accurate','accurately','accurateful'], 'Use a noun after “the”.'],
+        ['A ___ response unlocked the desk.', 'polite', ['polite','politely','politeness','polity'], 'Use an adjective before a noun.']
+      ];
+      var upgrades = [
+        ['a big problem', 'a significant issue', ['a significant issue','a very problem','a problem big','an issue significance'], '“Significant issue” is precise and natural.'],
+        ['a good idea', 'a practical suggestion', ['a practical suggestion','a goodly idea','an idea very good','a suggestion practice'], 'Use a precise adjective and noun.'],
+        ['a bad result', 'a disappointing outcome', ['a disappointing outcome','a badly result','a result bad','an outcome disappoint'], '“Outcome” is a useful academic synonym for result.'],
+        ['a big change', 'a substantial change', ['a substantial change','a change big','a substantially change','a change very'], '“Substantial” means large or important.'],
+        ['a small difference', 'a slight difference', ['a slight difference','a difference small','a slightly difference','a smallly difference'], '“Slight difference” is natural.'],
+        ['very important', 'crucial', ['crucial','importance very','very significance','importantly big'], '“Crucial” is concise and strong.'],
+        ['very clear', 'evident', ['evident','evidence','clearly very','clearful'], '“Evident” means clearly seen or understood.'],
+        ['many people', 'a large number of people', ['a large number of people','much people','a lot persons','many amount of people'], 'Use “a large number of” with countable plural nouns.'],
+        ['a nice room', 'an inviting room', ['an inviting room','a room nice','a nicely room','an invite room'], '“Inviting” gives a clearer feeling.'],
+        ['a scary sound', 'an unsettling sound', ['an unsettling sound','a sound scary','a scared sound','an unsettle sound'], '“Unsettling” is precise but not too dramatic.'],
+        ['the picture is good', 'the picture is visually striking', ['the picture is visually striking','the picture is goodly','the picture has good','the picture is strike visual'], 'IELTS descriptions benefit from specific adjectives.'],
+        ['the room is dark', 'the room is dimly lit', ['the room is dimly lit','the room is darkly','the room is lit dim','the room has dark'], '“Dimly lit” describes light precisely.'],
+        ['a lot of details', 'numerous details', ['numerous details','much details','a numerous detail','details much'], '“Numerous” is a formal alternative to “a lot of”.'],
+        ['the main thing', 'the most striking feature', ['the most striking feature','the mainly thing','the thing most strike','the most feature striking'], '“Feature” is useful for descriptions.'],
+        ['looks old', 'appears antique', ['appears antique','looks anciently','appears oldly','old appears'], '“Appears antique” is more precise.'],
+        ['a sad face', 'a melancholic expression', ['a melancholic expression','a sadness face','a face sadly','an expression melancholyly'], '“Expression” describes faces well.'],
+        ['a bright color', 'a vivid colour', ['a vivid colour','a colour brightly','a vividness colour','a colour vividly'], '“Vivid” is a precise adjective.'],
+        ['a quiet place', 'a tranquil setting', ['a tranquil setting','a quietly setting','a place quiet','a tranquillity setting'], '“Setting” is useful for describing scenes.'],
+        ['a strange object', 'an unusual object', ['an unusual object','a strangely object','a object unusual','an object unusually'], '“Unusual” is natural before a noun.'],
+        ['the two rooms are different', 'the two rooms contrast sharply', ['the two rooms contrast sharply','the two rooms different sharply','the two rooms are sharply difference','the two rooms contrast sharp'], 'Use “contrast” as a verb with an adverb.']
+      ];
+      var speakingPrompts = [
+        ['Describe the lobby in 20 seconds using one phrase.', ['It seems as if...', 'I noticed that...', 'The most striking detail is...']],
+        ['Describe the library as if you were in an IELTS speaking test.', ['In the background...', 'What stands out is...', 'The room gives the impression of...']],
+        ['Compare the kitchen with the lobby.', ['Compared with...', 'Whereas the lobby...', 'Both rooms seem...']],
+        ['Describe a portrait in the gallery.', ['The person appears to be...', 'Their expression suggests...', 'One noticeable feature is...']],
+        ['Describe the final door.', ['It looks as though...', 'The atmosphere feels...', 'The detail that draws my attention is...']],
+        ['Describe the mirror hall without using “scary.”', ['The corridor feels unsettling because...', 'I noticed a pattern in...', 'The reflections make the space seem...']],
+        ['Explain which room you would avoid and why.', ['I would avoid...', 'The main reason is...', 'Another factor is...']],
+        ['Describe an object from your inventory.', ['It appears to be...', 'It might be used for...', 'Its most distinctive feature is...']],
+        ['Summarize your escape plan.', ['First, I would...', 'After that...', 'Finally...']],
+        ['Describe the hotel’s atmosphere.', ['Overall, the atmosphere is...', 'The lighting creates...', 'This makes the hotel feel...']],
+        ['Talk about a mistake you learned from.', ['At first, I thought...', 'Then I realised...', 'Next time, I will...']],
+        ['Describe the attic candle.', ['It seems as if...', 'I noticed that...', 'The candle may represent...']],
+        ['Explain why polite English matters.', ['Polite language helps because...', 'For instance...', 'As a result...']],
+        ['Describe the elevator using linkers.', ['Although...', 'However...', 'Therefore...']],
+        ['Choose your favorite phrase and use it in a sentence.', ['My favorite phrase is...', 'I can use it when...', 'For example...']]
+      ];
+
+      return {
+        dialogue: dialoguePrompts.map(function (d, i) { return makeChoice('dialogue-' + (i + 1), 'lobby', 'Ghost: “' + d[0] + '”', [d[1], d[2], d[3], d[4]], d[1], 'This reply is natural, polite, and grammatically complete.', 'Avoid direct translation and missing auxiliary verbs.', d[1]); }),
+        order: orderData.map(function (parts, i) { return makeOrder('order-' + (i + 1), 'library', shuffle(parts.slice()), parts.join(' '), 'The clauses connect in a logical sentence shape.'); }),
+        collocation: collocations.map(function (c, i) { return makeChoice('collocation-' + (i + 1), 'kitchen', c[0], c[2], c[1], c[3], 'Prepositions often belong to fixed phrases; learn them as chunks.', c[0].replace('___', c[1])); }),
+        correction: corrections.map(function (c, i) { return makeChoice('correction-' + (i + 1), 'mirror', 'Incorrect: ' + c[0], c[2], c[1], c[3], 'Check subject-verb agreement, word order, articles, and countability.', c[1]); }),
+        linker: linkers.map(function (l, i) { return makeChoice('linker-' + (i + 1), 'elevator', l[0], l[2], l[1], l[3], 'Read both clauses first, then decide whether the relationship is reason, contrast, result, addition, or example.', l[0].replace('___', l[1])); }),
+        wordFamily: wordFamilies.map(function (w, i) { return makeChoice('word-' + (i + 1), 'attic', w[0], w[2], w[1], w[3], 'Look at the grammar slot: noun, verb, adjective, or adverb.', w[0].replace('___', w[1])); }),
+        upgrade: upgrades.map(function (u, i) { return makeChoice('upgrade-' + (i + 1), 'gallery', 'Upgrade this phrase: “' + u[0] + '”', u[2], u[1], u[3], 'Avoid adjective order mistakes and word-family confusion.', u[1]); }),
+        speaking: speakingPrompts.map(function (s, i) { return makeSpeaking('speaking-' + (i + 1), s[0], s[1]); })
+      };
+    }
+
+    var questionBank = buildQuestionBank();
+
+    function defaultState() {
+      return {
+        unlockedRooms: ['lobby'],
+        clearedRooms: [],
+        inventory: [],
+        achievements: [],
+        mistakes: [],
+        favoritePhrases: [],
+        score: 0,
+        streak: 0,
+        totalAnswered: 0,
+        totalCorrect: 0,
+        secretsFound: [],
+        weakQuestions: [],
+        currentRoomId: 'lobby',
+        reduceMotion: false,
+        ended: false
+      };
+    }
+
+    function initGame() {
+      loadGame();
+      bindGlobalButtons();
+      currentRoomId = playerState.currentRoomId || 'lobby';
+      document.body.classList.toggle('reduce-motion', playerState.reduceMotion);
+      document.getElementById('motionBtn').setAttribute('aria-pressed', String(playerState.reduceMotion));
+      renderAll();
+    }
+
+    function loadGame() {
+      try {
+        var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        playerState = Object.assign(defaultState(), saved || {});
+      } catch (error) {
+        playerState = defaultState();
+      }
+    }
+
+    function saveGame() {
+      playerState.currentRoomId = currentRoomId;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(playerState));
+    }
+
+    function resetGame() {
+      if (!confirm('Reset the hotel and start again? Your mistake notebook will also be cleared.')) return;
+      playerState = defaultState();
+      currentRoomId = 'lobby';
+      currentSet = [];
+      currentIndex = 0;
+      currentMode = 'room';
+      saveGame();
+      renderAll();
+    }
+
+    function bindGlobalButtons() {
+      document.getElementById('dailyReplayBtn').addEventListener('click', startDailyReplay);
+      document.getElementById('practiceBtn').addEventListener('click', practiceMistakes);
+      document.getElementById('clearMistakesBtn').addEventListener('click', function () {
+        if (confirm('Clear the mistake notebook?')) {
+          playerState.mistakes = [];
+          saveGame();
+          renderNotebook();
+        }
+      });
+      document.getElementById('motionBtn').addEventListener('click', function () {
+        playerState.reduceMotion = !playerState.reduceMotion;
+        document.body.classList.toggle('reduce-motion', playerState.reduceMotion);
+        this.setAttribute('aria-pressed', String(playerState.reduceMotion));
+        saveGame();
+      });
+    }
+
+    function renderAll() {
+      renderMap();
+      renderRoom();
+      renderStats();
+      renderInventory();
+      renderAchievements();
+      renderNotebook();
+      renderPupNote();
+    }
+
+    function renderMap() {
+      var map = document.getElementById('map');
+      map.innerHTML = '';
+      roomOrder.forEach(function (id) {
+        var room = rooms[id];
+        var unlocked = playerState.unlockedRooms.indexOf(id) !== -1 || isRoomAvailable(id);
+        var cleared = playerState.clearedRooms.indexOf(id) !== -1;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'room-card' + (id === currentRoomId ? ' active' : '') + (cleared ? ' cleared' : '') + (!unlocked ? ' locked' : '');
+        button.disabled = !unlocked;
+        button.innerHTML = '<span class="room-name">' + (unlocked ? '' : 'Locked: ') + room.name + '</span><span class="room-skill">' + room.skill + '</span><span class="room-skill">' + (cleared ? 'Cleared' : unlocked ? 'Unlocked' : 'Requires earlier items') + '</span>';
+        button.addEventListener('click', function () { currentRoomId = id; currentMode = 'room'; currentSet = []; saveGame(); renderAll(); });
+        map.appendChild(button);
+      });
+    }
+
+    function renderRoom() {
+      var room = rooms[currentRoomId];
+      var story = document.getElementById('storyPanel');
+      var clock = currentRoomId === 'lobby' ? '<button class="clock" id="lobbyClock" type="button" aria-label="Lobby clock">◷</button>' : '';
+      story.innerHTML = '<h2>' + clock + room.name + ': ' + room.skill + '</h2><p class="small"><strong>Goal:</strong> ' + room.goal + '</p><p>' + room.description + '</p><p class="ghost-line">' + room.ghost + '</p><div id="secretLine"></div>';
+      if (currentRoomId === 'lobby') {
+        document.getElementById('lobbyClock').addEventListener('click', handleClockSecret);
+      }
+      if (playerState.secretsFound.indexOf('clock') !== -1) {
+        document.getElementById('secretLine').innerHTML = '<p class="secret">Secret phrase: “The hotel repeats what you avoid.”</p>';
+      }
+      if (playerState.ended) {
+        renderEndScreen();
+      } else if (currentSet.length) {
+        renderChallenge();
+      } else {
+        renderRoomIntro();
+      }
+    }
+
+    function renderRoomIntro() {
+      var panel = document.getElementById('challengePanel');
+      var room = rooms[currentRoomId];
+      var cleared = playerState.clearedRooms.indexOf(currentRoomId) !== -1;
+      var lockedFinal = currentRoomId === 'final' && !hasAllPreFinalItems();
+      panel.innerHTML = '<h2 class="challenge-title">Room Challenge</h2><p class="prompt">' + (cleared ? 'You have cleared this room. You may replay it for practice, or choose another room.' : 'Complete this room to collect: ' + itemName(room.item) + '.') + '</p><p class="small">Most answers are tapped choices. Sentence strips can be tapped into order. Speaking prompts are self-rated.</p><div class="controls"><button class="primary" id="startRoomBtn" type="button" ' + (lockedFinal ? 'disabled' : '') + '>' + (cleared ? 'Replay room' : 'Start room') + '</button><button id="resetBtn" type="button">Play again / reset</button></div>' + (lockedFinal ? '<p class="feedback bad">The Final Door listens for all seven earlier items before it unlocks.</p>' : '');
+      document.getElementById('startRoomBtn').addEventListener('click', function () { startRoom(currentRoomId); });
+      document.getElementById('resetBtn').addEventListener('click', resetGame);
+    }
+
+    function startRoom(roomId) {
+      if (roomId === 'final' && !hasAllPreFinalItems()) return;
+      currentRoomId = roomId;
+      currentMode = 'room';
+      var room = rooms[roomId];
+      if (roomId === 'final') {
+        currentSet = buildFinalSet();
+      } else {
+        currentSet = questionBank[room.bank].slice(0, room.count);
+        if (room.speaking) currentSet = currentSet.concat(questionBank.speaking.slice(0, 2));
+      }
+      currentIndex = 0;
+      sessionCorrect = 0;
+      sessionMistakes = 0;
+      selectedAnswer = '';
+      orderedChips = [];
+      answered = false;
+      saveGame();
+      renderAll();
+    }
+
+    function nextChallenge() {
+      currentIndex += 1;
+      selectedAnswer = '';
+      orderedChips = [];
+      answered = false;
+      if (currentIndex >= currentSet.length) {
+        completeCurrentSet();
+      } else {
+        renderChallenge();
+      }
+      renderStats();
+      renderNotebook();
+      renderPupNote();
+    }
+
+    function renderChallenge() {
+      var q = currentSet[currentIndex];
+      var panel = document.getElementById('challengePanel');
+      var progress = '<p class="small">Challenge ' + (currentIndex + 1) + ' of ' + currentSet.length + ' · Score this round: ' + sessionCorrect + '</p>';
+      panel.innerHTML = '<h2 class="challenge-title">' + rooms[currentRoomId].name + '</h2>' + progress + '<div id="challengeBody"></div><div id="feedback"></div>';
+      if (q.type === 'order') renderOrder(q); else if (q.type === 'speaking') renderSpeaking(q); else renderChoice(q);
+    }
+
+    function renderChoice(q) {
+      var body = document.getElementById('challengeBody');
+      body.innerHTML = '<p class="prompt">' + q.prompt + '</p><div class="choices" id="choices"></div>';
+      var choices = document.getElementById('choices');
+      q.choices.forEach(function (choice) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice';
+        btn.textContent = choice;
+        btn.addEventListener('click', function () { handleChoice(choice); });
+        choices.appendChild(btn);
+      });
+    }
+
+    function handleChoice(choice) {
+      if (answered) return;
+      selectedAnswer = choice;
+      checkAnswer();
+    }
+
+    function renderOrder(q) {
+      var body = document.getElementById('challengeBody');
+      body.innerHTML = '<p class="prompt">' + q.prompt + '</p><div class="chip-area"><div class="answer-bank" id="answerBank" aria-label="Your sentence order"></div></div><div class="chip-bank" id="chipBank"></div><div class="controls"><button id="undoChipBtn" type="button">Undo last chip</button><button class="primary" id="checkOrderBtn" type="button">Check sentence</button></div>';
+      drawChips(q);
+      document.getElementById('undoChipBtn').addEventListener('click', function () { orderedChips.pop(); drawChips(q); });
+      document.getElementById('checkOrderBtn').addEventListener('click', handleSentenceOrder);
+    }
+
+    function drawChips(q) {
+      var answerBank = document.getElementById('answerBank');
+      var chipBank = document.getElementById('chipBank');
+      answerBank.innerHTML = '';
+      chipBank.innerHTML = '';
+      orderedChips.forEach(function (chip) {
+        var span = document.createElement('button');
+        span.type = 'button';
+        span.className = 'chip';
+        span.textContent = chip;
+        span.addEventListener('click', function () { orderedChips.splice(orderedChips.indexOf(chip), 1); drawChips(q); });
+        answerBank.appendChild(span);
+      });
+      q.chips.forEach(function (chip) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip' + (orderedChips.indexOf(chip) !== -1 ? ' used' : '');
+        btn.textContent = chip;
+        btn.disabled = orderedChips.indexOf(chip) !== -1 || answered;
+        btn.addEventListener('click', function () { orderedChips.push(chip); drawChips(q); });
+        chipBank.appendChild(btn);
+      });
+    }
+
+    function handleSentenceOrder() {
+      if (answered) return;
+      selectedAnswer = orderedChips.join(' ');
+      checkAnswer();
+    }
+
+    function renderSpeaking(q) {
+      var body = document.getElementById('challengeBody');
+      body.innerHTML = '<p class="prompt">' + q.prompt + '</p><ul>' + q.phrases.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul><textarea id="favoritePhrase" placeholder="Optional: save a favorite phrase or your sentence."></textarea><div class="controls"><button type="button" data-rate="Weak">Weak</button><button type="button" data-rate="Okay">Okay</button><button class="primary" type="button" data-rate="Strong">Strong</button></div>';
+      body.querySelectorAll('[data-rate]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (answered) return;
+          selectedAnswer = btn.getAttribute('data-rate');
+          var phrase = document.getElementById('favoritePhrase').value.trim();
+          if (phrase) playerState.favoritePhrases.unshift(phrase);
+          answered = true;
+          var strong = selectedAnswer === 'Strong';
+          registerAnswer(strong, q, selectedAnswer);
+          showFeedback(strong, q, selectedAnswer);
+        });
+      });
+    }
+
+    function checkAnswer() {
+      var q = currentSet[currentIndex];
+      answered = true;
+      var normalizedUser = normalize(selectedAnswer);
+      var normalizedAnswer = normalize(q.answer);
+      var correct = normalizedUser === normalizedAnswer;
+      registerAnswer(correct, q, selectedAnswer);
+      showFeedback(correct, q, selectedAnswer);
+    }
+
+    function registerAnswer(correct, q, userAnswer) {
+      playerState.totalAnswered += 1;
+      if (correct) {
+        playerState.totalCorrect += 1;
+        playerState.score += 10 + Math.min(playerState.streak, 5);
+        playerState.streak += 1;
+        sessionCorrect += 1;
+      } else {
+        playerState.streak = 0;
+        sessionMistakes += 1;
+        saveMistake(q, userAnswer);
+      }
+      saveGame();
+      renderStats();
+    }
+
+    function showFeedback(correct, q, userAnswer) {
+      var fb = document.getElementById('feedback');
+      fb.className = 'feedback ' + (correct ? 'good' : 'bad');
+      fb.innerHTML = '<h3>' + (correct ? 'Correct. The lock sighs open.' : 'Needs work. The chandelier trembles.') + '</h3>' +
+        '<p><strong>Your answer:</strong> ' + escapeHTML(userAnswer || '—') + '</p>' +
+        '<p><strong>Correct answer:</strong> ' + escapeHTML(q.answer) + '</p>' +
+        '<p><strong>Why it works:</strong> ' + q.explanation + '</p>' +
+        '<p><strong>Common mistake:</strong> ' + q.common + '</p>' +
+        '<p><strong>Example:</strong> ' + escapeHTML(q.example) + '</p>' +
+        (!correct ? '<p class="ghost-line">The ghost looks disappointed but not surprised. “Useful mistake. Put it in the notebook.”</p>' : '') +
+        '<div class="controls"><button class="primary" id="nextBtn" type="button">Next</button></div>';
+      document.getElementById('nextBtn').addEventListener('click', nextChallenge);
+      document.querySelectorAll('#challengeBody button').forEach(function (button) { button.disabled = true; });
+      renderNotebook();
+      renderAchievements();
+    }
+
+    function saveMistake(q, userAnswer) {
+      playerState.mistakes.unshift({
+        id: q.id,
+        question: q.prompt,
+        userAnswer: userAnswer || 'No answer',
+        correctAnswer: q.answer,
+        explanation: q.explanation,
+        room: rooms[q.room] ? rooms[q.room].name : rooms[currentRoomId].name,
+        date: new Date().toISOString().slice(0, 10)
+      });
+      if (playerState.mistakes.length >= 5) unlockAchievement('mistakeHunter');
+      if (playerState.weakQuestions.indexOf(q.id) === -1) playerState.weakQuestions.push(q.id);
+    }
+
+    function practiceMistakes() {
+      var mistakeQuestions = playerState.mistakes.map(function (m) { return findQuestion(m.id); }).filter(Boolean).slice(0, 10);
+      if (!mistakeQuestions.length) {
+        alert('No mistakes yet. The hotel is impressed, or suspicious. Try Daily Replay for review.');
+        return;
+      }
+      currentMode = 'mistakes';
+      currentRoomId = mistakeQuestions[0].room || 'lobby';
+      currentSet = mistakeQuestions;
+      currentIndex = 0;
+      sessionCorrect = 0;
+      sessionMistakes = 0;
+      answered = false;
+      renderAll();
+    }
+
+    function startDailyReplay() {
+      var mistakeQuestions = playerState.mistakes.map(function (m) { return findQuestion(m.id); }).filter(Boolean);
+      var review = mistakeQuestions.length ? mistakeQuestions.slice(0, 10) : getAllQuestions().filter(function (q) { return q.type !== 'speaking'; }).slice(8, 18);
+      currentMode = 'daily';
+      currentRoomId = review[0].room || 'lobby';
+      currentSet = review;
+      currentIndex = 0;
+      sessionCorrect = 0;
+      sessionMistakes = 0;
+      answered = false;
+      renderAll();
+    }
+
+    function completeCurrentSet() {
+      if (currentMode === 'room') {
+        if (currentRoomId === 'final') {
+          finishGame(sessionCorrect);
+          return;
+        }
+        clearRoom(currentRoomId);
+      }
+      currentSet = [];
+      currentIndex = 0;
+      currentMode = 'room';
+      saveGame();
+      renderAll();
+      document.getElementById('challengePanel').insertAdjacentHTML('beforeend', '<div class="feedback good"><h3>Round complete.</h3><p>You answered ' + sessionCorrect + ' of ' + (sessionCorrect + sessionMistakes) + ' challenges correctly.</p></div>');
+    }
+
+    function clearRoom(roomId) {
+      if (playerState.clearedRooms.indexOf(roomId) === -1) playerState.clearedRooms.push(roomId);
+      addItem(rooms[roomId].item);
+      if (sessionMistakes === 0) unlockAchievement('cleanSentence');
+      if (roomId === 'lobby') unlockAchievement('firstKey');
+      if (roomId === 'mirror') unlockAchievement('fixedMirror');
+      if (roomId === 'elevator') unlockAchievement('linkerTamer');
+      if (roomId === 'attic') unlockAchievement('wordFamilyWitch');
+      unlockRoom(nextRoomId(roomId));
+    }
+
+    function unlockRoom(roomId) {
+      if (roomId && playerState.unlockedRooms.indexOf(roomId) === -1) playerState.unlockedRooms.push(roomId);
+      if (hasAllPreFinalItems() && playerState.unlockedRooms.indexOf('final') === -1) playerState.unlockedRooms.push('final');
+    }
+
+    function addItem(itemId) {
+      if (itemId && playerState.inventory.indexOf(itemId) === -1) playerState.inventory.push(itemId);
+    }
+
+    function unlockAchievement(id) {
+      if (playerState.achievements.indexOf(id) === -1) playerState.achievements.push(id);
+    }
+
+    function finishGame(finalCorrect) {
+      if (finalCorrect >= 6) {
+        addItem('finalKey');
+        unlockAchievement('hotelLetYouLeave');
+        if (finalCorrect === 8) unlockAchievement('fluentEscape');
+        playerState.ended = true;
+        currentSet = [];
+        saveGame();
+        renderAll();
+      } else {
+        currentSet = [];
+        saveGame();
+        renderAll();
+        document.getElementById('challengePanel').innerHTML = '<h2>The Final Door stays closed.</h2><p class="prompt">You answered ' + finalCorrect + ' of 8. The hotel requires at least 6 correct answers.</p><p class="small">Review the missed items in your notebook, then retry.</p><div class="controls"><button class="primary" id="retryFinalBtn" type="button">Retry Final Door</button><button id="practiceFinalMistakesBtn" type="button">Practice mistakes</button></div>';
+        document.getElementById('retryFinalBtn').addEventListener('click', function () { startRoom('final'); });
+        document.getElementById('practiceFinalMistakesBtn').addEventListener('click', practiceMistakes);
+      }
+    }
+
+    function renderEndScreen() {
+      var accuracy = playerState.totalAnswered ? Math.round(playerState.totalCorrect / playerState.totalAnswered * 100) : 0;
+      var fav = playerState.favoritePhrases[0] || 'It seems as if the hotel wanted me to learn.';
+      document.getElementById('challengePanel').innerHTML = '<h2>Escaped!</h2><p class="prompt">The final key turns. The hotel bows with all its windows.</p><div class="stats"><div class="stat"><span>Final score</span><strong>' + playerState.score + '</strong></div><div class="stat"><span>Accuracy</span><strong>' + accuracy + '%</strong></div><div class="stat"><span>Mistakes made</span><strong>' + playerState.mistakes.length + '</strong></div><div class="stat"><span>Rooms cleared</span><strong>' + playerState.clearedRooms.length + '</strong></div></div><p><strong>Favorite phrase learned:</strong> ' + escapeHTML(fav) + '</p><p><strong>Achievements:</strong> ' + playerState.achievements.map(achievementName).join(', ') + '</p><div class="controls"><button class="primary" id="playAgainBtn" type="button">Play again</button><button id="endPracticeBtn" type="button">Practice mistakes</button><a class="button-link" href="index.html">Back to hub</a></div>';
+      document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+      document.getElementById('endPracticeBtn').addEventListener('click', practiceMistakes);
+    }
+
+    function renderStats() {
+      var stats = document.getElementById('stats');
+      stats.innerHTML = [
+        ['Score', playerState.score],
+        ['Streak', playerState.streak],
+        ['Mistakes', playerState.mistakes.length],
+        ['Rooms unlocked', playerState.unlockedRooms.length],
+        ['Secrets found', playerState.secretsFound.length],
+        ['Accuracy', (playerState.totalAnswered ? Math.round(playerState.totalCorrect / playerState.totalAnswered * 100) : 0) + '%']
+      ].map(function (s) { return '<div class="stat"><span>' + s[0] + '</span><strong>' + s[1] + '</strong></div>'; }).join('');
+    }
+
+    function renderInventory() {
+      document.getElementById('inventory').innerHTML = inventoryItems.map(function (item) {
+        var have = playerState.inventory.indexOf(item.id) !== -1;
+        return '<div class="item ' + (have ? 'have' : 'missing') + '">' + (have ? '✓ ' : '□ ') + item.name + '</div>';
+      }).join('');
+    }
+
+    function renderAchievements() {
+      document.getElementById('achievements').innerHTML = achievementList.map(function (a) {
+        var have = playerState.achievements.indexOf(a.id) !== -1;
+        return '<div class="achievement ' + (have ? 'have' : 'missing') + '">' + (have ? '★ ' : '☆ ') + a.name + '</div>';
+      }).join('');
+    }
+
+    function renderNotebook() {
+      var notebook = document.getElementById('notebook');
+      if (!playerState.mistakes.length) {
+        notebook.innerHTML = '<p class="small">No mistakes saved yet. The wallpaper is quietly impressed.</p>';
+        return;
+      }
+      notebook.innerHTML = playerState.mistakes.slice(0, 8).map(function (m) {
+        return '<article class="mistake-card"><strong>' + escapeHTML(m.room) + ' · ' + escapeHTML(m.date) + '</strong><p>' + escapeHTML(m.question) + '</p><p><strong>Your answer:</strong> ' + escapeHTML(m.userAnswer) + '</p><p><strong>Correct:</strong> ' + escapeHTML(m.correctAnswer) + '</p><p class="small">' + escapeHTML(m.explanation) + '</p></article>';
+      }).join('');
+    }
+
+    function renderPupNote() {
+      document.getElementById('pupNote').textContent = pupNotes[(playerState.totalAnswered + playerState.streak) % pupNotes.length];
+    }
+
+    function buildFinalSet() {
+      var fromMistakes = playerState.mistakes.map(function (m) { return findQuestion(m.id); }).filter(Boolean).slice(0, 3);
+      var mixed = [questionBank.dialogue[6], questionBank.order[6], questionBank.collocation[6], questionBank.correction[6], questionBank.upgrade[6], questionBank.linker[6], questionBank.wordFamily[6], questionBank.dialogue[7], questionBank.correction[7], questionBank.linker[7]];
+      return uniqueQuestions(fromMistakes.concat(mixed)).filter(function (q) { return q.type !== 'speaking'; }).slice(0, 8);
+    }
+
+    function startRoomFromDebug(roomId) { startRoom(roomId); }
+
+    function hasAllPreFinalItems() {
+      return inventoryItems.filter(function (item) { return item.id !== 'finalKey'; }).every(function (item) { return playerState.inventory.indexOf(item.id) !== -1; });
+    }
+
+    function isRoomAvailable(id) {
+      if (id === 'final') return hasAllPreFinalItems();
+      var previous = roomOrder[roomOrder.indexOf(id) - 1];
+      return !previous || playerState.clearedRooms.indexOf(previous) !== -1;
+    }
+
+    function nextRoomId(roomId) { return roomOrder[roomOrder.indexOf(roomId) + 1]; }
+    function itemName(id) { var item = inventoryItems.filter(function (i) { return i.id === id; })[0]; return item ? item.name : 'mystery item'; }
+    function achievementName(id) { var a = achievementList.filter(function (item) { return item.id === id; })[0]; return a ? a.name : id; }
+
+    function findQuestion(id) {
+      return getAllQuestions().filter(function (q) { return q.id === id; })[0];
+    }
+
+    function getAllQuestions() {
+      return Object.keys(questionBank).reduce(function (all, key) { return all.concat(questionBank[key]); }, []);
+    }
+
+    function uniqueQuestions(list) {
+      var seen = {};
+      return list.filter(function (q) {
+        if (!q || seen[q.id]) return false;
+        seen[q.id] = true;
+        return true;
+      });
+    }
+
+    function shuffle(array) {
+      for (var i = array.length - 1; i > 0; i -= 1) {
+        var j = Math.floor((i + 1) * 0.37) % (i + 1);
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+      return array;
+    }
+
+    function normalize(value) { return String(value || '').toLowerCase().replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim(); }
+    function escapeHTML(value) { return String(value).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+    function handleClockSecret() {
+      playerState.clockClicks = (playerState.clockClicks || 0) + 1;
+      if (playerState.clockClicks >= 3 && playerState.secretsFound.indexOf('clock') === -1) {
+        playerState.secretsFound.push('clock');
+        saveGame();
+        renderRoom();
+        renderStats();
+      } else {
+        saveGame();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initGame);
+    window.whisperingHotelDebug = { startRoom: startRoomFromDebug, resetGame: resetGame, questionBank: questionBank, rooms: rooms };
+  </script>
+</body>
+</html>
