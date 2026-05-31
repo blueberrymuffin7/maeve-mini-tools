@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Detective Notes: The Dinner Where Everyone Lied</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --charcoal: #0e0f12;
+      --ink: #171717;
+      --panel: rgba(28, 29, 33, 0.92);
+      --paper: #e8d6ad;
+      --paper-soft: #f4e6c6;
+      --muted-paper: #cbb98f;
+      --burgundy: #7b2635;
+      --burgundy-2: #a33a4b;
+      --brass: #c9a24d;
+      --bluegray: #8fa1ae;
+      --cold: #b8c5cc;
+      --faded-red: #b75a5b;
+      --line: rgba(232, 214, 173, 0.18);
+      --shadow: rgba(0, 0, 0, 0.48);
+      --success: #9ed3ac;
+      --warning: #e5bd68;
+      --danger: #d47a7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--paper-soft);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(123, 38, 53, 0.28), transparent 26%),
+        radial-gradient(circle at 80% 0%, rgba(143, 161, 174, 0.16), transparent 28%),
+        linear-gradient(135deg, #111216 0%, #08090b 70%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        radial-gradient(circle at 22% 16%, rgba(232, 214, 173, 0.12), transparent 18%);
+      background-size: 44px 44px, 44px 44px, 100% 100%;
+      mix-blend-mode: screen;
+    }
+
+    a { color: inherit; }
+
+    button, select, textarea, input {
+      font: inherit;
+    }
+
+    button, select, input[type="checkbox"] { cursor: pointer; }
+
+    button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid rgba(201, 162, 77, 0.95);
+      outline-offset: 3px;
+    }
+
+    .app-shell {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(30px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+
+    .case-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: -1px -16px 22px;
+      padding: 16px max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left));
+      background: linear-gradient(180deg, rgba(8,9,11,0.96), rgba(8,9,11,0.86));
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.28);
+    }
+
+    .header-grid {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--brass);
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      font-size: 0.84rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.05;
+      font-family: "Courier New", Courier, monospace;
+      letter-spacing: -0.035em;
+    }
+
+    h1 { font-size: clamp(1.8rem, 5vw, 4rem); }
+    h2 { font-size: clamp(1.35rem, 3vw, 2.2rem); }
+    h3 { font-size: 1.18rem; }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--cold);
+      font-size: 0.95rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(232, 214, 173, 0.07);
+    }
+
+    .progress-wrap {
+      min-width: min(320px, 35vw);
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      color: var(--muted-paper);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .progress-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(232, 214, 173, 0.11);
+      border: 1px solid var(--line);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--burgundy), var(--brass));
+      transition: width 0.25s ease;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      min-height: 46px;
+      min-width: 46px;
+      border: 1px solid rgba(232, 214, 173, 0.26);
+      border-radius: 14px;
+      padding: 11px 15px;
+      color: var(--paper-soft);
+      background: linear-gradient(180deg, rgba(232,214,173,0.13), rgba(232,214,173,0.05));
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+      font-weight: 800;
+      touch-action: manipulation;
+    }
+
+    .btn:hover { border-color: rgba(201,162,77,0.72); transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(180deg, rgba(123,38,53,0.92), rgba(85,26,37,0.94)); border-color: rgba(201,162,77,0.42); }
+    .btn.brass { background: linear-gradient(180deg, rgba(201,162,77,0.95), rgba(130,92,32,0.96)); color: #16110b; }
+    .btn.subtle { box-shadow: none; background: rgba(232,214,173,0.06); }
+
+    .tabs {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 2px 0 14px;
+      margin-bottom: 8px;
+      scrollbar-color: var(--burgundy) transparent;
+    }
+
+    .tab-btn {
+      flex: 0 0 auto;
+      min-height: 46px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 10px 15px;
+      background: rgba(232,214,173,0.07);
+      color: var(--cold);
+      font-weight: 800;
+    }
+
+    .tab-btn.active {
+      color: var(--paper-soft);
+      background: rgba(123,38,53,0.72);
+      border-color: rgba(201,162,77,0.56);
+    }
+
+    .section { display: none; }
+    .section.active { display: block; animation: rise 0.22s ease; }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid { display: grid; gap: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .case-card, .paper-card, .suspect-card, .evidence-card, .sticky-note {
+      position: relative;
+      border: 1px solid rgba(232,214,173,0.18);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.035), transparent 34%),
+        linear-gradient(180deg, rgba(32,33,37,0.95), rgba(20,21,24,0.96));
+      box-shadow: 0 18px 40px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .case-card::after, .paper-card::after, .suspect-card::after, .evidence-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.11;
+      background-image: radial-gradient(circle, rgba(232,214,173,0.7) 0 0.7px, transparent 0.8px);
+      background-size: 13px 13px;
+    }
+
+    .case-card { padding: clamp(18px, 3vw, 28px); }
+    .paper-card { padding: 20px; }
+
+    .hero {
+      min-height: 330px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .case-title {
+      font-size: clamp(2.2rem, 6vw, 5.1rem);
+      margin: 8px 0 14px;
+      color: var(--paper-soft);
+      text-shadow: 0 12px 30px rgba(0,0,0,0.44);
+    }
+
+    .lead {
+      color: var(--cold);
+      font-size: clamp(1.05rem, 2vw, 1.28rem);
+      line-height: 1.62;
+      max-width: 760px;
+    }
+
+    .learning-note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--brass);
+      border-radius: 14px;
+      color: var(--paper-soft);
+      background: rgba(201,162,77,0.1);
+      line-height: 1.5;
+    }
+
+    .thread-board {
+      min-height: 100%;
+      padding: 18px;
+      background:
+        linear-gradient(45deg, transparent 48%, rgba(183,90,91,0.32) 49%, rgba(183,90,91,0.32) 51%, transparent 52%),
+        linear-gradient(135deg, transparent 58%, rgba(183,90,91,0.22) 59%, rgba(183,90,91,0.22) 61%, transparent 62%),
+        rgba(11,12,14,0.82);
+    }
+
+    .mini-file {
+      padding: 14px;
+      margin-bottom: 14px;
+      border-radius: 16px;
+      background: rgba(232,214,173,0.1);
+      border: 1px solid var(--line);
+      transform: rotate(-1deg);
+    }
+
+    .mini-file:nth-child(2) { transform: rotate(1.2deg); }
+    .mini-file:nth-child(3) { transform: rotate(-0.6deg); }
+    .mini-file strong { color: var(--brass); font-family: "Courier New", Courier, monospace; }
+    .mini-file p { margin: 7px 0 0; color: var(--cold); line-height: 1.45; }
+
+    .prompt-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 16px 0 22px;
+    }
+
+    .prompt-strip span {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(143,161,174,0.1);
+      border: 1px solid rgba(143,161,174,0.22);
+      color: var(--cold);
+    }
+
+    .suspect-card, .evidence-card { padding: 18px; transition: transform 0.18s ease, border-color 0.18s ease; }
+    .suspect-card.marked { border-color: rgba(183,90,91,0.9); box-shadow: 0 18px 44px rgba(123,38,53,0.24); }
+    .evidence-card.important { border-color: rgba(201,162,77,0.8); }
+    .evidence-card.used { box-shadow: 0 0 0 2px rgba(143,161,174,0.3), 0 18px 40px var(--shadow); }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(201,162,77,0.12);
+      border: 1px solid rgba(201,162,77,0.26);
+      color: var(--brass);
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .suspect-card p, .evidence-card p, .paper-card p, .case-card p { line-height: 1.55; }
+    .muted { color: var(--cold); }
+    .gold { color: var(--brass); }
+    .danger { color: var(--danger); }
+    .success { color: var(--success); }
+
+    .testimony {
+      margin: 14px 0;
+      padding: 13px 14px;
+      border-left: 4px solid var(--burgundy-2);
+      border-radius: 12px;
+      background: rgba(123,38,53,0.13);
+      color: var(--paper-soft);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    label { color: var(--muted-paper); font-weight: 800; }
+
+    select, textarea, input[type="text"] {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid rgba(232,214,173,0.24);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: rgba(9,10,12,0.7);
+      color: var(--paper-soft);
+    }
+
+    textarea { min-height: 180px; resize: vertical; line-height: 1.55; }
+
+    .status-select { min-width: 170px; width: auto; }
+
+    .details {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(232,214,173,0.22);
+      animation: rise 0.2s ease;
+    }
+
+    .details.open { display: block; }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 12px 0 18px;
+    }
+
+    .filter-row select { width: min(280px, 100%); }
+
+    .sticky-note {
+      padding: 18px;
+      color: #21170d;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.22), transparent 38%),
+        #d7bd76;
+      border-color: rgba(80, 50, 10, 0.2);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+    }
+
+    .sticky-note h3 { color: #21170d; }
+    .sticky-note p, .sticky-note li { color: #352713; }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .checklist li {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(232,214,173,0.08);
+      border: 1px solid var(--line);
+      color: var(--cold);
+    }
+
+    .interrogation-panel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .response-box {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(143,161,174,0.3);
+      background: rgba(143,161,174,0.09);
+    }
+
+    .pressure-strong { border-color: rgba(158,211,172,0.56); }
+    .pressure-moderate { border-color: rgba(229,189,104,0.56); }
+    .pressure-weak { border-color: rgba(143,161,174,0.4); }
+
+    .deduction-grid { display: grid; gap: 18px; }
+    .option-list { display: grid; gap: 10px; margin-top: 12px; }
+
+    .option-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-height: 48px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(232,214,173,0.055);
+      color: var(--paper-soft);
+    }
+
+    .option-row input { margin-top: 3px; min-width: 18px; min-height: 18px; }
+
+    .score-card {
+      text-align: center;
+      padding: clamp(22px, 4vw, 42px);
+      border-color: rgba(201,162,77,0.55);
+    }
+
+    .score-number {
+      font-family: "Courier New", Courier, monospace;
+      font-size: clamp(3.5rem, 12vw, 8rem);
+      color: var(--brass);
+      line-height: 1;
+      margin: 10px 0;
+    }
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(232,214,173,0.06);
+    }
+
+    .timeline time { color: var(--brass); font-family: "Courier New", Courier, monospace; font-weight: 800; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 920px) {
+      .header-grid, .hero, .grid.two, .grid.three, .interrogation-panel { grid-template-columns: 1fr; }
+      .progress-wrap { min-width: 100%; }
+      .header-actions { justify-content: flex-start; }
+      .case-header { position: relative; }
+    }
+
+    @media (max-width: 560px) {
+      .app-shell { padding-left: 12px; padding-right: 12px; }
+      .case-card, .paper-card, .suspect-card, .evidence-card { border-radius: 18px; padding: 16px; }
+      .header-meta { font-size: 0.86rem; }
+      .btn { width: 100%; justify-content: center; }
+      .header-actions .btn { width: auto; }
+      .timeline li { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="case-header">
+    <div class="header-grid">
+      <div>
+        <p class="eyebrow">Case No. DV-2110 · Detective Notes</p>
+        <h1>Detective Notes: The Dinner Where Everyone Lied</h1>
+        <div class="header-meta" aria-live="polite">
+          <span class="pill" id="stageLabel">Current stage: Case brief</span>
+          <span class="pill" id="focusLine">Current focus: Start with the timeline.</span>
+          <span class="pill" id="reviewStats">Evidence reviewed: 0/16 · Suspects reviewed: 0/6 · Confrontations tried: 0</span>
+        </div>
+      </div>
+      <div class="progress-wrap" aria-label="Case progress">
+        <div class="progress-label"><span>Progress</span><span id="progressText">0%</span></div>
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="header-actions">
+          <button class="btn subtle" type="button" id="hintBtn">Hint</button>
+          <button class="btn subtle" type="button" id="resetTopBtn">Reset Case</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <nav class="tabs" aria-label="Case sections">
+      <button class="tab-btn active" type="button" data-tab="brief">Case Brief</button>
+      <button class="tab-btn" type="button" data-tab="suspects">Suspects</button>
+      <button class="tab-btn" type="button" data-tab="evidence">Evidence Board</button>
+      <button class="tab-btn" type="button" data-tab="notes">Detective Notes</button>
+      <button class="tab-btn" type="button" data-tab="interrogation">Interrogation</button>
+      <button class="tab-btn" type="button" data-tab="deduction">Final Deduction</button>
+      <button class="tab-btn" type="button" data-tab="result">Result</button>
+    </nav>
+
+    <section class="section active" id="brief" aria-labelledby="briefTitle">
+      <div class="hero">
+        <article class="case-card">
+          <p class="eyebrow">The Dinner Where Everyone Lied</p>
+          <h2 class="case-title" id="briefTitle">Vale House. A storm. A study door. One half-truth too polished.</h2>
+          <p class="lead">At 22:05, Dr. Elias Vale is found dead in his private study, beyond a glass greenhouse slick with rain. The power failed between 21:10 and 21:40. Six guests give six imperfect stories. Your task is not to read faces. Your task is to make the evidence speak.</p>
+          <div class="learning-note"><strong>Learning note:</strong> This is a fictional learning game, not a forensic lie-detection tool. The best deductions come from evidence, contradictions, motive, and timeline.</div>
+          <div class="prompt-strip" aria-label="Investigation guidance">
+            <span>A suspect can lie without being the killer.</span>
+            <span>A clue can reveal a lie without revealing the central lie.</span>
+            <span>The strongest accusation needs route + motive + contradiction.</span>
+          </div>
+          <button class="btn primary" type="button" data-jump="suspects">Open suspect files →</button>
+        </article>
+        <aside class="case-card thread-board" aria-label="Pinned case facts">
+          <div class="mini-file"><strong>Setting</strong><p>Vale House, an old estate where a glass greenhouse connects to Dr. Elias Vale’s private study.</p></div>
+          <div class="mini-file"><strong>Victim</strong><p>Dr. Elias Vale, 58. Psychology professor and author of the rumored manuscript <em>The Honest Lie</em>.</p></div>
+          <div class="mini-file"><strong>Timeline</strong><p>Blackout begins at 21:10. Estimated death is 21:25–21:40. Body discovered at 22:05.</p></div>
+          <div class="mini-file"><strong>Main question</strong><p>Who lied about the crucial time period, what exactly was the lie, and why did they lie?</p></div>
+        </aside>
+      </div>
+      <div class="grid two">
+        <article class="paper-card">
+          <h3>Psychology warning</h3>
+          <p class="muted">Do not rely on nervousness, eye contact, stammering, emotional behavior, or “microexpressions” as proof. Stress and guilt can look similar from the outside. Memory is not a recording. Evidence conflicts matter more than vibes.</p>
+        </article>
+        <article class="paper-card">
+          <h3>Investigation method</h3>
+          <p class="muted">Let each person commit to a story before confronting them with key evidence. Look for selective omission, self-serving bias, and claims that cannot coexist with objective records.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="suspects" aria-labelledby="suspectsTitle">
+      <div class="case-card">
+        <div class="card-top"><div><p class="eyebrow">Six imperfect stories</p><h2 id="suspectsTitle">Suspect Cards</h2></div><button class="btn subtle" type="button" data-jump="evidence">Study evidence →</button></div>
+        <p class="muted">Mark suspicion, set a working status, and expand each file for the full testimony. Emotional intensity is not evidence by itself.</p>
+      </div>
+      <div class="grid three" id="suspectGrid"></div>
+    </section>
+
+    <section class="section" id="evidence" aria-labelledby="evidenceTitle">
+      <div class="case-card">
+        <div class="card-top"><div><p class="eyebrow">Pinned board</p><h2 id="evidenceTitle">Evidence Board</h2></div><button class="btn subtle" type="button" data-jump="interrogation">Use evidence →</button></div>
+        <div class="filter-row">
+          <label for="evidenceFilter">Filter by tag</label>
+          <select id="evidenceFilter"></select>
+        </div>
+      </div>
+      <div class="grid three" id="evidenceGrid"></div>
+    </section>
+
+    <section class="section" id="notes" aria-labelledby="notesTitle">
+      <div class="grid two">
+        <article class="case-card">
+          <p class="eyebrow">Private notebook</p>
+          <h2 id="notesTitle">Detective Notes</h2>
+          <p class="muted">Autosaves to this browser only. Use the checklist to keep the case fair.</p>
+          <label for="playerNotes">Player notes</label>
+          <textarea id="playerNotes" placeholder="Write your theory in fragments: route, motive, contradiction, omitted fact..."></textarea>
+          <div class="controls-row"><button class="btn brass" type="button" id="saveNotesBtn">Save notes</button><span class="muted" id="saveNoteStatus" aria-live="polite"></span></div>
+        </article>
+        <aside class="grid">
+          <div class="sticky-note"><h3>Contradiction checklist</h3><ul class="checklist" id="contradictionChecklist"></ul></div>
+          <div class="paper-card"><h3>Suspect status summary</h3><div id="statusSummary" class="muted"></div></div>
+          <div class="paper-card"><h3>Important evidence</h3><div id="importantEvidenceList" class="muted"></div></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="interrogation" aria-labelledby="interrogationTitle">
+      <div class="case-card">
+        <p class="eyebrow">Strategic evidence use</p>
+        <h2 id="interrogationTitle">Interrogation Mode</h2>
+        <p class="muted">Choose a suspect, choose one evidence card, then confront. Preset responses teach how a clue pressures a claim without pretending to read minds.</p>
+        <div class="interrogation-panel">
+          <div><label for="interrogateSuspect">Suspect</label><select id="interrogateSuspect"></select></div>
+          <div><label for="interrogateEvidence">Evidence</label><select id="interrogateEvidence"></select></div>
+          <button class="btn primary" type="button" id="confrontBtn">Confront</button>
+        </div>
+        <div id="confrontationResponse" class="response-box hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section" id="deduction" aria-labelledby="deductionTitle">
+      <form class="case-card" id="deductionForm">
+        <p class="eyebrow">Final accusation</p>
+        <h2 id="deductionTitle">Final Deduction</h2>
+        <p class="muted">The case should not require guessing. A strong answer explains route, motive, contradiction, and the type of lie.</p>
+        <div class="deduction-grid" id="deductionFields"></div>
+        <div class="controls-row"><button class="btn brass" type="submit">Submit final deduction</button><button class="btn subtle" type="button" data-jump="notes">Review notes first</button></div>
+      </form>
+    </section>
+
+    <section class="section" id="result" aria-labelledby="resultTitle">
+      <div id="resultMount" class="grid"></div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "detectiveNotesDinnerLied.v1";
+
+    const suspects = [
+      {
+        id: "mara", name: "Mara Venn", role: "Former research assistant, now behavioral analysis consultant", surface: "Calm, professional, controlled", relationship: "Once co-authored studies with Dr. Vale, later broke with him over data ethics.",
+        testimony: "After the blackout at 21:10, I stayed in the dining room helping everyone find candles. I did not leave until about 21:42.",
+        psychology: "Mara knows how credibility is performed. She may use expert language to manage impressions.", motive: "Professional resentment and pride after the data-ethics rupture.",
+        full: "Mara says she took charge because panic makes memory unreliable. She describes distributing candles and watching reactions. Her account is polished, technical, and oddly interested in how everyone else performed under stress."
+      },
+      {
+        id: "julian", name: "Julian Vale", role: "Dr. Vale’s son, unsuccessful playwright", surface: "Sarcastic, emotional, defensive", relationship: "Financially dependent on his father. Had a loud argument with him before dinner.",
+        testimony: "From 21:20 to 21:45, I was in the wine cellar. I did not want another fight.",
+        psychology: "He looks suspicious because his emotions are visible, but emotional reactivity does not equal deception.", motive: "Inheritance pressure, humiliation, and fear of being cut off.",
+        full: "Julian admits he shouted before dinner, then insists he retreated to the wine cellar. He omits that the door was blocked from the outside, because being trapped in his father’s house felt childish and humiliating."
+      },
+      {
+        id: "celia", name: "Celia Rowan", role: "Dr. Vale’s publishing editor", surface: "Elegant, smooth, socially controlled", relationship: "Knew the new book’s contents and feared legal and career consequences.",
+        testimony: "Around 21:30 I was in the greenhouse taking a phone call with the publisher about delaying the book.",
+        psychology: "She is skilled at polished half-truths and professional framing.", motive: "A damaging chapter could harm the publisher, trigger legal trouble, and end her career.",
+        full: "Celia remembers the greenhouse, the rain on the glass, and a call to the publisher. Those details are real. The problem is whether they explain what she was doing there, or merely decorate an omission."
+      },
+      {
+        id: "tomas", name: "Father Tomas Reed", role: "Childhood friend of Dr. Vale, now a priest", surface: "Gentle, quiet, morally burdened", relationship: "Dr. Vale planned to write about a secret from his youth.",
+        testimony: "During the blackout, I remained in the sitting room praying. Then I heard glass break.",
+        psychology: "He may hide information to protect someone else, not necessarily himself.", motive: "Protecting an old secret and possibly protecting someone he pitied.",
+        full: "Father Tomas says his silence came from fear of making an accusation in darkness. He heard glass, hesitated, and later wondered whether Nina was involved. His omission is protective, not necessarily self-protective."
+      },
+      {
+        id: "nina", name: "Nina Calder", role: "Dr. Vale’s current wife", surface: "Sensitive, grieving, defensive", relationship: "Marriage was broken, but she did not want that known publicly.",
+        testimony: "After 21:15 I went upstairs to change because red wine spilled on my dress. I came back down around 21:50.",
+        psychology: "Her grief is real, but real grief is not the same as complete honesty.", motive: "A broken marriage, public image, and a private argument she wanted hidden.",
+        full: "Nina cries when discussing Elias, but her timeline has a rehearsed quality around the dress. She lies about when the wine spilled to conceal an earlier argument, not to account for the death itself."
+      },
+      {
+        id: "theo", name: "Theo Kline", role: "Dinner pianist, formerly funded by Dr. Vale", surface: "Quiet, eager to please, visibly anxious", relationship: "Dr. Vale knew Theo had falsified part of his academic background.",
+        testimony: "After the blackout, I stayed by the piano in the music room. I did not leave.",
+        psychology: "His nervousness is obvious, but it may come from fear of authority and exposure, not guilt in the death.", motive: "Fear that Dr. Vale would expose his falsified academic history.",
+        full: "Theo admits he played broken fragments on the old upright piano to calm himself. The anxiety is real, but unrelated secrets can create visible fear in innocent people."
+      }
+    ];
+
+    const evidence = [
+      { id: "time-death", letter: "A", title: "Time of death", tag: "Timeline", summary: "Death falls inside the blackout window.", detail: "The medical examiner estimates death between 21:25 and 21:40.", relevance: "Any alibi must survive this narrow period.", psychology: "Objective anchors are safer than impressions of emotion." },
+      { id: "study-door", letter: "B", title: "Study door", tag: "Physical Evidence", summary: "No forced entry at the study.", detail: "The study door shows no sign of forced entry. The person who entered likely had a key, knew the spare key location, or was willingly admitted.", relevance: "Focus on access instead of personality.", psychology: "A route can falsify a confident story." },
+      { id: "glass-fragments", letter: "C", title: "Glass fragments", tag: "Physical Evidence", summary: "Broken glass near the desk has a partial print from Nina.", detail: "A broken glass lies near the desk. There are no fingerprints from Dr. Vale on the fragments. A partial print from Nina is present.", relevance: "Suspicious, but the print may predate the death.", psychology: "A clue can reveal a lie without revealing the central lie." },
+      { id: "red-wine", letter: "D", title: "Red wine stain", tag: "Testimony Conflict", summary: "Nina’s dress stain is dry, not fresh.", detail: "Nina’s dress does have a red wine stain, but the stain is already dry. It does not look freshly spilled at 21:15.", relevance: "Shows Nina lied about timing.", psychology: "Real grief can coexist with self-protective deception." },
+      { id: "missing-candles", letter: "E", title: "Missing candles", tag: "Physical Evidence", summary: "Two dining-room candles are missing.", detail: "The dining-room candle box holds 8 candles. Only 6 are found afterward. Mara claims she took out all the candles during the blackout.", relevance: "Candles matter because the greenhouse route was dark.", psychology: "An expert can manage impressions without being the central culprit." },
+      { id: "mud-print", letter: "F", title: "Greenhouse mud print", tag: "Route", summary: "A small muddy print links greenhouse and study side door.", detail: "A partial muddy footprint is found on the carpet between the greenhouse and the study side door. The shoe size is small and does not match Julian’s shoes.", relevance: "Supports movement through the greenhouse route.", psychology: "Physical route evidence is stronger than emotional suspicion." },
+      { id: "phone-record", letter: "G", title: "Phone record", tag: "Testimony Conflict", summary: "Celia’s 21:31 call lasted only 9 seconds.", detail: "Celia’s phone shows a call at 21:31, but it lasted only 9 seconds. It could not have been a long publishing discussion.", relevance: "Directly weakens Celia’s stated reason for being in the greenhouse.", psychology: "Half-truths often keep real details while falsifying purpose." },
+      { id: "piano-sound", letter: "H", title: "Piano sound", tag: "Timeline", summary: "Broken piano music was heard during the death window.", detail: "Two witnesses heard broken piano music between 21:28 and 21:36. The electric piano could not work during the blackout, but the old upright piano could.", relevance: "Supports Theo’s location if he used the old upright piano.", psychology: "Visible anxiety should be checked against independent evidence." },
+      { id: "cellar-door", letter: "I", title: "Wine cellar door", tag: "Route", summary: "The cellar door appears blocked from outside.", detail: "The wine cellar door appears to have been blocked from the outside by a chair. If Julian was inside, he may have been trapped rather than hiding.", relevance: "Makes Julian’s humiliating omission important but not central.", psychology: "People omit facts that damage pride, not only facts that prove guilt." },
+      { id: "desk-note", letter: "J", title: "Desk note", tag: "Psychology", summary: "A handwritten note about a kind lie sits on the desk.", detail: "On Dr. Vale’s desk is a handwritten note: “The kindest lie is still a cage.” The handwriting is his.", relevance: "Frames the case around protective and self-serving lies.", psychology: "Motive can be identity-protective rather than purely criminal." },
+      { id: "recorder", letter: "K", title: "Recorder", tag: "Audio", summary: "A study recorder captured a confrontation at 21:33.", detail: "A recorder in Dr. Vale’s study captured a low exchange at 21:33: Dr. Vale: “Tell the truth before I do.” Unknown voice: “You don’t know what truth costs.”", relevance: "Places a confrontation inside the death window.", psychology: "Words under pressure reveal stakes, not a magical lie signature." },
+      { id: "iris-perfume", letter: "L", title: "Iris perfume", tag: "Physical Evidence", summary: "Iris scent remains on the study curtains.", detail: "The study curtains carry a faint iris perfume. Celia and Nina both use iris-based scents, but Nina’s is sweeter while Celia’s is colder and powderier.", relevance: "Supports a narrowed pool but cannot convict alone.", psychology: "Ambiguous evidence needs corroboration." },
+      { id: "spare-key", letter: "M", title: "Spare key", tag: "Route", summary: "The spare key is hidden under the greenhouse blue flowerpot.", detail: "The study spare key is usually kept under the blue flowerpot in the greenhouse. Only people who had been to Vale House often would know this.", relevance: "Connects access to the greenhouse route.", psychology: "Knowledge can be opportunity; opportunity still needs contradiction and motive." },
+      { id: "psych-handout", letter: "N", title: "Psychology handout", tag: "Psychology", summary: "Dr. Vale’s handout warns against polished credibility.", detail: "Dr. Vale left a lecture handout on the dining table: “Liars often over-control what they say. Truth-tellers often under-control how they say it.”", relevance: "A reminder not to reward the smoothest speaker automatically.", psychology: "Baseline and evidence matter more than performance." },
+      { id: "candle-wax", letter: "O", title: "Greenhouse candle wax", tag: "Physical Evidence", summary: "Candle wax appears by the blue flowerpot.", detail: "A small trace of candle wax is found near the blue flowerpot in the greenhouse.", relevance: "Supports someone using candlelight to retrieve the key during the blackout.", psychology: "Small physical traces can expose selective omission." },
+      { id: "contract-page", letter: "P", title: "Publishing contract page", tag: "Motive", summary: "Celia’s tablet shows publisher legal risk.", detail: "A draft contract on Celia’s tablet shows that the publisher could face legal trouble if the new book printed certain claims without clearance.", relevance: "Gives Celia a professional motive to force a change.", psychology: "Self-serving bias often protects career and identity, not just liberty." }
+    ];
+
+    const confrontations = {
+      "celia|phone-record": ["strong", "Celia’s calm phrasing tightens. A 9-second call cannot carry the long publishing discussion she described.", "Her alibi contains a real call, but the purpose looks false.", "This is selective omission: true detail, false explanation."],
+      "celia|spare-key": ["strong", "The greenhouse is no longer scenery. It is an access point, and Celia knew Vale House well enough to know the flowerpot routine.", "The key makes her greenhouse presence meaningful.", "Route evidence tests story structure better than demeanor."],
+      "celia|mud-print": ["strong", "Celia says the greenhouse was for a call. The muddy print suggests someone crossed from greenhouse to study.", "Her location overlaps the route into the study.", "A place can be true while the stated reason is false."],
+      "celia|recorder": ["strong", "The recorder catches a confrontation at 21:33. Celia’s professional stakes fit the line about truth costing something.", "The audio connects motive, timing, and conflict.", "Do not overread voice tone; read the conflict against evidence."],
+      "celia|iris-perfume": ["moderate", "The colder powdery iris scent is compatible with Celia, but Nina also uses iris perfume.", "Supportive, not conclusive.", "Ambiguous clues need corroboration."],
+      "celia|candle-wax": ["strong", "Candle wax by the blue flowerpot supports a quiet search for the spare key during the blackout.", "The missing candle trail points toward the greenhouse key.", "Small traces can reveal omitted actions."],
+      "nina|red-wine": ["strong", "Nina admits the dress story is not clean. The stain was from earlier, before the blackout.", "She lied about timing to hide an argument, not necessarily the death.", "Finding one lie is not the same as finding the central lie."],
+      "nina|glass-fragments": ["moderate", "The partial print worries Nina, but household glass moves between rooms. It does not prove she broke it at 21:37.", "Suspicious but incomplete.", "Context prevents confirmation bias."],
+      "nina|iris-perfume": ["weak", "Nina uses a sweeter iris scent, but the curtain trace is ambiguous and Celia uses iris too.", "Perfume cannot carry the case alone.", "Ambiguous sensory clues require restraint."],
+      "julian|cellar-door": ["strong", "Julian’s humiliation surfaces: he may have been trapped from outside, not hiding with perfect freedom.", "This supports his location while explaining the omission.", "Self-protective omissions often protect pride."],
+      "julian|time-death": ["moderate", "The death window overlaps his cellar claim, but the door evidence matters before assuming guilt.", "Relevant timeline pressure, not a conviction.", "Timeline narrows questions; it does not answer them alone."],
+      "mara|missing-candles": ["strong", "Mara noticed the missing candles and chose to watch reactions rather than disclose it immediately.", "Her concealment is ego-driven and observational.", "Expertise can become impression management."],
+      "mara|psych-handout": ["moderate", "Mara’s polished credibility should not be overvalued. She speaks like someone grading other witnesses.", "Credibility performance is not innocence.", "Do not mistake smoothness for truth."],
+      "tomas|recorder": ["moderate", "Father Tomas cannot explain the recorded exchange. He looks troubled rather than informed.", "His silence may be protective but does not place him on the route.", "Moral burden is not the same as action evidence."],
+      "tomas|glass-fragments": ["moderate", "The broken glass supports that he may have heard something real, even if he delayed saying so.", "His omission delayed the timeline.", "Hesitation can come from fear of harming someone else."],
+      "theo|piano-sound": ["strong", "Theo’s story gains support: the old upright piano could be played during the blackout.", "The sound places him away from the study during much of the death window.", "Nervousness is not guilt when independent evidence explains location."],
+      "theo|time-death": ["moderate", "The death window overlaps the piano fragments, reducing rather than raising suspicion if the witnesses are reliable.", "His anxiety has another source.", "Stress behavior is not a lie detector."]
+    };
+
+    const finalAnswer = {
+      suspect: "celia",
+      lie: "celia-greenhouse-call",
+      lieType: "half-truth",
+      strongEvidence: ["phone-record", "spare-key", "mud-print", "recorder", "candle-wax"],
+      supportEvidence: ["iris-perfume", "contract-page", "study-door"],
+      partialEvidence: ["glass-fragments", "red-wine"]
+    };
+
+    const psychologyNotes = [
+      ["Half-truths are harder to detect than full lies.", "Liars often mix real details with a false purpose. Real details lower cognitive load and make the story feel more natural."],
+      ["Nervousness is not a lie detector.", "Innocent people can look anxious under pressure, especially when they fear being misunderstood or have unrelated secrets."],
+      ["Memory conflict is not always deception.", "Stress can distort order, timing, and emphasis. Look for claims that cannot coexist with objective evidence."],
+      ["Strategic evidence use matters.", "Do not reveal all evidence too early. Let a person commit to a version of events, then test it against key evidence."],
+      ["Self-serving bias shapes testimony.", "People often lie to protect pride, identity, relationships, and self-image, not only to avoid punishment."]
+    ];
+
+    const timeline = [
+      ["21:10", "The blackout begins."], ["21:18", "Celia leaves the dining room under the cover of confusion."], ["21:22", "She enters the greenhouse."], ["21:24", "She retrieves the study spare key from beneath the blue flowerpot."], ["21:29", "She enters the study through the greenhouse side door."], ["21:31", "She makes a 9-second phone call to create a traceable half-truth."], ["21:33", "The recorder captures the confrontation."], ["21:35", "Dr. Vale dies during the confrontation."], ["21:37", "Celia breaks or disturbs the glass, pushing suspicion toward Nina."], ["21:39", "She returns through the greenhouse."], ["21:42", "The group begins to reassemble."], ["22:05", "The body is discovered."]
+    ];
+
+    const hints = [
+      "Do not start with who looks most nervous. Start with whose story cannot coexist with physical evidence.",
+      "Check the phone record and the greenhouse route.",
+      "Look for a half-truth. She really was in the greenhouse. The question is why.",
+      "The 9-second call is a trace, not an alibi."
+    ];
+
+    const defaultState = () => ({
+      activeTab: "brief", notes: "", suspectStatuses: {}, markedSuspects: [], expandedSuspects: [], markedEvidence: [], expandedEvidence: [], usedEvidence: [], confrontationAttempts: [], finalSelections: { suspect: "", lie: "", evidence: [], lieType: "", theory: "" }, finalResult: null, hintLevel: 0
+    });
+
+    let state = defaultState();
+
+    function initGame() {
+      loadState();
+      bindChrome();
+      renderSuspects();
+      renderEvidence();
+      renderNotes();
+      renderInterrogation();
+      renderFinalDeduction();
+      renderResult();
+      setActiveTab(state.activeTab || "brief");
+      updateProgress();
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        state = Object.assign(defaultState(), saved || {});
+        state.suspectStatuses = state.suspectStatuses || {};
+        state.finalSelections = Object.assign(defaultState().finalSelections, state.finalSelections || {});
+      } catch (error) {
+        state = defaultState();
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateProgress();
+    }
+
+    function resetCase() {
+      if (!confirm("Reset all notes and case progress?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState();
+      renderSuspects(); renderEvidence(); renderNotes(); renderInterrogation(); renderFinalDeduction(); renderResult(); setActiveTab("brief"); updateProgress();
+    }
+
+    function bindChrome() {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn.dataset.tab)));
+      document.querySelectorAll("[data-jump]").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn.dataset.jump)));
+      document.getElementById("resetTopBtn").addEventListener("click", resetCase);
+      document.getElementById("hintBtn").addEventListener("click", showHint);
+      document.getElementById("saveNotesBtn").addEventListener("click", () => {
+        state.notes = document.getElementById("playerNotes").value;
+        saveState();
+        document.getElementById("saveNoteStatus").textContent = "Saved.";
+        setTimeout(() => document.getElementById("saveNoteStatus").textContent = "", 1400);
+      });
+      document.getElementById("playerNotes").addEventListener("input", event => { state.notes = event.target.value; saveState(); renderNotes(false); });
+      document.getElementById("confrontBtn").addEventListener("click", confrontSuspect);
+      document.getElementById("deductionForm").addEventListener("submit", submitDeduction);
+      document.getElementById("evidenceFilter").addEventListener("change", renderEvidence);
+    }
+
+    function setActiveTab(tab) {
+      state.activeTab = tab;
+      document.querySelectorAll(".section").forEach(section => section.classList.toggle("active", section.id === tab));
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+      const names = { brief: "Case brief", suspects: "Suspect review", evidence: "Evidence board", notes: "Detective notes", interrogation: "Interrogation", deduction: "Final deduction", result: "Result" };
+      document.getElementById("stageLabel").textContent = "Current stage: " + (names[tab] || "Case brief");
+      saveState();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderSuspects() {
+      const grid = document.getElementById("suspectGrid");
+      grid.innerHTML = suspects.map(s => {
+        const marked = state.markedSuspects.includes(s.id);
+        const expanded = state.expandedSuspects.includes(s.id);
+        const status = state.suspectStatuses[s.id] || "Unclear";
+        return `<article class="suspect-card ${marked ? "marked" : ""}" data-suspect-card="${s.id}">
+          <div class="card-top"><div><span class="tag">${s.surface}</span><h3>${s.name}</h3></div><span class="tag">${marked ? "Marked" : "Open"}</span></div>
+          <p class="muted"><strong>Role:</strong> ${s.role}</p><p class="muted"><strong>Relationship:</strong> ${s.relationship}</p>
+          <div class="testimony">“${s.testimony}”</div>
+          <p><strong class="gold">Psychology profile:</strong> <span class="muted">${s.psychology}</span></p>
+          <p><strong class="gold">Motive:</strong> <span class="muted">${s.motive}</span></p>
+          <div class="controls-row">
+            <label for="status-${s.id}">Status</label><select class="status-select" id="status-${s.id}" data-status="${s.id}"><option${status === "Trustworthy" ? " selected" : ""}>Trustworthy</option><option${status === "Suspicious" ? " selected" : ""}>Suspicious</option><option${status === "Lying" ? " selected" : ""}>Lying</option><option${status === "Unclear" ? " selected" : ""}>Unclear</option></select>
+            <button class="btn subtle" type="button" data-mark-suspect="${s.id}">${marked ? "Unmark suspicious" : "Mark suspicious"}</button>
+            <button class="btn subtle" type="button" data-toggle-suspect="${s.id}" aria-expanded="${expanded}">${expanded ? "Hide full testimony" : "Expand full testimony"}</button>
+          </div>
+          <div class="details ${expanded ? "open" : ""}" id="details-${s.id}"><p class="muted">${s.full}</p></div>
+        </article>`;
+      }).join("");
+      grid.querySelectorAll("[data-status]").forEach(el => el.addEventListener("change", e => setSuspectStatus(e.target.dataset.status, e.target.value)));
+      grid.querySelectorAll("[data-mark-suspect]").forEach(btn => btn.addEventListener("click", () => toggleSuspectMark(btn.dataset.markSuspect)));
+      grid.querySelectorAll("[data-toggle-suspect]").forEach(btn => btn.addEventListener("click", () => toggleSuspect(btn.dataset.toggleSuspect)));
+      grid.querySelectorAll("[data-suspect-card]").forEach(card => card.addEventListener("click", event => {
+        if (event.target.closest("button, select, label, input, a")) return;
+        toggleSuspect(card.dataset.suspectCard);
+      }));
+      renderNotes(false); updateProgress();
+    }
+
+    function toggleSuspect(id) {
+      toggleArray(state.expandedSuspects, id);
+      saveState(); renderSuspects();
+    }
+
+    function toggleSuspectMark(id) {
+      toggleArray(state.markedSuspects, id);
+      saveState(); renderSuspects();
+    }
+
+    function setSuspectStatus(id, status) {
+      state.suspectStatuses[id] = status;
+      saveState(); renderNotes(false);
+    }
+
+    function renderEvidence() {
+      const filter = document.getElementById("evidenceFilter");
+      const tags = ["All", ...Array.from(new Set(evidence.map(e => e.tag)))];
+      if (!filter.options.length) filter.innerHTML = tags.map(tag => `<option>${tag}</option>`).join("");
+      const active = filter.value || "All";
+      const list = active === "All" ? evidence : evidence.filter(e => e.tag === active);
+      document.getElementById("evidenceGrid").innerHTML = list.map(item => {
+        const important = state.markedEvidence.includes(item.id);
+        const expanded = state.expandedEvidence.includes(item.id);
+        const used = state.usedEvidence.includes(item.id);
+        return `<article class="evidence-card ${important ? "important" : ""} ${used ? "used" : ""}" data-evidence-card="${item.id}">
+          <div class="card-top"><div><span class="tag">${item.letter} · ${item.tag}</span><h3>${important ? "📌 " : ""}${item.title}</h3></div><span class="tag">${used ? "Used" : "Case note"}</span></div>
+          <p class="muted">${item.summary}</p>
+          <div class="controls-row"><button class="btn subtle" type="button" data-toggle-evidence="${item.id}" aria-expanded="${expanded}">${expanded ? "Collapse detail" : "Expand detail"}</button><button class="btn subtle" type="button" data-mark-evidence="${item.id}">${important ? "Unmark important" : "Mark important"}</button></div>
+          <div class="details ${expanded ? "open" : ""}"><p>${item.detail}</p><p><strong class="gold">Relevance:</strong> <span class="muted">${item.relevance}</span></p>${item.psychology ? `<p><strong class="gold">Psychology note:</strong> <span class="muted">${item.psychology}</span></p>` : ""}</div>
+        </article>`;
+      }).join("");
+      document.querySelectorAll("[data-toggle-evidence]").forEach(btn => btn.addEventListener("click", () => toggleEvidence(btn.dataset.toggleEvidence)));
+      document.querySelectorAll("[data-mark-evidence]").forEach(btn => btn.addEventListener("click", () => markEvidence(btn.dataset.markEvidence)));
+      document.querySelectorAll("[data-evidence-card]").forEach(card => card.addEventListener("click", event => {
+        if (event.target.closest("button, select, label, input, a")) return;
+        toggleEvidence(card.dataset.evidenceCard);
+      }));
+      renderInterrogation(); renderNotes(false); updateProgress();
+    }
+
+    function toggleEvidence(id) {
+      toggleArray(state.expandedEvidence, id);
+      saveState(); renderEvidence();
+    }
+
+    function markEvidence(id) {
+      toggleArray(state.markedEvidence, id);
+      saveState(); renderEvidence();
+    }
+
+    function renderNotes(updateTextarea = true) {
+      if (updateTextarea) document.getElementById("playerNotes").value = state.notes || "";
+      const statusSummary = suspects.map(s => `<p><strong>${s.name}:</strong> ${state.suspectStatuses[s.id] || "Unclear"}${state.markedSuspects.includes(s.id) ? " · marked suspicious" : ""}</p>`).join("");
+      const important = evidence.filter(e => state.markedEvidence.includes(e.id));
+      document.getElementById("statusSummary").innerHTML = statusSummary;
+      document.getElementById("importantEvidenceList").innerHTML = important.length ? important.map(e => `<p>📌 <strong>${e.title}</strong> — ${e.summary}</p>`).join("") : "<p>No evidence marked important yet.</p>";
+      document.getElementById("contradictionChecklist").innerHTML = ["Does the story coexist with the phone record?", "Can the suspect reach the study during 21:25–21:40?", "Is this a central lie or a side lie?", "Does the evidence show route + motive + contradiction?", "Am I punishing nervousness instead of testing facts?"].map(text => `<li>${text}</li>`).join("");
+    }
+
+    function renderInterrogation() {
+      document.getElementById("interrogateSuspect").innerHTML = suspects.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+      document.getElementById("interrogateEvidence").innerHTML = evidence.map(e => `<option value="${e.id}">${e.title}</option>`).join("");
+    }
+
+    function confrontSuspect() {
+      const suspectId = document.getElementById("interrogateSuspect").value;
+      const evidenceId = document.getElementById("interrogateEvidence").value;
+      const key = `${suspectId}|${evidenceId}`;
+      const suspect = suspects.find(s => s.id === suspectId);
+      const item = evidence.find(e => e.id === evidenceId);
+      const preset = confrontations[key] || ["weak", `${suspect.name} gives no meaningful new ground when confronted with ${item.title}.`, "This pairing does not pressure the central claim.", "A weak confrontation can still teach you which evidence belongs elsewhere."];
+      const attempt = { suspectId, evidenceId, pressure: preset[0], at: Date.now() };
+      state.confrontationAttempts.push(attempt);
+      if (!state.usedEvidence.includes(evidenceId)) state.usedEvidence.push(evidenceId);
+      saveState(); renderEvidence();
+      const box = document.getElementById("confrontationResponse");
+      box.className = `response-box pressure-${preset[0]}`;
+      box.innerHTML = `<span class="tag">Pressure: ${preset[0]}</span><h3>${suspect.name} × ${item.title}</h3><p>${preset[1]}</p><p><strong class="gold">Detective note:</strong> ${preset[2]}</p><p><strong class="gold">Psychology note:</strong> ${preset[3]}</p>`;
+      setActiveTab("interrogation");
+    }
+
+    function renderFinalDeduction() {
+      const lieOptions = suspects.map(s => ({ id: s.id === "celia" ? "celia-greenhouse-call" : `${s.id}-statement`, text: `${s.name}: “${s.testimony}”` }));
+      const selectedEvidence = state.finalSelections.evidence || [];
+      document.getElementById("deductionFields").innerHTML = `
+        <div class="paper-card"><h3>A. Who lied about the crucial time period?</h3><div class="option-list">${suspects.map(s => radioRow("suspect", s.id, s.name, state.finalSelections.suspect)).join("")}</div></div>
+        <div class="paper-card"><h3>B. Which testimony was the crucial lie?</h3><div class="option-list">${lieOptions.map(o => radioRow("lie", o.id, o.text, state.finalSelections.lie)).join("")}</div></div>
+        <div class="paper-card"><h3>C. Select two or three strongest evidence items.</h3><div class="option-list">${evidence.map(e => `<label class="option-row"><input type="checkbox" name="evidence" value="${e.id}" ${selectedEvidence.includes(e.id) ? "checked" : ""}> <span><strong>${e.title}</strong><br><span class="muted">${e.summary}</span></span></label>`).join("")}</div></div>
+        <div class="paper-card"><h3>D. What type of lie was it?</h3><div class="option-list">${[["fabrication","Complete fabrication"],["half-truth","Half-truth and selective omission"],["false-memory","False memory"],["exaggeration","Emotional exaggeration"]].map(o => radioRow("lieType", o[0], o[1], state.finalSelections.lieType)).join("")}</div></div>
+        <div class="paper-card"><h3>E. Optional typed deduction</h3><label for="theoryText">Write your theory in your own words.</label><textarea id="theoryText" name="theory">${escapeHtml(state.finalSelections.theory || "")}</textarea></div>`;
+      document.querySelectorAll("#deductionFields input, #theoryText").forEach(input => input.addEventListener("input", saveFinalSelections));
+      document.querySelectorAll("#deductionFields input[type=radio], #deductionFields input[type=checkbox]").forEach(input => input.addEventListener("change", saveFinalSelections));
+    }
+
+    function radioRow(name, value, label, current) {
+      return `<label class="option-row"><input type="radio" name="${name}" value="${value}" ${current === value ? "checked" : ""}> <span>${label}</span></label>`;
+    }
+
+    function saveFinalSelections() {
+      const form = document.getElementById("deductionForm");
+      const data = new FormData(form);
+      state.finalSelections = { suspect: data.get("suspect") || "", lie: data.get("lie") || "", evidence: data.getAll("evidence"), lieType: data.get("lieType") || "", theory: data.get("theory") || "" };
+      saveState();
+    }
+
+    function calculateScore() {
+      saveFinalSelections();
+      const selections = state.finalSelections;
+      return {
+        suspect: selections.suspect === finalAnswer.suspect ? 40 : 0,
+        lie: selections.lie === finalAnswer.lie ? 25 : 0,
+        evidence: getEvidenceComboScore(selections.evidence),
+        psychology: selections.lieType === finalAnswer.lieType ? 10 : 0
+      };
+    }
+
+    function getEvidenceComboScore(selected) {
+      const set = new Set(selected);
+      if (set.has("phone-record") && set.has("spare-key") && set.has("recorder")) return 25;
+      if (set.has("phone-record") && ["spare-key", "recorder", "mud-print", "candle-wax"].some(id => set.has(id))) return 23;
+      const highCount = finalAnswer.strongEvidence.filter(id => set.has(id)).length;
+      if (highCount >= 3) return 20;
+      if (highCount >= 2) return 17;
+      if (set.has("iris-perfume") && highCount >= 1) return 14;
+      if (set.has("iris-perfume")) return 6;
+      if (finalAnswer.partialEvidence.some(id => set.has(id))) return 8;
+      return highCount ? 10 : 0;
+    }
+
+    function submitDeduction(event) {
+      event.preventDefault();
+      saveFinalSelections();
+      if (!confirm("Are you ready to accuse?")) return;
+      const parts = calculateScore();
+      const total = parts.suspect + parts.lie + parts.evidence + parts.psychology;
+      state.finalResult = { total, parts, selections: Object.assign({}, state.finalSelections), submittedAt: new Date().toISOString(), showReconstruction: false, showNotes: false };
+      saveState(); renderResult(); setActiveTab("result");
+    }
+
+    function renderResult() {
+      const mount = document.getElementById("resultMount");
+      if (!state.finalResult) {
+        mount.innerHTML = `<article class="case-card"><p class="eyebrow">No accusation submitted</p><h2 id="resultTitle">Result</h2><p class="muted">Submit your final deduction to see score, feedback, reconstruction, and psychology notes.</p><button class="btn primary" type="button" data-jump="deduction">Go to final deduction →</button></article>`;
+        mount.querySelector("[data-jump]").addEventListener("click", e => setActiveTab(e.currentTarget.dataset.jump));
+        return;
+      }
+      const result = state.finalResult;
+      const rank = getRank(result.total);
+      const selectedName = (suspects.find(s => s.id === result.selections.suspect) || {}).name || "No suspect selected";
+      mount.innerHTML = `<article class="case-card score-card"><p class="eyebrow">Case result</p><h2 id="resultTitle">${rank}</h2><div class="score-number">${result.total}</div><p class="muted">Score out of 100 · Selected suspect: ${selectedName}</p><div class="controls-row" style="justify-content:center"><button class="btn primary" type="button" id="reconstructionBtn">Show Full Case Reconstruction</button><button class="btn subtle" type="button" id="reviewNotesBtn">Review My Notes</button><button class="btn subtle" type="button" id="resultResetBtn">Reset Case</button><a class="btn subtle" href="index.html">Back to Hub</a></div></article>
+        <article class="paper-card"><h3>Correct / incorrect sections</h3>${scoreLine("Correct suspect", result.parts.suspect, 40)}${scoreLine("Crucial lie", result.parts.lie, 25)}${scoreLine("Evidence combo", result.parts.evidence, 25)}${scoreLine("Psychology classification", result.parts.psychology, 10)}</article>
+        <article class="paper-card"><h3>Suspect feedback</h3><p class="muted">${getSuspectFeedback(result.selections.suspect)}</p></article>
+        <article class="paper-card"><h3>Evidence feedback</h3><p class="muted">${getEvidenceFeedback(result.selections.evidence || [])}</p></article>
+        <article class="paper-card"><h3>Psychological lesson</h3><p class="muted">The central lie was a half-truth and selective omission: Celia really was in the greenhouse and really made a call, but the 9-second call was cover for retrieving the spare key and entering the study.</p></article>
+        <article class="case-card ${result.showReconstruction ? "" : "hidden"}" id="reconstructionPanel"><h3>Full Case Reconstruction</h3><ul class="timeline">${timeline.map(t => `<li><time>${t[0]}</time><span>${t[1]}</span></li>`).join("")}</ul></article>
+        <article class="case-card ${result.showNotes ? "" : "hidden"}" id="reviewNotesPanel"><h3>Your notes</h3><p class="muted">${escapeHtml(state.notes || "No notes saved.").replace(/\n/g, "<br>")}</p></article>
+        <div class="grid three">${psychologyNotes.map(n => `<article class="sticky-note"><h3>${n[0]}</h3><p>${n[1]}</p></article>`).join("")}</div>`;
+      document.getElementById("reconstructionBtn").addEventListener("click", showReconstruction);
+      document.getElementById("reviewNotesBtn").addEventListener("click", () => { state.finalResult.showNotes = !state.finalResult.showNotes; saveState(); renderResult(); });
+      document.getElementById("resultResetBtn").addEventListener("click", resetCase);
+    }
+
+    function scoreLine(label, points, max) {
+      const cls = points === max ? "success" : points > 0 ? "gold" : "danger";
+      return `<p><strong class="${cls}">${label}:</strong> ${points}/${max}</p>`;
+    }
+
+    function getRank(score) {
+      if (score >= 90) return "Master of Half-Truths";
+      if (score >= 75) return "Sharp Investigator";
+      if (score >= 55) return "Careful but Misdirected";
+      if (score >= 30) return "Pattern Chaser";
+      return "Misled by the Loudest Suspect";
+    }
+
+    function getSuspectFeedback(id) {
+      const feedback = {
+        julian: "You may have been pulled toward the most emotional suspect. Anger, sarcasm, and defensiveness are not proof of deception. Compare his claim with the wine cellar evidence.",
+        nina: "You found a real lie, but not the central one. Nina’s red wine story is false, yet it does not explain the phone record, greenhouse route, or recorder.",
+        mara: "Mara is manipulative and withholding, but the evidence chain does not put her inside the study. Her lie is observational and ego-driven, not the central action.",
+        tomas: "His silence is a protective omission, not the main action lie. He may have delayed the truth, but the physical route points elsewhere.",
+        theo: "Theo’s nervousness is highly visible, but visible anxiety is not guilt. The piano evidence actually helps explain where he was.",
+        celia: "You identified the central half-truth. The strongest part of her lie is that it contains real details: the greenhouse and the phone call."
+      };
+      return feedback[id] || "No suspect was selected, so the accusation had no central theory.";
+    }
+
+    function getEvidenceFeedback(selected) {
+      const set = new Set(selected);
+      if (set.has("phone-record") && set.has("spare-key") && set.has("recorder")) return "Excellent chain: the phone record breaks the stated purpose, the spare key explains access, and the recorder places a confrontation in the study.";
+      if (set.has("phone-record") && ["spare-key", "mud-print", "recorder", "candle-wax"].some(id => set.has(id))) return "Strong chain. You paired the 9-second call with route or confrontation evidence, which is the fairest way to expose Celia’s half-truth.";
+      if (set.has("iris-perfume") && selected.length === 1) return "Iris perfume is only supporting evidence. Because both Nina and Celia use iris scents, it cannot carry the accusation alone.";
+      if (["red-wine", "glass-fragments"].some(id => set.has(id))) return "You found evidence of another lie around Nina. That matters, but it does not explain Celia’s phone record, the spare key route, or the recorder.";
+      return "The strongest evidence chain begins with the phone record and then adds route evidence such as the spare key, mud print, candle wax, or the recorder.";
+    }
+
+    function showReconstruction() {
+      state.finalResult.showReconstruction = !state.finalResult.showReconstruction;
+      saveState(); renderResult();
+    }
+
+    function showHint() {
+      const index = Math.min(state.hintLevel, hints.length - 1);
+      alert(`Hint ${index + 1}: ${hints[index]}`);
+      if (state.hintLevel < hints.length) state.hintLevel += 1;
+      saveState();
+    }
+
+    function updateProgress() {
+      const evidenceReviewed = state.expandedEvidence.length;
+      const suspectsReviewed = state.expandedSuspects.length;
+      const confrontationsTried = state.confrontationAttempts.length;
+      const evidenceMarked = state.markedEvidence.length;
+      const finalDone = state.finalResult ? 1 : 0;
+      const percent = Math.min(100, Math.round(((evidenceReviewed / evidence.length) * 36) + ((suspectsReviewed / suspects.length) * 24) + Math.min(confrontationsTried, 6) * 4 + Math.min(evidenceMarked, 6) * 2 + finalDone * 14));
+      document.getElementById("progressText").textContent = percent + "%";
+      document.getElementById("progressBar").style.width = percent + "%";
+      document.getElementById("reviewStats").textContent = `Evidence reviewed: ${evidenceReviewed}/${evidence.length} · Suspects reviewed: ${suspectsReviewed}/${suspects.length} · Confrontations tried: ${confrontationsTried}`;
+      const focus = percent < 25 ? "Start with the timeline." : percent < 50 ? "Compare testimony with physical evidence." : percent < 78 ? "Try confronting a suspect with evidence." : "Submit your final deduction.";
+      document.getElementById("focusLine").textContent = "Current focus: " + focus;
+    }
+
+    function toggleArray(array, value) {
+      const index = array.indexOf(value);
+      if (index >= 0) array.splice(index, 1); else array.push(value);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+    }
+
+    document.addEventListener("DOMContentLoaded", initGame);
+  </script>
+</body>
+</html>
