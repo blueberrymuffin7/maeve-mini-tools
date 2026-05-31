@@ -173,6 +173,36 @@
       justify-content: flex-end;
       gap: 10px;
       margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .language-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-height: 46px;
+      padding: 4px;
+      border: 1px solid rgba(232,214,173,0.24);
+      border-radius: 999px;
+      background: rgba(232,214,173,0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .language-toggle button {
+      min-height: 38px;
+      min-width: 76px;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--cold);
+      background: transparent;
+      font-weight: 800;
+      touch-action: manipulation;
+    }
+
+    .language-toggle button.active {
+      color: #16110b;
+      background: linear-gradient(180deg, rgba(201,162,77,0.95), rgba(130,92,32,0.96));
     }
 
     .btn {
@@ -544,6 +574,10 @@
         <div class="progress-label"><span>Progress</span><span id="progressText">0%</span></div>
         <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
         <div class="header-actions">
+          <div class="language-toggle" role="group" aria-label="Language selector">
+            <button type="button" data-language="en" class="active">English</button>
+            <button type="button" data-language="zh">中文</button>
+          </div>
           <button class="btn subtle" type="button" id="hintBtn">Hint</button>
           <button class="btn subtle" type="button" id="resetTopBtn">Reset Case</button>
         </div>
@@ -770,23 +804,176 @@
       "The 9-second call is a trace, not an alibi."
     ];
 
+
+
+    const translations = {
+      en: {
+        title: "Detective Notes: The Dinner Where Everyone Lied", eyebrow: "Case No. DV-2110 · Detective Notes", progress: "Progress", hint: "Hint", reset: "Reset Case", langLabel: "Language selector",
+        tabs: { brief: "Case Brief", suspects: "Suspects", evidence: "Evidence Board", notes: "Detective Notes", interrogation: "Interrogation", deduction: "Final Deduction", result: "Result" },
+        stagePrefix: "Current stage: ", focusPrefix: "Current focus: ", reviewed: (e, et, s, st, c) => `Evidence reviewed: ${e}/${et} · Suspects reviewed: ${s}/${st} · Confrontations tried: ${c}`,
+        focus: ["Start with the timeline.", "Compare testimony with physical evidence.", "Try confronting a suspect with evidence.", "Submit your final deduction."],
+        brief: {
+          eyebrow: "The Dinner Where Everyone Lied", title: "Vale House. A storm. A study door. One half-truth too polished.",
+          lead: "At 22:05, Dr. Elias Vale is found dead in his private study, beyond a glass greenhouse slick with rain. The power failed between 21:10 and 21:40. Six guests give six imperfect stories. Your task is not to read faces. Your task is to make the evidence speak.",
+          learning: "<strong>Learning note:</strong> This is a fictional learning game, not a forensic lie-detection tool. The best deductions come from evidence, contradictions, motive, and timeline.",
+          prompts: ["A suspect can lie without being the killer.", "A clue can reveal a lie without revealing the central lie.", "The strongest accusation needs route + motive + contradiction."],
+          open: "Open suspect files →", files: [["Setting", "Vale House, an old estate where a glass greenhouse connects to Dr. Elias Vale’s private study."], ["Victim", "Dr. Elias Vale, 58. Psychology professor and author of the rumored manuscript <em>The Honest Lie</em>."], ["Timeline", "Blackout begins at 21:10. Estimated death is 21:25–21:40. Body discovered at 22:05."], ["Main question", "Who lied about the crucial time period, what exactly was the lie, and why did they lie?"]],
+          warningTitle: "Psychology warning", warning: "Do not rely on nervousness, eye contact, stammering, emotional behavior, or “microexpressions” as proof. Stress and guilt can look similar from the outside. Memory is not a recording. Evidence conflicts matter more than vibes.",
+          methodTitle: "Investigation method", method: "Let each person commit to a story before confronting them with key evidence. Look for selective omission, self-serving bias, and claims that cannot coexist with objective records."
+        },
+        sections: { suspectsEyebrow: "Six imperfect stories", suspectsTitle: "Suspect Cards", studyEvidence: "Study evidence →", suspectsIntro: "Mark suspicion, set a working status, and expand each file for the full testimony. Emotional intensity is not evidence by itself.", evidenceEyebrow: "Pinned board", evidenceTitle: "Evidence Board", useEvidence: "Use evidence →", filter: "Filter by tag", notesEyebrow: "Private notebook", notesTitle: "Detective Notes", notesIntro: "Autosaves to this browser only. Use the checklist to keep the case fair.", playerNotes: "Player notes", notesPlaceholder: "Write your theory in fragments: route, motive, contradiction, omitted fact...", saveNotes: "Save notes", checklist: "Contradiction checklist", statusSummary: "Suspect status summary", importantEvidence: "Important evidence", interrogationEyebrow: "Strategic evidence use", interrogationTitle: "Interrogation Mode", interrogationIntro: "Choose a suspect, choose one evidence card, then confront. Preset responses teach how a clue pressures a claim without pretending to read minds.", suspect: "Suspect", evidence: "Evidence", confront: "Confront", deductionEyebrow: "Final accusation", deductionTitle: "Final Deduction", deductionIntro: "The case should not require guessing. A strong answer explains route, motive, contradiction, and the type of lie.", submit: "Submit final deduction", reviewNotesFirst: "Review notes first" },
+        labels: { role: "Role:", relationship: "Relationship:", psychologyProfile: "Psychology profile:", motive: "Motive:", status: "Status", marked: "Marked", open: "Open", markSuspicious: "Mark suspicious", unmarkSuspicious: "Unmark suspicious", hideTestimony: "Hide full testimony", expandTestimony: "Expand full testimony", used: "Used", caseNote: "Case note", collapseDetail: "Collapse detail", expandDetail: "Expand detail", markImportant: "Mark important", unmarkImportant: "Unmark important", relevance: "Relevance:", psychologyNote: "Psychology note:", detectiveNote: "Detective note:", pressure: "Pressure:", saved: "Saved." },
+        statuses: { Trustworthy: "Trustworthy", Suspicious: "Suspicious", Lying: "Lying", Unclear: "Unclear" }, all: "All", noneImportant: "<p>No evidence marked important yet.</p>", markedSuspicious: " · marked suspicious",
+        checklist: ["Does the story coexist with the phone record?", "Can the suspect reach the study during 21:25–21:40?", "Is this a central lie or a side lie?", "Does the evidence show route + motive + contradiction?", "Am I punishing nervousness instead of testing facts?"],
+        deduction: { a: "A. Who lied about the crucial time period?", b: "B. Which testimony was the crucial lie?", c: "C. Select two or three strongest evidence items.", d: "D. What type of lie was it?", e: "E. Optional typed deduction", theory: "Write your theory in your own words.", lieTypes: [["fabrication","Complete fabrication"],["half-truth","Half-truth and selective omission"],["false-memory","False memory"],["exaggeration","Emotional exaggeration"]] },
+        result: { noneEye: "No accusation submitted", title: "Result", none: "Submit your final deduction to see score, feedback, reconstruction, and psychology notes.", go: "Go to final deduction →", eye: "Case result", score: (name) => `Score out of 100 · Selected suspect: ${name}`, noneSuspect: "No suspect selected", showRecon: "Show Full Case Reconstruction", reviewNotes: "Review My Notes", reset: "Reset Case", hub: "Back to Hub", sections: "Correct / incorrect sections", suspectScore: "Correct suspect", lieScore: "Crucial lie", evidenceScore: "Evidence combo", psychScore: "Psychology classification", suspectFeedback: "Suspect feedback", evidenceFeedback: "Evidence feedback", lessonTitle: "Psychological lesson", lesson: "The central lie was a half-truth and selective omission: Celia really was in the greenhouse and really made a call, but the 9-second call was cover for retrieving the spare key and entering the study.", reconstruction: "Full Case Reconstruction", yourNotes: "Your notes", noNotes: "No notes saved." },
+        confirmReset: "Reset all notes and case progress?", confirmAccuse: "Are you ready to accuse?", hintPrefix: "Hint"
+      },
+      zh: {
+        title: "侦探笔记：人人说谎的晚宴", eyebrow: "案件编号 DV-2110 · 侦探笔记", progress: "进度", hint: "提示", reset: "重置案件", langLabel: "语言选择",
+        tabs: { brief: "案件简报", suspects: "嫌疑人", evidence: "证据板", notes: "侦探笔记", interrogation: "讯问", deduction: "最终推理", result: "结果" },
+        stagePrefix: "当前阶段：", focusPrefix: "当前重点：", reviewed: (e, et, s, st, c) => `已查看证据：${e}/${et} · 已查看嫌疑人：${s}/${st} · 已尝试质询：${c}`,
+        focus: ["先从时间线开始。", "把证词与物证逐项对照。", "用证据质询一名嫌疑人。", "提交你的最终推理。"],
+        brief: { eyebrow: "人人说谎的晚宴", title: "Vale House。暴雨。书房门。一个过分光滑的半真相。", lead: "暴雨封住了 Vale House。21:10 至 21:40 之间，老宅短暂停电。22:05，心理学教授兼畅销书作者 Dr. Elias Vale 被发现死在书房。六位宾客给出六段不完整的证词。你的任务不是读脸，而是让证据说话。", learning: "<strong>学习提示：</strong>这是一个虚构推理学习游戏，不是法医学测谎工具。可靠的推理来自证据、矛盾、动机和时间线。", prompts: ["嫌疑人说谎，不等于就是凶手。", "线索可以揭穿一个谎，却未必揭开核心谎言。", "最有力的指控需要路线、动机与矛盾。"], open: "打开嫌疑人档案 →", files: [["地点", "Vale House，一座老宅；玻璃温室连接着 Dr. Elias Vale 的私人书房。"], ["死者", "Dr. Elias Vale，58 岁。心理学教授，传闻中手稿 <em>The Honest Lie</em> 的作者。"], ["时间线", "21:10 停电开始。推定死亡时间为 21:25–21:40。22:05 尸体被发现。"], ["核心问题", "谁在关键时间段说了谎？谎言具体是什么？他们为什么要说谎？"]], warningTitle: "心理学警告", warning: "不要把紧张、眼神、结巴、情绪化或所谓“微表情”当成证据。压力和内疚在外表上可能很像。记忆不是录像。证据冲突比感觉更重要。", methodTitle: "调查方法", method: "先让每个人固定自己的说法，再用关键证据质询。寻找选择性遗漏、自利偏差，以及无法与客观记录共存的陈述。" },
+        sections: { suspectsEyebrow: "六段不完整的证词", suspectsTitle: "嫌疑人卡片", studyEvidence: "查看证据 →", suspectsIntro: "标记怀疑、设置工作状态，并展开档案阅读完整证词。情绪强度本身不是证据。", evidenceEyebrow: "钉在板上的线索", evidenceTitle: "证据板", useEvidence: "使用证据 →", filter: "按标签筛选", notesEyebrow: "私人笔记本", notesTitle: "侦探笔记", notesIntro: "仅自动保存在本浏览器。用清单保持推理公平。", playerNotes: "玩家笔记", notesPlaceholder: "用碎片写下你的理论：路线、动机、矛盾、被省略的事实……", saveNotes: "保存笔记", checklist: "矛盾检查清单", statusSummary: "嫌疑人状态摘要", importantEvidence: "重要证据", interrogationEyebrow: "策略性使用证据", interrogationTitle: "讯问模式", interrogationIntro: "选择一名嫌疑人和一张证据卡，然后质询。预设回应会展示线索如何压迫说法，而不是假装读心。", suspect: "嫌疑人", evidence: "证据", confront: "质询", deductionEyebrow: "最终指控", deductionTitle: "最终推理", deductionIntro: "这个案件不该靠猜。强有力的答案要解释路线、动机、矛盾和谎言类型。", submit: "提交最终推理", reviewNotesFirst: "先查看笔记" },
+        labels: { role: "身份：", relationship: "关系：", psychologyProfile: "心理观察：", motive: "动机：", status: "状态", marked: "已标记", open: "待判断", markSuspicious: "标记为可疑", unmarkSuspicious: "取消可疑标记", hideTestimony: "收起完整证词", expandTestimony: "展开完整证词", used: "已使用", caseNote: "案件记录", collapseDetail: "收起细节", expandDetail: "展开细节", markImportant: "标记重要", unmarkImportant: "取消重要标记", relevance: "关联：", psychologyNote: "心理学提示：", detectiveNote: "侦探备注：", pressure: "压力：", saved: "已保存。" },
+        statuses: { Trustworthy: "可信", Suspicious: "可疑", Lying: "说谎", Unclear: "不明" }, all: "全部", noneImportant: "<p>尚未标记重要证据。</p>", markedSuspicious: " · 已标记可疑",
+        checklist: ["这段说法能与电话记录共存吗？", "嫌疑人能否在 21:25–21:40 到达书房？", "这是核心谎言，还是旁支谎言？", "证据是否同时显示路线、动机与矛盾？", "我是否在惩罚紧张，而不是检验事实？"],
+        deduction: { a: "A. 谁在关键时间段说了谎？", b: "B. 哪段证词是关键谎言？", c: "C. 选择两到三项最强证据。", d: "D. 这是什么类型的谎言？", e: "E. 可选：写下你的推理", theory: "用你自己的话写出理论。", lieTypes: [["fabrication","完全捏造"],["half-truth","半真相与选择性遗漏"],["false-memory","错误记忆"],["exaggeration","情绪性夸大"]] },
+        result: { noneEye: "尚未提交指控", title: "结果", none: "提交最终推理后，可查看分数、反馈、案件重建和心理学笔记。", go: "前往最终推理 →", eye: "案件结果", score: (name) => `总分 100 · 选择的嫌疑人：${name}`, noneSuspect: "未选择嫌疑人", showRecon: "显示完整案件重建", reviewNotes: "查看我的笔记", reset: "重置案件", hub: "返回中心", sections: "正确 / 错误部分", suspectScore: "正确嫌疑人", lieScore: "关键谎言", evidenceScore: "证据组合", psychScore: "心理分类", suspectFeedback: "嫌疑人反馈", evidenceFeedback: "证据反馈", lessonTitle: "心理学结论", lesson: "核心谎言是半真相与选择性遗漏：Celia 确实在温室，也确实打过电话，但 9 秒通话只是掩护，她真正做的是取备用钥匙并进入书房。", reconstruction: "完整案件重建", yourNotes: "你的笔记", noNotes: "尚未保存笔记。" },
+        confirmReset: "要重置所有笔记和案件进度吗？", confirmAccuse: "你准备好提出指控了吗？", hintPrefix: "提示"
+      }
+    };
+
+    const suspectZh = {
+      mara: { role: "死者的前研究助理，现为行为分析顾问", surface: "冷静、专业、克制", relationship: "曾与 Dr. Vale 共同发表研究，后来因数据伦理问题决裂。", testimony: "21:10 停电后，我一直在餐厅帮大家找蜡烛，直到 21:42 左右才离开。", psychology: "她很懂得如何表现得可信，也会用专业词汇包装自己的行为。", motive: "数据伦理决裂后的职业怨恨与自尊受损。", full: "Mara 说她接管局面，是因为恐慌会让记忆变得不可靠。她描述自己分发蜡烛、观察众人反应。她的叙述精确、技术化，并且异常关注每个人在压力下的表现。" },
+      julian: { role: "Dr. Vale 的儿子，失意剧作家", surface: "讽刺、情绪外露、防御性强", relationship: "经济上依赖父亲。晚餐前曾与父亲激烈争吵。", testimony: "21:20 到 21:45，我在酒窖里。我不想再吵一次。", psychology: "他看起来可疑，是因为情绪全写在脸上；但情绪反应不等于欺骗。", motive: "继承压力、羞辱感，以及害怕被断绝资助。", full: "Julian 承认晚餐前吼过父亲，随后坚持说自己退到酒窖。他省略了门可能从外面被堵住，因为被困在父亲的房子里让他觉得幼稚又羞耻。" },
+      celia: { role: "Dr. Vale 的出版编辑", surface: "优雅、圆滑、社交控制力强", relationship: "了解新书内容，并担心法律与职业后果。", testimony: "21:30 左右，我在温室里给出版社打电话，讨论推迟出书。", psychology: "她擅长打磨半真相，也擅长用职业语言框住叙事。", motive: "新书中有一章可能伤害出版社、引发法律风险，并终结她的职业生涯。", full: "Celia 记得温室、玻璃上的雨声，以及打给出版社的电话。这些细节都是真的。问题在于，它们是在解释她为什么在那里，还是在装饰一个被省略的动作。" },
+      tomas: { role: "Dr. Vale 的童年朋友，现为神父", surface: "温和、安静、背负道德压力", relationship: "Dr. Vale 准备写出他年轻时的一个秘密。", testimony: "停电期间，我一直在起居室祈祷。后来我听见玻璃碎裂。", psychology: "他可能隐瞒信息是为了保护别人，而不一定是保护自己。", motive: "保护旧秘密，也可能保护他怜悯的人。", full: "Father Tomas 说，沉默是因为他害怕在黑暗中贸然指控别人。他听见玻璃声，犹豫了，后来又怀疑 Nina 是否牵涉其中。他的遗漏带有保护性，不一定是自我保护。" },
+      nina: { role: "Dr. Vale 现在的妻子", surface: "敏感、悲伤、防御", relationship: "婚姻已经破裂，但她不愿让外界知道。", testimony: "21:15 后，我上楼换衣服，因为红酒洒在了裙子上。大约 21:50 我回到楼下。", psychology: "她的悲伤是真的，但真实悲伤不等于完全诚实。", motive: "破裂的婚姻、公众形象，以及她想隐藏的一场私下争吵。", full: "谈到 Elias 时，Nina 会哭；但她关于裙子的时间线有排练过的痕迹。她谎称红酒洒出的时间，是为了掩盖更早的一场争执，而不是为死亡本身制造不在场证明。" },
+      theo: { role: "晚宴钢琴师，曾受 Dr. Vale 资助", surface: "安静、讨好、明显焦虑", relationship: "Dr. Vale 知道 Theo 伪造过部分学术背景。", testimony: "停电后，我一直待在音乐室的钢琴旁，没有离开。", psychology: "他的紧张很明显，但可能来自对权威和曝光的恐惧，而不是死亡罪责。", motive: "害怕 Dr. Vale 揭穿他伪造的学术经历。", full: "Theo 承认自己在旧立式钢琴上断续弹奏，试图让自己冷静。焦虑是真的，但无关秘密也会让无辜者显得害怕。" }
+    };
+
+    const tagZh = { "Timeline": "时间线", "Physical Evidence": "物证", "Testimony Conflict": "证词冲突", "Motive": "动机", "Psychology": "心理学", "Route": "路线", "Audio": "录音", "Behavior": "行为" };
+
+
+    const evidenceZh = {
+      "time-death": { title: "死亡时间", summary: "死亡发生在停电窗口内。", detail: "法医推定死亡时间为 21:25 至 21:40。", relevance: "任何不在场证明都必须经得起这个狭窄时段的检验。", psychology: "客观锚点比情绪印象更安全。" },
+      "study-door": { title: "书房门", summary: "书房没有强行闯入痕迹。", detail: "书房门没有被撬开的痕迹。进入者很可能有钥匙、知道备用钥匙位置，或被死者主动放入。", relevance: "把注意力放在进入路线，而不是人格判断上。", psychology: "路线可以推翻一个自信的故事。" },
+      "glass-fragments": { title: "玻璃碎片", summary: "书桌旁的碎玻璃上有 Nina 的局部指纹。", detail: "书桌旁有一个破碎的玻璃杯。碎片上没有 Dr. Vale 的指纹，却有 Nina 的局部指纹。", relevance: "可疑，但指纹可能早于死亡时间。", psychology: "一个线索可以揭穿谎言，却未必揭示核心谎言。" },
+      "red-wine": { title: "红酒污渍", summary: "Nina 裙子上的酒渍已经干了，不新鲜。", detail: "Nina 的裙子确有红酒污渍，但污渍已经变干，不像 21:15 刚洒上的。", relevance: "说明 Nina 对时间撒了谎。", psychology: "真实的悲伤可以与自我保护式欺骗共存。" },
+      "missing-candles": { title: "失踪的蜡烛", summary: "餐厅少了两支蜡烛。", detail: "餐厅蜡烛盒原有 8 支，事后只找到 6 支。Mara 声称停电时她把所有蜡烛都拿出来了。", relevance: "蜡烛重要，因为温室路线在停电时一片黑暗。", psychology: "专家可以操控印象，却不一定是核心凶手。" },
+      "mud-print": { title: "温室泥印", summary: "小号泥脚印连接温室与书房侧门。", detail: "温室与书房侧门之间的地毯上发现局部泥脚印。鞋码偏小，与 Julian 的鞋不符。", relevance: "支持有人通过温室路线移动。", psychology: "物理路线证据强于情绪化怀疑。" },
+      "phone-record": { title: "电话记录", summary: "Celia 21:31 的通话只持续 9 秒。", detail: "Celia 的手机显示 21:31 有一通电话，但只持续 9 秒，不可能是她所说的长时间出版讨论。", relevance: "直接削弱 Celia 对温室停留目的的解释。", psychology: "半真相常保留真实细节，却伪造目的。" },
+      "piano-sound": { title: "钢琴声", summary: "死亡窗口内有人听见断续钢琴声。", detail: "两名证人在 21:28 至 21:36 间听见断续钢琴声。电钢琴停电时无法使用，但旧立式钢琴可以。", relevance: "如果 Theo 用的是旧立式钢琴，这支持他的位置。", psychology: "明显焦虑必须用独立证据校验。" },
+      "cellar-door": { title: "酒窖门", summary: "酒窖门似乎从外侧被堵住。", detail: "酒窖门看起来曾被一把椅子从外侧卡住。如果 Julian 在里面，他可能是被困，而不是自由躲藏。", relevance: "让 Julian 的羞耻性遗漏变得重要，但不是核心。", psychology: "人们会省略伤害自尊的事实，不只省略证明有罪的事实。" },
+      "desk-note": { title: "书桌便条", summary: "书桌上有一张关于善意谎言的手写便条。", detail: "Dr. Vale 的书桌上有一张手写便条：“最温柔的谎言仍是一座牢笼。”笔迹属于他本人。", relevance: "提示本案围绕保护性与自利性谎言展开。", psychology: "动机可能是身份保护，而不只是犯罪利益。" },
+      "recorder": { title: "录音笔", summary: "书房录音笔记录了 21:33 的争执。", detail: "Dr. Vale 书房内的录音笔在 21:33 录到低声对话：Dr. Vale：“在我说出来之前，先说真话。”未知声音：“你不知道真相要付出什么代价。”", relevance: "把一场争执放进死亡窗口。", psychology: "压力下的话语揭示利害关系，不是神奇的测谎信号。" },
+      "iris-perfume": { title: "鸢尾香水", summary: "书房窗帘上残留鸢尾香气。", detail: "书房窗帘上有淡淡鸢尾香。Celia 和 Nina 都使用鸢尾调香水，但 Nina 的更甜，Celia 的更冷、更粉。", relevance: "能缩小范围，但不能单独定罪。", psychology: "模糊证据需要佐证。" },
+      "spare-key": { title: "备用钥匙", summary: "备用钥匙藏在温室蓝色花盆下。", detail: "书房备用钥匙通常放在温室蓝色花盆下。只有常来 Vale House 的人才可能知道。", relevance: "把进入权限与温室路线连接起来。", psychology: "知识可以形成机会；机会仍需要矛盾与动机。" },
+      "psych-handout": { title: "心理学讲义", summary: "Dr. Vale 的讲义提醒不要迷信精致可信感。", detail: "Dr. Vale 在餐桌上留下讲义：“说谎者常过度控制自己说什么；说真话的人常无法控制自己怎么说。”", relevance: "提醒你不要自动奖励最圆滑的讲述者。", psychology: "基线和证据比表演更重要。" },
+      "candle-wax": { title: "温室蜡迹", summary: "蓝色花盆旁发现蜡迹。", detail: "温室蓝色花盆附近发现一小块蜡迹。", relevance: "支持有人在停电期间借烛光寻找钥匙。", psychology: "细小物理痕迹可以暴露选择性遗漏。" },
+      "contract-page": { title: "出版合同页", summary: "Celia 平板显示出版社面临法律风险。", detail: "Celia 平板上的合同草稿显示，如果新书未经许可刊印某些指控，出版社可能遭遇法律麻烦。", relevance: "给了 Celia 迫使死者修改内容的职业动机。", psychology: "自利偏差常保护职业和身份，不只是保护自由。" }
+    };
+
+    const psychologyNotesZh = [
+      ["半真相比完整谎言更难识别。", "说谎者常把真实细节与虚假目的混在一起。真实细节降低认知负荷，也让故事更自然。"],
+      ["紧张不是测谎仪。", "无辜者在压力下也会显得焦虑，尤其当他们害怕被误解，或背负无关秘密。"],
+      ["记忆冲突不总是欺骗。", "压力会扭曲顺序、时间和重点。寻找那些无法与客观证据共存的陈述。"],
+      ["策略性使用证据很重要。", "不要过早亮出全部证据。先让对方固定版本，再用关键证据测试。"],
+      ["自利偏差会塑造证词。", "人们常为了保护自尊、身份、关系和自我形象而说谎，不只是为了逃避惩罚。"]
+    ];
+
+    const timelineZh = [["21:10", "停电开始。"], ["21:18", "Celia 趁混乱离开餐厅。"], ["21:22", "她进入温室。"], ["21:24", "她从蓝色花盆下取出书房备用钥匙。"], ["21:29", "她经温室侧门进入书房。"], ["21:31", "她拨出 9 秒电话，制造可追踪的半真相。"], ["21:33", "录音笔记录下争执。"], ["21:35", "Dr. Vale 在争执中死亡。"], ["21:37", "Celia 打碎或扰动玻璃，把怀疑推向 Nina。"], ["21:39", "她从温室返回。"], ["21:42", "众人开始重新聚集。"], ["22:05", "尸体被发现。"]];
+
+    const hintsZh = ["不要从谁最紧张开始。先看谁的故事无法与物证共存。", "检查电话记录和温室路线。", "寻找半真相。她确实在温室。问题是为什么在那里。", "9 秒通话是痕迹，不是不在场证明。"];
+
+
+    const confrontationsZh = {
+      "celia|phone-record": ["strong", "Celia 平静的措辞收紧了。9 秒通话不可能承载她描述的出版讨论。", "她的不在场说法包含真实通话，但目的看起来是假的。", "这是选择性遗漏：真实细节，虚假解释。"],
+      "celia|spare-key": ["strong", "温室不再只是背景。它是进入点，而 Celia 熟悉 Vale House，足以知道蓝色花盆的习惯。", "钥匙让她出现在温室这件事变得有意义。", "路线证据比神态更能测试故事结构。"],
+      "celia|mud-print": ["strong", "Celia 说温室只是为了打电话。泥印却显示有人从温室穿到书房。", "她的位置与进入书房的路线重叠。", "地点可以是真的，理由却是假的。"],
+      "celia|recorder": ["strong", "录音笔捕捉到 21:33 的冲突。Celia 的职业利害与“真相的代价”相吻合。", "录音连接了动机、时间和冲突。", "不要过度解读声调；把冲突放回证据链中。"],
+      "celia|iris-perfume": ["moderate", "冷而粉的鸢尾气味与 Celia 相符，但 Nina 也使用鸢尾香水。", "支持性证据，不是结论。", "模糊线索需要佐证。"],
+      "celia|candle-wax": ["strong", "蓝色花盆旁的蜡迹支持有人在停电中安静寻找备用钥匙。", "缺失的蜡烛轨迹指向温室钥匙。", "细小痕迹能揭开被省略的动作。"],
+      "nina|red-wine": ["strong", "Nina 承认裙子的说法并不干净。污渍来自更早，早于停电。", "她为隐藏争吵而谎报时间，不一定是在掩盖死亡。", "找到一个谎，不等于找到核心谎言。"],
+      "nina|glass-fragments": ["moderate", "局部指纹让 Nina 不安，但家用玻璃会在房间间移动，不能证明她在 21:37 打碎它。", "可疑，但不完整。", "语境能阻止确认偏误。"],
+      "nina|iris-perfume": ["weak", "Nina 的鸢尾香更甜，但窗帘气味很模糊，Celia 也使用鸢尾。", "香水不能独自支撑案件。", "模糊感官线索需要克制。"],
+      "julian|cellar-door": ["strong", "Julian 的羞辱感浮现出来：他可能是被外面困住，而不是自由躲藏。", "这支持他的位置，同时解释他的遗漏。", "自我保护式遗漏常保护的是自尊。"],
+      "julian|time-death": ["moderate", "死亡窗口与他的酒窖说法重叠，但在推定有罪前，门的证据很重要。", "这是时间压力，不是定罪。", "时间线缩小问题，却不能单独回答问题。"],
+      "mara|missing-candles": ["strong", "Mara 注意到蜡烛少了，却选择观察反应，而不是立刻说出。", "她的隐瞒源于自我和观察欲。", "专业能力也可能变成印象管理。"],
+      "mara|psych-handout": ["moderate", "Mara 打磨过的可信感不应被高估。她说话像在给其他证人评分。", "可信表演不等于清白。", "不要把圆滑误认为真相。"],
+      "tomas|recorder": ["moderate", "Father Tomas 无法解释录音中的交锋。他显得受困，而不是知情。", "他的沉默可能是保护性遗漏，但没有把他放在路线上。", "道德负担不等于行动证据。"],
+      "tomas|glass-fragments": ["moderate", "碎玻璃支持他可能确实听见了什么，即便他延迟说出。", "他的遗漏拖慢了时间线。", "犹豫可能来自害怕伤害别人。"],
+      "theo|piano-sound": ["strong", "Theo 的说法获得支持：停电时旧立式钢琴仍可演奏。", "声音把他放在远离书房的位置，覆盖了死亡窗口的大部分时间。", "当独立证据解释位置时，紧张不是罪责。"],
+      "theo|time-death": ["moderate", "如果证人可靠，死亡窗口与钢琴片段重叠反而降低嫌疑，而不是增加。", "他的焦虑另有来源。", "压力行为不是测谎仪。"]
+    };
+
     const defaultState = () => ({
-      activeTab: "brief", notes: "", suspectStatuses: {}, markedSuspects: [], expandedSuspects: [], markedEvidence: [], expandedEvidence: [], usedEvidence: [], confrontationAttempts: [], finalSelections: { suspect: "", lie: "", evidence: [], lieType: "", theory: "" }, finalResult: null, hintLevel: 0
+      activeTab: "brief", language: "en", notes: "", suspectStatuses: {}, markedSuspects: [], expandedSuspects: [], markedEvidence: [], expandedEvidence: [], usedEvidence: [], confrontationAttempts: [], currentConfrontation: null, finalSelections: { suspect: "", lie: "", evidence: [], lieType: "", theory: "" }, finalResult: null, hintLevel: 0
     });
 
     let state = defaultState();
 
+
+    function lang() { return state.language === "zh" ? "zh" : "en"; }
+    function ui() { return translations[lang()]; }
+    function tx(value) { return value && typeof value === "object" && (value.en || value.zh) ? (value[lang()] || value.en || value.zh) : value; }
+    function suspectText(s, key) { return lang() === "zh" && suspectZh[s.id] && suspectZh[s.id][key] ? suspectZh[s.id][key] : s[key]; }
+    function evidenceText(item, key) { return lang() === "zh" && evidenceZh[item.id] && evidenceZh[item.id][key] ? evidenceZh[item.id][key] : item[key]; }
+    function tagText(tag) { return lang() === "zh" ? (tagZh[tag] || tag) : tag; }
+    function statusText(status) { return ui().statuses[status] || status; }
+    function activePsychologyNotes() { return lang() === "zh" ? psychologyNotesZh : psychologyNotes; }
+    function activeTimeline() { return lang() === "zh" ? timelineZh : timeline; }
+    function activeHints() { return lang() === "zh" ? hintsZh : hints; }
+
+    function renderLanguage() {
+      document.documentElement.lang = lang() === "zh" ? "zh-CN" : "en";
+      document.title = ui().title;
+      document.querySelectorAll("[data-language]").forEach(btn => btn.classList.toggle("active", btn.dataset.language === lang()));
+      const toggle = document.querySelector(".language-toggle");
+      if (toggle) toggle.setAttribute("aria-label", ui().langLabel);
+    }
+
+    function renderChromeText() {
+      renderLanguage();
+      document.querySelector(".case-header .eyebrow").textContent = ui().eyebrow;
+      document.querySelector(".case-header h1").textContent = ui().title;
+      document.querySelector(".progress-label span:first-child").textContent = ui().progress;
+      document.getElementById("hintBtn").textContent = ui().hint;
+      document.getElementById("resetTopBtn").textContent = ui().reset;
+      document.querySelectorAll(".tab-btn").forEach(btn => { btn.textContent = ui().tabs[btn.dataset.tab]; });
+    }
+
+    function renderStaticSections() {
+      const b = ui().brief;
+      document.querySelector("#brief .case-card .eyebrow").textContent = b.eyebrow;
+      document.getElementById("briefTitle").textContent = b.title;
+      document.querySelector("#brief .lead").textContent = b.lead;
+      document.querySelector("#brief .learning-note").innerHTML = b.learning;
+      document.querySelectorAll("#brief .prompt-strip span").forEach((el, i) => { el.textContent = b.prompts[i]; });
+      document.querySelector("#brief [data-jump='suspects']").textContent = b.open;
+      document.querySelectorAll("#brief .mini-file").forEach((el, i) => { el.querySelector("strong").textContent = b.files[i][0]; el.querySelector("p").innerHTML = b.files[i][1]; });
+      const briefCards = document.querySelectorAll("#brief .grid.two .paper-card");
+      briefCards[0].querySelector("h3").textContent = b.warningTitle; briefCards[0].querySelector("p").textContent = b.warning;
+      briefCards[1].querySelector("h3").textContent = b.methodTitle; briefCards[1].querySelector("p").textContent = b.method;
+      const sec = ui().sections;
+      document.querySelector("#suspects .eyebrow").textContent = sec.suspectsEyebrow; document.getElementById("suspectsTitle").textContent = sec.suspectsTitle; document.querySelector("#suspects [data-jump='evidence']").textContent = sec.studyEvidence; document.querySelector("#suspects .case-card > p.muted").textContent = sec.suspectsIntro;
+      document.querySelector("#evidence .eyebrow").textContent = sec.evidenceEyebrow; document.getElementById("evidenceTitle").textContent = sec.evidenceTitle; document.querySelector("#evidence [data-jump='interrogation']").textContent = sec.useEvidence; document.querySelector("label[for='evidenceFilter']").textContent = sec.filter;
+      document.querySelector("#notes .eyebrow").textContent = sec.notesEyebrow; document.getElementById("notesTitle").textContent = sec.notesTitle; document.querySelector("#notes article.case-card p.muted").textContent = sec.notesIntro; document.querySelector("label[for='playerNotes']").textContent = sec.playerNotes; document.getElementById("playerNotes").placeholder = sec.notesPlaceholder; document.getElementById("saveNotesBtn").textContent = sec.saveNotes;
+      const noteHeads = document.querySelectorAll("#notes aside h3"); noteHeads[0].textContent = sec.checklist; noteHeads[1].textContent = sec.statusSummary; noteHeads[2].textContent = sec.importantEvidence;
+      document.querySelector("#interrogation .eyebrow").textContent = sec.interrogationEyebrow; document.getElementById("interrogationTitle").textContent = sec.interrogationTitle; document.querySelector("#interrogation p.muted").textContent = sec.interrogationIntro; document.querySelector("label[for='interrogateSuspect']").textContent = sec.suspect; document.querySelector("label[for='interrogateEvidence']").textContent = sec.evidence; document.getElementById("confrontBtn").textContent = sec.confront;
+      document.querySelector("#deduction .eyebrow").textContent = sec.deductionEyebrow; document.getElementById("deductionTitle").textContent = sec.deductionTitle; document.querySelector("#deduction p.muted").textContent = sec.deductionIntro; document.querySelector("#deduction button[type='submit']").textContent = sec.submit; document.querySelector("#deduction [data-jump='notes']").textContent = sec.reviewNotesFirst;
+    }
+
+    function rerenderAll() {
+      renderChromeText(); renderStaticSections(); renderSuspects(); renderEvidence(); renderNotes(); renderInterrogation(); renderFinalDeduction(); renderResult(); setActiveTab(state.activeTab || "brief", false); updateProgress();
+    }
+
     function initGame() {
       loadState();
       bindChrome();
-      renderSuspects();
-      renderEvidence();
-      renderNotes();
-      renderInterrogation();
-      renderFinalDeduction();
-      renderResult();
-      setActiveTab(state.activeTab || "brief");
-      updateProgress();
+      rerenderAll();
     }
 
     function loadState() {
@@ -795,6 +982,7 @@
         state = Object.assign(defaultState(), saved || {});
         state.suspectStatuses = state.suspectStatuses || {};
         state.finalSelections = Object.assign(defaultState().finalSelections, state.finalSelections || {});
+        state.language = state.language === "zh" ? "zh" : "en";
       } catch (error) {
         state = defaultState();
       }
@@ -806,10 +994,10 @@
     }
 
     function resetCase() {
-      if (!confirm("Reset all notes and case progress?")) return;
+      if (!confirm(ui().confirmReset)) return;
       localStorage.removeItem(STORAGE_KEY);
       state = defaultState();
-      renderSuspects(); renderEvidence(); renderNotes(); renderInterrogation(); renderFinalDeduction(); renderResult(); setActiveTab("brief"); updateProgress();
+      rerenderAll(); setActiveTab("brief");
     }
 
     function bindChrome() {
@@ -817,10 +1005,11 @@
       document.querySelectorAll("[data-jump]").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn.dataset.jump)));
       document.getElementById("resetTopBtn").addEventListener("click", resetCase);
       document.getElementById("hintBtn").addEventListener("click", showHint);
+      document.querySelectorAll("[data-language]").forEach(btn => btn.addEventListener("click", () => { state.language = btn.dataset.language === "zh" ? "zh" : "en"; saveState(); rerenderAll(); }));
       document.getElementById("saveNotesBtn").addEventListener("click", () => {
         state.notes = document.getElementById("playerNotes").value;
         saveState();
-        document.getElementById("saveNoteStatus").textContent = "Saved.";
+        document.getElementById("saveNoteStatus").textContent = ui().labels.saved;
         setTimeout(() => document.getElementById("saveNoteStatus").textContent = "", 1400);
       });
       document.getElementById("playerNotes").addEventListener("input", event => { state.notes = event.target.value; saveState(); renderNotes(false); });
@@ -829,34 +1018,36 @@
       document.getElementById("evidenceFilter").addEventListener("change", renderEvidence);
     }
 
-    function setActiveTab(tab) {
+    function setActiveTab(tab, scroll = true) {
       state.activeTab = tab;
       document.querySelectorAll(".section").forEach(section => section.classList.toggle("active", section.id === tab));
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
-      const names = { brief: "Case brief", suspects: "Suspect review", evidence: "Evidence board", notes: "Detective notes", interrogation: "Interrogation", deduction: "Final deduction", result: "Result" };
-      document.getElementById("stageLabel").textContent = "Current stage: " + (names[tab] || "Case brief");
+      const names = ui().tabs;
+      document.getElementById("stageLabel").textContent = ui().stagePrefix + (names[tab] || names.brief);
       saveState();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function renderSuspects() {
       const grid = document.getElementById("suspectGrid");
+      const l = ui().labels;
       grid.innerHTML = suspects.map(s => {
         const marked = state.markedSuspects.includes(s.id);
         const expanded = state.expandedSuspects.includes(s.id);
         const status = state.suspectStatuses[s.id] || "Unclear";
+        const statusOptions = ["Trustworthy", "Suspicious", "Lying", "Unclear"].map(option => `<option value="${option}"${status === option ? " selected" : ""}>${statusText(option)}</option>`).join("");
         return `<article class="suspect-card ${marked ? "marked" : ""}" data-suspect-card="${s.id}">
-          <div class="card-top"><div><span class="tag">${s.surface}</span><h3>${s.name}</h3></div><span class="tag">${marked ? "Marked" : "Open"}</span></div>
-          <p class="muted"><strong>Role:</strong> ${s.role}</p><p class="muted"><strong>Relationship:</strong> ${s.relationship}</p>
-          <div class="testimony">“${s.testimony}”</div>
-          <p><strong class="gold">Psychology profile:</strong> <span class="muted">${s.psychology}</span></p>
-          <p><strong class="gold">Motive:</strong> <span class="muted">${s.motive}</span></p>
+          <div class="card-top"><div><span class="tag">${suspectText(s, "surface")}</span><h3>${s.name}</h3></div><span class="tag">${marked ? l.marked : l.open}</span></div>
+          <p class="muted"><strong>${l.role}</strong> ${suspectText(s, "role")}</p><p class="muted"><strong>${l.relationship}</strong> ${suspectText(s, "relationship")}</p>
+          <div class="testimony">“${suspectText(s, "testimony")}”</div>
+          <p><strong class="gold">${l.psychologyProfile}</strong> <span class="muted">${suspectText(s, "psychology")}</span></p>
+          <p><strong class="gold">${l.motive}</strong> <span class="muted">${suspectText(s, "motive")}</span></p>
           <div class="controls-row">
-            <label for="status-${s.id}">Status</label><select class="status-select" id="status-${s.id}" data-status="${s.id}"><option${status === "Trustworthy" ? " selected" : ""}>Trustworthy</option><option${status === "Suspicious" ? " selected" : ""}>Suspicious</option><option${status === "Lying" ? " selected" : ""}>Lying</option><option${status === "Unclear" ? " selected" : ""}>Unclear</option></select>
-            <button class="btn subtle" type="button" data-mark-suspect="${s.id}">${marked ? "Unmark suspicious" : "Mark suspicious"}</button>
-            <button class="btn subtle" type="button" data-toggle-suspect="${s.id}" aria-expanded="${expanded}">${expanded ? "Hide full testimony" : "Expand full testimony"}</button>
+            <label for="status-${s.id}">${l.status}</label><select class="status-select" id="status-${s.id}" data-status="${s.id}">${statusOptions}</select>
+            <button class="btn subtle" type="button" data-mark-suspect="${s.id}">${marked ? l.unmarkSuspicious : l.markSuspicious}</button>
+            <button class="btn subtle" type="button" data-toggle-suspect="${s.id}" aria-expanded="${expanded}">${expanded ? l.hideTestimony : l.expandTestimony}</button>
           </div>
-          <div class="details ${expanded ? "open" : ""}" id="details-${s.id}"><p class="muted">${s.full}</p></div>
+          <div class="details ${expanded ? "open" : ""}" id="details-${s.id}"><p class="muted">${suspectText(s, "full")}</p></div>
         </article>`;
       }).join("");
       grid.querySelectorAll("[data-status]").forEach(el => el.addEventListener("change", e => setSuspectStatus(e.target.dataset.status, e.target.value)));
@@ -886,19 +1077,21 @@
 
     function renderEvidence() {
       const filter = document.getElementById("evidenceFilter");
+      const previous = filter.value || "All";
       const tags = ["All", ...Array.from(new Set(evidence.map(e => e.tag)))];
-      if (!filter.options.length) filter.innerHTML = tags.map(tag => `<option>${tag}</option>`).join("");
+      filter.innerHTML = tags.map(tag => `<option value="${tag}"${previous === tag ? " selected" : ""}>${tag === "All" ? ui().all : tagText(tag)}</option>`).join("");
       const active = filter.value || "All";
       const list = active === "All" ? evidence : evidence.filter(e => e.tag === active);
+      const l = ui().labels;
       document.getElementById("evidenceGrid").innerHTML = list.map(item => {
         const important = state.markedEvidence.includes(item.id);
         const expanded = state.expandedEvidence.includes(item.id);
         const used = state.usedEvidence.includes(item.id);
         return `<article class="evidence-card ${important ? "important" : ""} ${used ? "used" : ""}" data-evidence-card="${item.id}">
-          <div class="card-top"><div><span class="tag">${item.letter} · ${item.tag}</span><h3>${important ? "📌 " : ""}${item.title}</h3></div><span class="tag">${used ? "Used" : "Case note"}</span></div>
-          <p class="muted">${item.summary}</p>
-          <div class="controls-row"><button class="btn subtle" type="button" data-toggle-evidence="${item.id}" aria-expanded="${expanded}">${expanded ? "Collapse detail" : "Expand detail"}</button><button class="btn subtle" type="button" data-mark-evidence="${item.id}">${important ? "Unmark important" : "Mark important"}</button></div>
-          <div class="details ${expanded ? "open" : ""}"><p>${item.detail}</p><p><strong class="gold">Relevance:</strong> <span class="muted">${item.relevance}</span></p>${item.psychology ? `<p><strong class="gold">Psychology note:</strong> <span class="muted">${item.psychology}</span></p>` : ""}</div>
+          <div class="card-top"><div><span class="tag">${item.letter} · ${tagText(item.tag)}</span><h3>${important ? "📌 " : ""}${evidenceText(item, "title")}</h3></div><span class="tag">${used ? l.used : l.caseNote}</span></div>
+          <p class="muted">${evidenceText(item, "summary")}</p>
+          <div class="controls-row"><button class="btn subtle" type="button" data-toggle-evidence="${item.id}" aria-expanded="${expanded}">${expanded ? l.collapseDetail : l.expandDetail}</button><button class="btn subtle" type="button" data-mark-evidence="${item.id}">${important ? l.unmarkImportant : l.markImportant}</button></div>
+          <div class="details ${expanded ? "open" : ""}"><p>${evidenceText(item, "detail")}</p><p><strong class="gold">${l.relevance}</strong> <span class="muted">${evidenceText(item, "relevance")}</span></p>${item.psychology ? `<p><strong class="gold">${l.psychologyNote}</strong> <span class="muted">${evidenceText(item, "psychology")}</span></p>` : ""}</div>
         </article>`;
       }).join("");
       document.querySelectorAll("[data-toggle-evidence]").forEach(btn => btn.addEventListener("click", () => toggleEvidence(btn.dataset.toggleEvidence)));
@@ -922,44 +1115,54 @@
 
     function renderNotes(updateTextarea = true) {
       if (updateTextarea) document.getElementById("playerNotes").value = state.notes || "";
-      const statusSummary = suspects.map(s => `<p><strong>${s.name}:</strong> ${state.suspectStatuses[s.id] || "Unclear"}${state.markedSuspects.includes(s.id) ? " · marked suspicious" : ""}</p>`).join("");
+      const statusSummary = suspects.map(s => `<p><strong>${s.name}:</strong> ${statusText(state.suspectStatuses[s.id] || "Unclear")}${state.markedSuspects.includes(s.id) ? ui().markedSuspicious : ""}</p>`).join("");
       const important = evidence.filter(e => state.markedEvidence.includes(e.id));
       document.getElementById("statusSummary").innerHTML = statusSummary;
-      document.getElementById("importantEvidenceList").innerHTML = important.length ? important.map(e => `<p>📌 <strong>${e.title}</strong> — ${e.summary}</p>`).join("") : "<p>No evidence marked important yet.</p>";
-      document.getElementById("contradictionChecklist").innerHTML = ["Does the story coexist with the phone record?", "Can the suspect reach the study during 21:25–21:40?", "Is this a central lie or a side lie?", "Does the evidence show route + motive + contradiction?", "Am I punishing nervousness instead of testing facts?"].map(text => `<li>${text}</li>`).join("");
+      document.getElementById("importantEvidenceList").innerHTML = important.length ? important.map(e => `<p>📌 <strong>${evidenceText(e, "title")}</strong> — ${evidenceText(e, "summary")}</p>`).join("") : ui().noneImportant;
+      document.getElementById("contradictionChecklist").innerHTML = ui().checklist.map(text => `<li>${text}</li>`).join("");
     }
 
     function renderInterrogation() {
       document.getElementById("interrogateSuspect").innerHTML = suspects.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
-      document.getElementById("interrogateEvidence").innerHTML = evidence.map(e => `<option value="${e.id}">${e.title}</option>`).join("");
+      document.getElementById("interrogateEvidence").innerHTML = evidence.map(e => `<option value="${e.id}">${evidenceText(e, "title")}</option>`).join("");
+      if (state.currentConfrontation) renderConfrontationResponse(state.currentConfrontation.suspectId, state.currentConfrontation.evidenceId);
+    }
+
+    function renderConfrontationResponse(suspectId, evidenceId) {
+      const key = `${suspectId}|${evidenceId}`;
+      const suspect = suspects.find(s => s.id === suspectId);
+      const item = evidence.find(e => e.id === evidenceId);
+      if (!suspect || !item) return;
+      const preset = (lang() === "zh" ? confrontationsZh[key] : confrontations[key]) || ["weak", lang() === "zh" ? `${suspect.name} 面对${evidenceText(item, "title")}时没有给出有意义的新信息。` : `${suspect.name} gives no meaningful new ground when confronted with ${item.title}.`, lang() === "zh" ? "这组证据无法压迫核心说法。" : "This pairing does not pressure the central claim.", lang() === "zh" ? "弱质询仍能告诉你哪些证据属于别处。" : "A weak confrontation can still teach you which evidence belongs elsewhere."];
+      const box = document.getElementById("confrontationResponse");
+      box.className = `response-box pressure-${preset[0]}`;
+      box.innerHTML = `<span class="tag">${ui().labels.pressure} ${preset[0]}</span><h3>${suspect.name} × ${evidenceText(item, "title")}</h3><p>${preset[1]}</p><p><strong class="gold">${ui().labels.detectiveNote}</strong> ${preset[2]}</p><p><strong class="gold">${ui().labels.psychologyNote}</strong> ${preset[3]}</p>`;
     }
 
     function confrontSuspect() {
       const suspectId = document.getElementById("interrogateSuspect").value;
       const evidenceId = document.getElementById("interrogateEvidence").value;
       const key = `${suspectId}|${evidenceId}`;
-      const suspect = suspects.find(s => s.id === suspectId);
-      const item = evidence.find(e => e.id === evidenceId);
-      const preset = confrontations[key] || ["weak", `${suspect.name} gives no meaningful new ground when confronted with ${item.title}.`, "This pairing does not pressure the central claim.", "A weak confrontation can still teach you which evidence belongs elsewhere."];
+      const preset = (lang() === "zh" ? confrontationsZh[key] : confrontations[key]) || ["weak"];
       const attempt = { suspectId, evidenceId, pressure: preset[0], at: Date.now() };
       state.confrontationAttempts.push(attempt);
+      state.currentConfrontation = { suspectId, evidenceId };
       if (!state.usedEvidence.includes(evidenceId)) state.usedEvidence.push(evidenceId);
       saveState(); renderEvidence();
-      const box = document.getElementById("confrontationResponse");
-      box.className = `response-box pressure-${preset[0]}`;
-      box.innerHTML = `<span class="tag">Pressure: ${preset[0]}</span><h3>${suspect.name} × ${item.title}</h3><p>${preset[1]}</p><p><strong class="gold">Detective note:</strong> ${preset[2]}</p><p><strong class="gold">Psychology note:</strong> ${preset[3]}</p>`;
+      renderConfrontationResponse(suspectId, evidenceId);
       setActiveTab("interrogation");
     }
 
     function renderFinalDeduction() {
-      const lieOptions = suspects.map(s => ({ id: s.id === "celia" ? "celia-greenhouse-call" : `${s.id}-statement`, text: `${s.name}: “${s.testimony}”` }));
+      const lieOptions = suspects.map(s => ({ id: s.id === "celia" ? "celia-greenhouse-call" : `${s.id}-statement`, text: `${s.name}: “${suspectText(s, "testimony")}”` }));
       const selectedEvidence = state.finalSelections.evidence || [];
+      const d = ui().deduction;
       document.getElementById("deductionFields").innerHTML = `
-        <div class="paper-card"><h3>A. Who lied about the crucial time period?</h3><div class="option-list">${suspects.map(s => radioRow("suspect", s.id, s.name, state.finalSelections.suspect)).join("")}</div></div>
-        <div class="paper-card"><h3>B. Which testimony was the crucial lie?</h3><div class="option-list">${lieOptions.map(o => radioRow("lie", o.id, o.text, state.finalSelections.lie)).join("")}</div></div>
-        <div class="paper-card"><h3>C. Select two or three strongest evidence items.</h3><div class="option-list">${evidence.map(e => `<label class="option-row"><input type="checkbox" name="evidence" value="${e.id}" ${selectedEvidence.includes(e.id) ? "checked" : ""}> <span><strong>${e.title}</strong><br><span class="muted">${e.summary}</span></span></label>`).join("")}</div></div>
-        <div class="paper-card"><h3>D. What type of lie was it?</h3><div class="option-list">${[["fabrication","Complete fabrication"],["half-truth","Half-truth and selective omission"],["false-memory","False memory"],["exaggeration","Emotional exaggeration"]].map(o => radioRow("lieType", o[0], o[1], state.finalSelections.lieType)).join("")}</div></div>
-        <div class="paper-card"><h3>E. Optional typed deduction</h3><label for="theoryText">Write your theory in your own words.</label><textarea id="theoryText" name="theory">${escapeHtml(state.finalSelections.theory || "")}</textarea></div>`;
+        <div class="paper-card"><h3>${d.a}</h3><div class="option-list">${suspects.map(s => radioRow("suspect", s.id, s.name, state.finalSelections.suspect)).join("")}</div></div>
+        <div class="paper-card"><h3>${d.b}</h3><div class="option-list">${lieOptions.map(o => radioRow("lie", o.id, o.text, state.finalSelections.lie)).join("")}</div></div>
+        <div class="paper-card"><h3>${d.c}</h3><div class="option-list">${evidence.map(e => `<label class="option-row"><input type="checkbox" name="evidence" value="${e.id}" ${selectedEvidence.includes(e.id) ? "checked" : ""}> <span><strong>${evidenceText(e, "title")}</strong><br><span class="muted">${evidenceText(e, "summary")}</span></span></label>`).join("")}</div></div>
+        <div class="paper-card"><h3>${d.d}</h3><div class="option-list">${d.lieTypes.map(o => radioRow("lieType", o[0], o[1], state.finalSelections.lieType)).join("")}</div></div>
+        <div class="paper-card"><h3>${d.e}</h3><label for="theoryText">${d.theory}</label><textarea id="theoryText" name="theory">${escapeHtml(state.finalSelections.theory || "")}</textarea></div>`;
       document.querySelectorAll("#deductionFields input, #theoryText").forEach(input => input.addEventListener("input", saveFinalSelections));
       document.querySelectorAll("#deductionFields input[type=radio], #deductionFields input[type=checkbox]").forEach(input => input.addEventListener("change", saveFinalSelections));
     }
@@ -1002,7 +1205,7 @@
     function submitDeduction(event) {
       event.preventDefault();
       saveFinalSelections();
-      if (!confirm("Are you ready to accuse?")) return;
+      if (!confirm(ui().confirmAccuse)) return;
       const parts = calculateScore();
       const total = parts.suspect + parts.lie + parts.evidence + parts.psychology;
       state.finalResult = { total, parts, selections: Object.assign({}, state.finalSelections), submittedAt: new Date().toISOString(), showReconstruction: false, showNotes: false };
@@ -1011,22 +1214,25 @@
 
     function renderResult() {
       const mount = document.getElementById("resultMount");
+      const r = ui().result;
       if (!state.finalResult) {
-        mount.innerHTML = `<article class="case-card"><p class="eyebrow">No accusation submitted</p><h2 id="resultTitle">Result</h2><p class="muted">Submit your final deduction to see score, feedback, reconstruction, and psychology notes.</p><button class="btn primary" type="button" data-jump="deduction">Go to final deduction →</button></article>`;
+        mount.innerHTML = `<article class="case-card"><p class="eyebrow">${r.noneEye}</p><h2 id="resultTitle">${r.title}</h2><p class="muted">${r.none}</p><button class="btn primary" type="button" data-jump="deduction">${r.go}</button></article>`;
         mount.querySelector("[data-jump]").addEventListener("click", e => setActiveTab(e.currentTarget.dataset.jump));
         return;
       }
       const result = state.finalResult;
       const rank = getRank(result.total);
-      const selectedName = (suspects.find(s => s.id === result.selections.suspect) || {}).name || "No suspect selected";
-      mount.innerHTML = `<article class="case-card score-card"><p class="eyebrow">Case result</p><h2 id="resultTitle">${rank}</h2><div class="score-number">${result.total}</div><p class="muted">Score out of 100 · Selected suspect: ${selectedName}</p><div class="controls-row" style="justify-content:center"><button class="btn primary" type="button" id="reconstructionBtn">Show Full Case Reconstruction</button><button class="btn subtle" type="button" id="reviewNotesBtn">Review My Notes</button><button class="btn subtle" type="button" id="resultResetBtn">Reset Case</button><a class="btn subtle" href="index.html">Back to Hub</a></div></article>
-        <article class="paper-card"><h3>Correct / incorrect sections</h3>${scoreLine("Correct suspect", result.parts.suspect, 40)}${scoreLine("Crucial lie", result.parts.lie, 25)}${scoreLine("Evidence combo", result.parts.evidence, 25)}${scoreLine("Psychology classification", result.parts.psychology, 10)}</article>
-        <article class="paper-card"><h3>Suspect feedback</h3><p class="muted">${getSuspectFeedback(result.selections.suspect)}</p></article>
-        <article class="paper-card"><h3>Evidence feedback</h3><p class="muted">${getEvidenceFeedback(result.selections.evidence || [])}</p></article>
-        <article class="paper-card"><h3>Psychological lesson</h3><p class="muted">The central lie was a half-truth and selective omission: Celia really was in the greenhouse and really made a call, but the 9-second call was cover for retrieving the spare key and entering the study.</p></article>
-        <article class="case-card ${result.showReconstruction ? "" : "hidden"}" id="reconstructionPanel"><h3>Full Case Reconstruction</h3><ul class="timeline">${timeline.map(t => `<li><time>${t[0]}</time><span>${t[1]}</span></li>`).join("")}</ul></article>
-        <article class="case-card ${result.showNotes ? "" : "hidden"}" id="reviewNotesPanel"><h3>Your notes</h3><p class="muted">${escapeHtml(state.notes || "No notes saved.").replace(/\n/g, "<br>")}</p></article>
-        <div class="grid three">${psychologyNotes.map(n => `<article class="sticky-note"><h3>${n[0]}</h3><p>${n[1]}</p></article>`).join("")}</div>`;
+      const selectedName = (suspects.find(s => s.id === result.selections.suspect) || {}).name || r.noneSuspect;
+      const notes = activePsychologyNotes();
+      const caseTimeline = activeTimeline();
+      mount.innerHTML = `<article class="case-card score-card"><p class="eyebrow">${r.eye}</p><h2 id="resultTitle">${rank}</h2><div class="score-number">${result.total}</div><p class="muted">${r.score(selectedName)}</p><div class="controls-row" style="justify-content:center"><button class="btn primary" type="button" id="reconstructionBtn">${r.showRecon}</button><button class="btn subtle" type="button" id="reviewNotesBtn">${r.reviewNotes}</button><button class="btn subtle" type="button" id="resultResetBtn">${r.reset}</button><a class="btn subtle" href="index.html">${r.hub}</a></div></article>
+        <article class="paper-card"><h3>${r.sections}</h3>${scoreLine(r.suspectScore, result.parts.suspect, 40)}${scoreLine(r.lieScore, result.parts.lie, 25)}${scoreLine(r.evidenceScore, result.parts.evidence, 25)}${scoreLine(r.psychScore, result.parts.psychology, 10)}</article>
+        <article class="paper-card"><h3>${r.suspectFeedback}</h3><p class="muted">${getSuspectFeedback(result.selections.suspect)}</p></article>
+        <article class="paper-card"><h3>${r.evidenceFeedback}</h3><p class="muted">${getEvidenceFeedback(result.selections.evidence || [])}</p></article>
+        <article class="paper-card"><h3>${r.lessonTitle}</h3><p class="muted">${r.lesson}</p></article>
+        <article class="case-card ${result.showReconstruction ? "" : "hidden"}" id="reconstructionPanel"><h3>${r.reconstruction}</h3><ul class="timeline">${caseTimeline.map(t => `<li><time>${t[0]}</time><span>${t[1]}</span></li>`).join("")}</ul></article>
+        <article class="case-card ${result.showNotes ? "" : "hidden"}" id="reviewNotesPanel"><h3>${r.yourNotes}</h3><p class="muted">${escapeHtml(state.notes || r.noNotes).replace(/\n/g, "<br>")}</p></article>
+        <div class="grid three">${notes.map(n => `<article class="sticky-note"><h3>${n[0]}</h3><p>${n[1]}</p></article>`).join("")}</div>`;
       document.getElementById("reconstructionBtn").addEventListener("click", showReconstruction);
       document.getElementById("reviewNotesBtn").addEventListener("click", () => { state.finalResult.showNotes = !state.finalResult.showNotes; saveState(); renderResult(); });
       document.getElementById("resultResetBtn").addEventListener("click", resetCase);
@@ -1038,6 +1244,13 @@
     }
 
     function getRank(score) {
+      if (lang() === "zh") {
+        if (score >= 90) return "半真相大师";
+        if (score >= 75) return "锐利调查员";
+        if (score >= 55) return "谨慎但误入歧途";
+        if (score >= 30) return "追逐模式的人";
+        return "被最吵的嫌疑人误导";
+      }
       if (score >= 90) return "Master of Half-Truths";
       if (score >= 75) return "Sharp Investigator";
       if (score >= 55) return "Careful but Misdirected";
@@ -1046,6 +1259,17 @@
     }
 
     function getSuspectFeedback(id) {
+      if (lang() === "zh") {
+        const feedback = {
+          julian: "你可能被情绪最强烈的人吸引了。愤怒、讽刺和防御不是欺骗证据。把他的说法与酒窖证据比较。",
+          nina: "你找到一个真实谎言，但不是核心谎言。Nina 的红酒说法是假的，却不能解释电话记录、温室路线或录音笔。",
+          mara: "Mara 操控感强，也有所隐瞒，但证据链没有把她放进书房。她的谎是观察性和自我驱动的，不是核心行动。",
+          tomas: "他的沉默是保护性遗漏，不是主要行动谎言。他可能延迟了真相，但物理路线指向别处。",
+          theo: "Theo 的紧张很明显，但可见焦虑不是罪责。钢琴证据反而帮助解释他的位置。",
+          celia: "你识别出核心半真相。她谎言最强的部分，正是其中包含真实细节：温室和电话。"
+        };
+        return feedback[id] || "没有选择嫌疑人，因此指控缺少核心理论。";
+      }
       const feedback = {
         julian: "You may have been pulled toward the most emotional suspect. Anger, sarcasm, and defensiveness are not proof of deception. Compare his claim with the wine cellar evidence.",
         nina: "You found a real lie, but not the central one. Nina’s red wine story is false, yet it does not explain the phone record, greenhouse route, or recorder.",
@@ -1059,6 +1283,13 @@
 
     function getEvidenceFeedback(selected) {
       const set = new Set(selected);
+      if (lang() === "zh") {
+        if (set.has("phone-record") && set.has("spare-key") && set.has("recorder")) return "优秀证据链：电话记录击穿陈述目的，备用钥匙解释进入方式，录音笔把冲突放进书房。";
+        if (set.has("phone-record") && ["spare-key", "mud-print", "recorder", "candle-wax"].some(id => set.has(id))) return "很强的证据链。你把 9 秒通话与路线或冲突证据结合起来，这是揭穿 Celia 半真相最公平的方法。";
+        if (set.has("iris-perfume") && selected.length === 1) return "鸢尾香水只是支持性证据。因为 Nina 和 Celia 都使用鸢尾调，它不能独自支撑指控。";
+        if (["red-wine", "glass-fragments"].some(id => set.has(id))) return "你发现了 Nina 周围的另一个谎言。这很重要，但不能解释 Celia 的电话记录、备用钥匙路线或录音笔。";
+        return "最强证据链从电话记录开始，再加入备用钥匙、泥印、蜡迹或录音笔等路线证据。";
+      }
       if (set.has("phone-record") && set.has("spare-key") && set.has("recorder")) return "Excellent chain: the phone record breaks the stated purpose, the spare key explains access, and the recorder places a confrontation in the study.";
       if (set.has("phone-record") && ["spare-key", "mud-print", "recorder", "candle-wax"].some(id => set.has(id))) return "Strong chain. You paired the 9-second call with route or confrontation evidence, which is the fairest way to expose Celia’s half-truth.";
       if (set.has("iris-perfume") && selected.length === 1) return "Iris perfume is only supporting evidence. Because both Nina and Celia use iris scents, it cannot carry the accusation alone.";
@@ -1072,9 +1303,10 @@
     }
 
     function showHint() {
-      const index = Math.min(state.hintLevel, hints.length - 1);
-      alert(`Hint ${index + 1}: ${hints[index]}`);
-      if (state.hintLevel < hints.length) state.hintLevel += 1;
+      const hintList = activeHints();
+      const index = Math.min(state.hintLevel, hintList.length - 1);
+      alert(`${ui().hintPrefix} ${index + 1}: ${hintList[index]}`);
+      if (state.hintLevel < hintList.length) state.hintLevel += 1;
       saveState();
     }
 
@@ -1087,9 +1319,9 @@
       const percent = Math.min(100, Math.round(((evidenceReviewed / evidence.length) * 36) + ((suspectsReviewed / suspects.length) * 24) + Math.min(confrontationsTried, 6) * 4 + Math.min(evidenceMarked, 6) * 2 + finalDone * 14));
       document.getElementById("progressText").textContent = percent + "%";
       document.getElementById("progressBar").style.width = percent + "%";
-      document.getElementById("reviewStats").textContent = `Evidence reviewed: ${evidenceReviewed}/${evidence.length} · Suspects reviewed: ${suspectsReviewed}/${suspects.length} · Confrontations tried: ${confrontationsTried}`;
-      const focus = percent < 25 ? "Start with the timeline." : percent < 50 ? "Compare testimony with physical evidence." : percent < 78 ? "Try confronting a suspect with evidence." : "Submit your final deduction.";
-      document.getElementById("focusLine").textContent = "Current focus: " + focus;
+      document.getElementById("reviewStats").textContent = ui().reviewed(evidenceReviewed, evidence.length, suspectsReviewed, suspects.length, confrontationsTried);
+      const focus = percent < 25 ? ui().focus[0] : percent < 50 ? ui().focus[1] : percent < 78 ? ui().focus[2] : ui().focus[3];
+      document.getElementById("focusLine").textContent = ui().focusPrefix + focus;
     }
 
     function toggleArray(array, value) {
